@@ -19,7 +19,7 @@
     </div>
     <div class="">
       <div class="keyboard-list">
-        <div v-for="keyboard in keyboardHistory" :key="keyboard.id" class="keyboard-preview">
+        <div v-for="keyboard in keyboardHistory" :key="keyboard.id" class="keyboard-preview" @click="selectKeyboard(keyboard.path)">
           <div class="image">
             <img :src="keyboard.image" alt="" />
           </div>
@@ -30,11 +30,11 @@
             <div>
               <div
                 v-for="tag in keyboard.tags"
-                :key="tag.label"
+                :key="tag"
                 class="badge"
-                :style="{ backgroundColor: tag.color }"
+                :style="{ backgroundColor: '#ea871a' }"
               >
-                {{ tag.label }}
+                {{ tag }}
               </div>
             </div>
           </div>
@@ -49,28 +49,28 @@
 import { ref } from 'vue'
 import { ulid } from 'ulid'
 import { useRouter } from 'vue-router'
-import {keyboardStore} from "../store";
+import {keyboardStore, keyboardHistory} from "../store";
 const router = useRouter()
-
-const keyboardHistory = ref<
-  {
-    id: string
-    name: string
-    description: string
-    image: string
-    path: string
-    tags: { label: string; color: string; category: 'formfactor' }[]
-  }[]
->([])
-
-keyboardHistory.value.push({
-  id: ulid(),
-  name: '0xCB New Horizons',
-  description: '65% keyboard with rotary encoder',
-  path: '/Volumes/Helios',
-  image: '',
-  tags: [{ category: 'formfactor', label: '65%', color: '#399453' }]
-})
+//
+// const keyboardHistory = ref<
+//   {
+//     id: string
+//     name: string
+//     description: string
+//     image: string
+//     path: string
+//     tags: { label: string; color: string; category: 'formfactor' }[]
+//   }[]
+// >([])
+//
+// keyboardHistory.value.push({
+//   id: ulid(),
+//   name: '0xCB New Horizons',
+//   description: '65% keyboard with rotary encoder',
+//   path: '/Volumes/Helios',
+//   image: '',
+//   tags: [{ category: 'formfactor', label: '65%', color: '#399453' }]
+// })
 
 const addKeyboard = () => {
   router.push('/add-keyboard')
@@ -85,6 +85,12 @@ const selectDrive = async () => {
   } else {
     router.push('/setup-wizard')
   }
+}
+const selectKeyboard = async (keyboardPath) => {
+  const keyboard = await window.api.selectKeyboard(keyboardPath)
+  console.log(keyboard)
+  keyboardStore.import(keyboard)
+  router.push('/configurator')
 }
 </script>
 

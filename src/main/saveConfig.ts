@@ -1,6 +1,19 @@
 import * as fs from 'fs-extra'
 import { currentKeyboard } from './store'
 // save code.py based on pog.json
+
+export const saveConfiguration = (data: string) => {
+  const {pogConfig, writeFirmware} = JSON.parse(data)
+  // write pog.json config
+  // write pog.json
+  fs.writeFile(currentKeyboard.path + '/pog.json', JSON.stringify(pogConfig, null, 4), () => {
+    console.log('pog File written successfully\n')
+  })
+  if (writeFirmware) {
+    console.log('should also write firmware files')
+  }
+}
+
 export const handleKeymapSave = (jsondata) => {
   console.log('saving keymap', jsondata)
   const data = JSON.parse(jsondata)

@@ -9,10 +9,12 @@ export const handleSelectDrive = async () => {
   if (canceled) {
     return
   }
-
-  const folderContents = await fs.promises.readdir(`${filePaths[0]}`)
+  return await loadKeyboard(filePaths[0])
+}
+const loadKeyboard = async (path) => {
+  const folderContents = await fs.promises.readdir(`${path}`)
   // check for kmk, code.py and boot.py
-  currentKeyboard.path = filePaths[0]
+  currentKeyboard.path = path
   let codeContents: string | undefined = undefined
   if (folderContents.includes('code.py')) {
     codeContents = await fs.promises.readFile(`${currentKeyboard.path}/code.py`, {
@@ -29,10 +31,15 @@ export const handleSelectDrive = async () => {
       })
     )
   }
+  console.log('found something', folderContents)
   return {
-    path: filePaths[0],
+    path,
     folderContents,
     codeContents,
     configContents
   }
+}
+export const selectKeyboard = async (keyboardPath) => {
+  console.log('checking keyboard files for', keyboardPath)
+  return await loadKeyboard(keyboardPath)
 }

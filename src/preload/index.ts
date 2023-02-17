@@ -5,6 +5,8 @@ import { electronAPI } from '@electron-toolkit/preload'
 export const API = {
   selectDrive: () => ipcRenderer.invoke('selectDrive'),
   updateFirmware: () => ipcRenderer.invoke('updateFirmware'),
+  saveConfiguration: (data) => ipcRenderer.send('saveConfiguration', data),
+  selectKeyboard: (data) => ipcRenderer.invoke('selectKeyboard', data),
   onUpdateFirmwareInstallProgress: (callback) =>
     ipcRenderer.on('onUpdateFirmwareInstallProgress', callback)
 }

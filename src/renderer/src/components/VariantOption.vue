@@ -1,80 +1,51 @@
 <template>
-  <div
-    v-if="Array.isArray(variant)"
-    class="grid grid-cols-2 items-center gap-4 h-12"
-  >
+  <div v-if="layout.variants && layout.variants.length > 0" class="grid h-12 grid-cols-2 items-center gap-4">
     <p class="text-right">
       {{ variantName }}
     </p>
-    <select
-      @change="selectMultiVariant"
-      v-model="selectedOption"
-      class="select select-bordered"
-    >
-      <option
-        :value="oindex"
-        v-for="(option, oindex) in variant.filter((a, i) => i !== 0)"
-      >
+    <select v-model="selectedOption" class="select-bordered select" @change="selectMultiVariant">
+      <option v-for="(option, oindex) in layout.variants.filter((a, i) => i !== 0)" :value="oindex">
         {{ option }}
       </option>
     </select>
   </div>
-  <div v-else class="grid grid-cols-2 items-center gap-4 h-12">
+  <div v-else class="grid h-12 grid-cols-2 items-center gap-4">
     <p class="text-right">
-      <input v-model="variantName" class="input input-sm input-bordered" />
+      <input v-model="variantName" class="input-bordered input input-sm" />
     </p>
     <div class="flex gap-4">
-      <input
-        type="checkbox"
-        class="checkbox"
-        v-model="selectedBool"
-        @input="selectBool"
-      />
+      <input v-model="selectedBool" type="checkbox" class="checkbox" @input="selectBool" />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from "vue";
-import { selectedConfig, selectedVariants } from "../store";
+import { computed, ref } from 'vue'
+import { keyboardStore } from '../store'
 
-const props = defineProps(["variant", "index"]);
-const selectedOption = ref(0);
-const selectedBool = ref(false);
-if (selectedConfig.value && selectedConfig.value.selectedVariants) {
-  selectedBool.value =
-    selectedConfig.value.selectedVariants[props.index] === 1;
-  selectedOption.value = selectedConfig.value.selectedVariants[props.index];
-}
+const props = defineProps(['layout', 'index'])
+const selectedOption = ref(0)
+const selectedBool = ref(false)
+selectedBool.value = keyboardStore.layouts[props.index].selected === 1
+selectedOption.value = keyboardStore.layouts[props.index].selected
 const selectMultiVariant = () => {
-  selectVariant({ layout: props.index, variant: selectedOption.value });
-};
+  selectVariant({ layoutIndex: props.index, variant: selectedOption.value })
+}
 const selectBool = () => {
-  selectVariant({ layout: props.index, variant: !selectedBool.value ? 1 : 0 });
-};
-const selectVariant = ({
-  layout,
-  variant,
-}: {
-  layout: number;
-  variant: number;
-}) => {
-  if (!selectedConfig.value) return;
-  if (!selectedConfig.value.selectedVariants) selectedConfig.value.selectedVariants = []
-  selectedConfig.value.selectedVariants[layout] = variant;
-};
+  selectVariant({ layoutIndex: props.index, variant: !selectedBool.value ? 1 : 0 })
+}
+const selectVariant = ({ layoutIndex, variant }: { layoutIndex: number; variant: number }) => {
+  keyboardStore.layouts[layoutIndex].selected = variant
+}
 
 const variantName = computed({
   get() {
-    if (Array.isArray(props.variant)) return props.variant[0];
-    return props.variant;
+    return props.layout.name
   },
   set(newVal) {
-    if (Array.isArray(props.variant)) props.variant[0] = newVal;
-    if (selectedConfig.value)
-      selectedConfig.value.layouts.labels[props.index] = newVal;
-  },
-});
+    keyboardStore.layouts[props.index].name = newVal
+  }
+})
 </script>
 
 <style lang="scss" scoped></style>

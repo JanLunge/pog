@@ -2,8 +2,9 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { handleSelectDrive } from './selectKeyboard'
+import {handleSelectDrive, selectKeyboard} from './selectKeyboard'
 import { updateFirmware } from './kmkUpdater'
+import { saveConfiguration } from './saveConfig'
 
 let mainWindow: BrowserWindow | null = null
 export { mainWindow }
@@ -83,3 +84,5 @@ app.on('window-all-closed', () => {
 
 ipcMain.handle('selectDrive', () => handleSelectDrive())
 ipcMain.handle('updateFirmware', () => updateFirmware())
+ipcMain.on('saveConfiguration', (_event, data) => saveConfiguration(data))
+ipcMain.handle('selectKeyboard', (_event, data) => selectKeyboard(data))

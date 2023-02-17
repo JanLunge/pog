@@ -6,14 +6,14 @@
     </p>
 
     <div class="mb-4">
-      <p class="text-sm mb-2">Wiring Method</p>
-      <select v-model="keyboardStore.wiringMethod" class="select select-bordered w-full">
+      <p class="mb-2 text-sm">Wiring Method</p>
+      <select v-model="keyboardStore.wiringMethod" class="select-bordered select w-full">
         <option value="matrix">Matrix</option>
         <option value="direct">Direct Pins</option>
       </select>
     </div>
 
-    <div v-if="keyboardStore.wiringMethod === 'matrix'" class="grid grid-cols-2 gap-2 mb-8">
+    <div v-if="keyboardStore.wiringMethod === 'matrix'" class="mb-8 grid grid-cols-2 gap-2">
       <InputLabel
         v-model="keyboardStore.cols"
         placeholder="1"
@@ -41,10 +41,10 @@
         @input="checkMatrix"
       ></InputLabel>
     </div>
-    <div class="flex justify-center mb-8">
-      <div class="btn btn-primary" :class="{ 'btn-disabled': matrixEmpty }" @click="$emit('next')">
+    <div class="mb-8 flex justify-center" v-if="initialSetup">
+      <button class="btn-primary btn" :class="{ 'btn-disabled': matrixEmpty }" @click="$emit('next')">
         Next
-      </div>
+      </button>
     </div>
     <div v-if="keyboardStore.wiringMethod === 'matrix'" class="grid-visualizer">
       <div v-for="row in keyboardStore.rows" class="row">
@@ -58,7 +58,7 @@
 import InputLabel from './ui/InputLabel.vue'
 import { keyboardStore } from '../store'
 import { computed } from 'vue'
-
+const props = defineProps(['initialSetup'])
 const matrixEmpty = computed(() => {
   return !(
     keyboardStore.cols !== 0 &&

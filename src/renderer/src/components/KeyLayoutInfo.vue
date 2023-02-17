@@ -88,7 +88,7 @@
 </template>
 
 <script lang="ts" setup>
-import { selectedKey, selectedKeys } from "../store";
+import { selectedKeys } from "../store";
 import { computed, ref, watch } from "vue";
 import { isNumber } from "@vueuse/core";
 
@@ -181,6 +181,7 @@ watch(
 
 const updateKey = () => {
   selectedKeys.value.forEach((keyIndex) => {
+    console.log('updating key with index', keyIndex, props.layout[keyIndex])
     // only modify if a field has a value
     // validate all fields and remove things that are set to default
     if (tmpKey.value.x !== "")

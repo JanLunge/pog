@@ -1,23 +1,25 @@
 <template>
-  <div v-if="selectedConfig && selectedConfig.layouts">
-    <p class="text-xl font-bold mb-4">Layout Options</p>
-    <button class="btn btn-sm" @click="addLayoutOption">
-      add Layout Option
-    </button>
+  <div>
+    <p class="mb-4 text-xl font-bold">Layout Options</p>
+    <button class="btn-sm btn" @click="addLayoutOption">add Layout Option</button>
     <VariantOption
-      v-for="(variant, index) in selectedConfig.layouts.labels"
-      :variant="variant"
+      v-for="(layout, index) in keyboardStore.layouts"
+      :layout="layout"
       :index="index"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { selectedConfig } from "../store";
-import VariantOption from "./VariantOption.vue";
+import { keyboardStore } from '../store'
+import VariantOption from './VariantOption.vue'
 const addLayoutOption = () => {
-  selectedConfig.value?.layouts.labels.push("");
-};
+  keyboardStore.layouts.push({
+    name: 'variant',
+    selected: 0,
+    variants: []
+  })
+}
 </script>
 
 <style lang="scss" scoped></style>

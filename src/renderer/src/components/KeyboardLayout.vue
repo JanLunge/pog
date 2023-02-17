@@ -6,24 +6,24 @@
     :on-start="onStart"
   >
     <div
-      class="flex items-center justify-center my-5 relative"
       id="keyboardlayout-wrapper"
+      class="relative my-5 flex items-center justify-center"
       :style="{ height: keyboardScale * (keyboardHeight * 58) + 'px' }"
     >
       <div
-        class="relative w-full h-64"
         id="keyboardlayout"
+        class="relative h-64 w-full"
         :style="{
           width: keyboardWidth * 58 + 'px',
           height: keyboardHeight * 58 + 'px',
-          transform: `scale( ${keyboardScale})`,
+          transform: `scale( ${keyboardScale})`
         }"
         style="transform-origin: center left"
-        :class="{dragging: moving}"
+        :class="{ dragging: moving }"
       >
         <div
-          class="rotation-origin-helper"
           v-if="mode === 'layout' && selectedKeys.size !== 0"
+          class="rotation-origin-helper"
           :style="{ left: rotationOriginX, top: rotationOriginY }"
         ></div>
         <div class="wire-preview">
@@ -31,11 +31,11 @@
         </div>
 
         <key-cap
-          v-for="(key, keyIndex) in keyLayout.keys"
-          @selected="keyChanged"
+          v-for="(key, keyIndex) in keyLayout"
           :key-data="key"
           :key-index="keyIndex"
           :mode="mode"
+          @selected="keyChanged"
         >
         </key-cap>
       </div>
@@ -44,52 +44,52 @@
 </template>
 
 <script lang="ts" setup>
-import KeyCap from "./KeyCap.vue";
-import { computed, onDeactivated, onMounted, onUnmounted, ref } from "vue";
-import { selectedConfig, selectedKey, selectedKeys } from "../store";
-import { SelectionArea } from "@viselect/vue";
-import type { SelectionEvent } from "@viselect/vue";
-import { isNumber } from "@vueuse/core";
+import KeyCap from './KeyCap.vue'
+import { computed, onDeactivated, onMounted, onUnmounted, ref } from 'vue'
+import { keyboardStore, selectedKeys } from '../store'
+import { SelectionArea } from '@viselect/vue'
+import type { SelectionEvent } from '@viselect/vue'
+import { isNumber } from '@vueuse/core'
 import { useDebounceFn } from '@vueuse/core'
-const props = defineProps(["keyLayout", "mode"]);
+const props = defineProps(['keyLayout', 'mode'])
 // mode can be layout or keymap
 
 // find right edge
 const keyboardWidth = computed(() => {
-  let maxW = 0;
-  props.keyLayout.keys.forEach((k: any) => {
-    let width = k.w || 1;
-    let rightEdge = k.x + width;
+  let maxW = 0
+  props.keyLayout.forEach((k) => {
+    const width = k.w || 1
+    const rightEdge = k.x + width
     if (rightEdge > maxW) {
-      maxW = rightEdge;
+      maxW = rightEdge
     }
-  });
-  return maxW;
-});
+  })
+  return maxW
+})
 
 // find bottom edge
 const keyboardHeight = computed(() => {
-  let maxH = 0;
-  props.keyLayout.keys.forEach((k: KeyData) => {
-    let height = k.h || 1;
-    let bottomEdge = k.y + height;
+  let maxH = 0
+  props.keyLayout.forEach((k) => {
+    const height = k.h || 1
+    const bottomEdge = k.y + height
     if (bottomEdge > maxH) {
-      maxH = bottomEdge;
+      maxH = bottomEdge
     }
-  });
-  return maxH;
-});
+  })
+  return maxH
+})
 
 const keyChanged = ({
   key,
   args,
   keyIndex,
-  added,
+  added
 }: {
-  key: number[];
-  args: boolean;
-  keyIndex: number;
-  added: boolean;
+  key: number[]
+  args: boolean
+  keyIndex: number
+  added: boolean
 }) => {
   // if (added && props.mode === "layout") {
   //   selectedKeys.value.add(keyIndex);
@@ -99,42 +99,39 @@ const keyChanged = ({
   // selectedKey.value.key = key;
   // selectedKey.value.args = args;
   // selectedKey.value.keyIndex = keyIndex;
-};
-const keyboardScale = ref(1);
+}
+const keyboardScale = ref(1)
 const updateScale = () => {
-  const wrapper = document.querySelector("#keyboardlayout-wrapper");
+  const wrapper = document.querySelector('#keyboardlayout-wrapper')
   if (wrapper) {
-    const wrapperWidth = wrapper.clientWidth;
-    keyboardScale.value = Math.min(
-      wrapperWidth / (keyboardWidth.value * 58),
-      1
-    );
+    const wrapperWidth = wrapper.clientWidth
+    keyboardScale.value = Math.min(wrapperWidth / (keyboardWidth.value * 58), 1)
   }
-};
+}
 onMounted(() => {
   // adjust keyboard size to fit
-  updateScale();
-  window.addEventListener("resize", updateScale);
-});
+  updateScale()
+  window.addEventListener('resize', updateScale)
+})
 
 onUnmounted(() => {
-  window.removeEventListener("resize", updateScale);
-});
+  window.removeEventListener('resize', updateScale)
+})
 
 const rotationOriginX = computed(() => {
-  if (!selectedKeys.value.size) return 0;
+  if (!selectedKeys.value.size) return 0
   const firstSelectedKey = [...selectedKeys.value][0]
-  if (!props.keyLayout.keys[firstSelectedKey]) return "0";
-  let x = props.keyLayout.keys[firstSelectedKey].rx * 58;
-  return `${x}px`; // return "xpx ypx"
-});
+  if (!props.keyLayout.keys[firstSelectedKey]) return '0'
+  const x = props.keyLayout.keys[firstSelectedKey].rx * 58
+  return `${x}px` // return "xpx ypx"
+})
 const rotationOriginY = computed(() => {
-  if (!selectedKeys.value.size) return 0;
+  if (!selectedKeys.value.size) return 0
   const firstSelectedKey = [...selectedKeys.value][0]
-  if (!props.keyLayout.keys[firstSelectedKey]) return "0";
-  let y = props.keyLayout.keys[firstSelectedKey].ry * 58;
-  return `${y}px`; // return "xpx ypx"
-});
+  if (!props.keyLayout.keys[firstSelectedKey]) return '0'
+  const y = props.keyLayout.keys[firstSelectedKey].ry * 58
+  return `${y}px` // return "xpx ypx"
+})
 
 // const deselectKey = (e: MouseEvent) => {
 //   console.log(e);
@@ -148,79 +145,79 @@ const rotationOriginY = computed(() => {
 // };
 const extractIndexes = (els: Element[]): number[] => {
   return els
-    .map((v) => v.getAttribute("data-index"))
+    .map((v) => v.getAttribute('data-index'))
     .filter((a) => !isNumber(a))
-    .map(Number);
-};
-const moving = ref(false);
-const moveStart = ref({ x: 0, y: 0 });
-const writtenDelta = ref({ x: 0, y: 0 });
+    .map(Number)
+}
+const moving = ref(false)
+const moveStart = ref({ x: 0, y: 0 })
+const writtenDelta = ref({ x: 0, y: 0 })
 const onStart = ({ event, selection }: SelectionEvent) => {
-  if (event?.shiftKey && props.mode === "layout") {
+  if (event?.shiftKey && props.mode === 'layout') {
     if (event instanceof MouseEvent) {
       // save start point
-      moving.value = true;
-      moveStart.value.x = event.clientX;
-      moveStart.value.y = event.clientY;
-      selection.getSelectionArea().classList.add("hidden");
+      moving.value = true
+      moveStart.value.x = event.clientX
+      moveStart.value.y = event.clientY
+      writtenDelta.value.x = 0
+      writtenDelta.value.y = 0
+      selection.getSelectionArea().classList.add('hidden')
     }
-    return;
+    return
   }
-  selection.getSelectionArea().classList.remove("hidden");
+  selection.getSelectionArea().classList.remove('hidden')
   if (!event?.ctrlKey && !event?.metaKey) {
-    selection.clearSelection();
-    selectedKeys.value.clear();
+    selection.clearSelection()
+    selectedKeys.value.clear()
   }
-};
+}
 const roundNearQtr = (number: number) => {
-  return Math.round(number * 4) / 4;
-};
+  return Math.round(number * 4) / 4
+}
 const onMove = ({
   store: {
-    changed: { added, removed },
+    changed: { added, removed }
   },
   event,
-  selection,
+  selection
 }: SelectionEvent) => {
-  if (event?.shiftKey && props.mode === "layout") {
+  if (event?.shiftKey && props.mode === 'layout') {
     if (event instanceof MouseEvent) {
       // console.log(event, selection);
-      moving.value = true;
+      moving.value = true
       // move keys by start distance
-      let delta = { x: 0, y: 0 };
-      delta.x = (event.clientX - moveStart.value.x ) * (1/keyboardScale.value);
-      delta.y = (event.clientY - moveStart.value.y) *(1/ keyboardScale.value);
-      console.log(delta);
+      const delta = { x: 0, y: 0 }
+      delta.x = (event.clientX - moveStart.value.x) * (1 / keyboardScale.value)
+      delta.y = (event.clientY - moveStart.value.y) * (1 / keyboardScale.value)
+      console.log(delta)
       // snap in every 0.25 of a key width 58
       const deltaTmp = {
         x: roundNearQtr(delta.x / 58),
-        y: roundNearQtr(delta.y / 58),
-      };
+        y: roundNearQtr(delta.y / 58)
+      }
       // subtract already written distance
-      console.log(deltaTmp);
+      console.log(deltaTmp)
       const writableDelta = {
         x: deltaTmp.x - writtenDelta.value.x,
-        y: deltaTmp.y - writtenDelta.value.y,
-      };
-      writtenDelta.value.x = deltaTmp.x;
-      writtenDelta.value.y = deltaTmp.y;
-      console.log("w", writableDelta);
+        y: deltaTmp.y - writtenDelta.value.y
+      }
+      writtenDelta.value.x = deltaTmp.x
+      writtenDelta.value.y = deltaTmp.y
+      console.log(writableDelta)
       // write to each key
       selectedKeys.value.forEach((keyIndex) => {
-        selectedConfig.value!.layouts.keymap[keyIndex].x =
-          selectedConfig.value!.layouts.keymap[keyIndex].x + writableDelta.x;
-        selectedConfig.value!.layouts.keymap[keyIndex].y =
-          selectedConfig.value!.layouts.keymap[keyIndex].y + writableDelta.y;
-      });
+        keyboardStore.keys[keyIndex].delta({ property: 'x', value: writableDelta.x })
+        keyboardStore.keys[keyIndex].delta({ property: 'y', value: writableDelta.y })
+      })
     }
 
     resetMoving()
-    return;
+    return
   }
-  extractIndexes(added).forEach((id) => selectedKeys.value.add(id));
-  extractIndexes(removed).forEach((id) => selectedKeys.value.delete(id));
-  console.log(added, removed);
-};
+  extractIndexes(added).forEach((id) => selectedKeys.value.add(id))
+  extractIndexes(removed).forEach((id) => selectedKeys.value.delete(id))
+  console.log(added, removed)
+}
 const resetMoving = useDebounceFn(() => {
   moving.value = false
 }, 1000)

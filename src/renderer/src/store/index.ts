@@ -1,13 +1,18 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import VueStore from '@wlard/vue-class-store'
 import { ulid } from 'ulid'
-
+import { useRouter } from 'vue-router'
+import { matrixPositionToIndex } from '../helpers'
+import {useStorage} from "@vueuse/core";
+const router = useRouter()
 // @ts-ignore will be used later
 type KeyActions = {
   type: 'chord' | 'tap' | 'short_hold' | 'hold' | 'sequence'
   keycodes: string[]
   actions: KeyActions[]
 }[]
+
+export const keyboardHistory = useStorage('keyboardHistory', [])
 
 // list of key indexes that are selected
 export const selectedKeys = ref<Set<number>>(new Set())
@@ -17,12 +22,12 @@ export const selectedLayer = ref(0)
 
 type EncoderLayer = EncoderActions[]
 type EncoderActions = [string, string]
-type KeyInfo = {
+
+export type BaseKeyInfo = {
   x: number
   y: number
   x2?: number
   y2?: number
-  matrix?: [number, number]
   w?: number
   h?: number
   h2?: number
@@ -30,10 +35,13 @@ type KeyInfo = {
   r?: number
   rx?: number
   ry?: number
+}
+export type KeyInfo = BaseKeyInfo & {
+  matrix?: [number, number]
   variant?: [number, number]
 }
 
-class Key {
+export class Key {
   id = ulid()
   x = 0
   x2?: number = undefined
@@ -86,6 +94,66 @@ class Key {
     }
     return tmpKey
   }
+  set({}) {}
+  // happity hoppety property
+  delta({ property, value }: { value: number; property: keyof BaseKeyInfo }) {
+    console.log('writing delta', property, value, this[property])
+    if (this[property]) {
+      // validate eg not less than 0 on w and h
+      if (['w', 'h'].includes(property)) {
+        if (this[property]! + value < 0.25) {
+          return
+        }
+      }
+      // @ts-ignore only using correct keys from type
+      this[property] = this[property] + value
+    } else {
+      this[property] = value
+    }
+  }
+  setOnKeymap(keyCode) {
+    if (!this.matrix) return
+    const keyIndex = matrixPositionToIndex({
+      pos: this.matrix,
+      matrixWidth: keyboardStore.cols
+    })
+
+    console.log('setting ', this.matrix, 'to', keyCode, 'at')
+    const currentKeyAction = keyboardStore.keymap[selectedLayer.value][keyIndex]
+    if (!keyCode.includes('(')) {
+      // TODO: could set this as arg in a key
+      // if (
+      //   currentKeyAction &&
+      //   currentKeyAction.includes("(") &&
+      //   selectedKey.value.args
+      // ) {
+      //   // Validate for what args this function takes
+      //   // only set this as arg
+      //   // TODO: handle multiple args
+      //   let action = currentKeyAction.split("(")[0].replace(")", "");
+      //   keymap.value[selectedLayer.value][keyIndex] =
+      //     action + "(" + keyCode + ")";
+      //   return;
+      // }
+    }
+    keyboardStore.keymap[selectedLayer.value][keyIndex] = keyCode
+  }
+  getMatrixLabel() {
+    if (this.matrix) {
+      if (
+        typeof this.matrix[0] === 'number' &&
+        !isNaN(this.matrix[0]) &&
+        typeof this.matrix[1] === 'number' &&
+        !isNaN(this.matrix[1])
+      )
+        return `${this.matrix[0]} - ${this.matrix[1]}`
+      if (typeof this.matrix[0] === 'number' && !isNaN(this.matrix[0]))
+        return `${this.matrix[0]} - X`
+      if (typeof this.matrix[1] === 'number' && !isNaN(this.matrix[1]))
+        return `X - ${this.matrix[1]}`
+    }
+    return ''
+  }
 }
 const layouts = [
   {
@@ -96,9 +164,12 @@ const layouts = [
 ]
 
 class Keyboard {
-  path?: string = ''
+  path?: string = undefined
   name = ''
   manufacturer = ''
+  tags: string[] = []
+  description = ''
+
   driveContents: string[] = []
 
   pogConfigured = false
@@ -111,7 +182,7 @@ class Keyboard {
 
   // wiring
 
-  controller?: string = undefined
+  controller = ''
   diodeDirection: 'ROW2COL' | 'COL2ROW' = 'COL2ROW'
   wiringMethod: 'matrix' | 'direct' = 'matrix'
   rows = 1
@@ -123,17 +194,15 @@ class Keyboard {
 
   // features
 
-  encoders?: { pad_a: string; pad_b: string }[]
+  encoders: { pad_a: string; pad_b: string }[] = []
 
   // keymaps
 
   // layer > encoder index > encoder action index > keycode
-  encoderKeymap?: EncoderLayer[] = undefined
-  keymap?: (string | undefined)[][] = undefined
+  encoderKeymap?: EncoderLayer[] = []
+  keymap: (string | undefined)[][] = [[]]
 
-  constructor({ path }: { path: string }) {
-    this.path = path
-  }
+  constructor() {}
 
   // Keys
   setKeys(keys: KeyInfo[]) {
@@ -147,8 +216,39 @@ class Keyboard {
     return this.keys.map((key) => key.serialize())
   }
 
+  addKey(key) {
+    this.keys.push(new Key(key))
+  }
+  removeKeyIndex(keyIndex) {
+    this.keys.filter((_a, index) => keyIndex !== index)
+  }
+  deltaForKeys({
+    keyIndexes,
+    property,
+    value
+  }: {
+    keyIndexes: number[]
+    property: keyof BaseKeyInfo
+    value: number
+  }) {
+    keyIndexes.forEach((keyIndex) => {
+      this.keys[keyIndex].delta({ property, value })
+    })
+  }
+
   hasFile(filename) {
     return this.driveContents.includes(filename)
+  }
+
+  // count keys on the matrix
+  physicalKeyCount() {
+    if (this.wiringMethod === 'matrix') return this.rows * this.cols
+    return this.pins
+  }
+
+  // count keys in the layout (including variant keys so duplicate physical keys)
+  keyCount() {
+    return this.keys.length
   }
 
   import({
@@ -203,7 +303,27 @@ class Keyboard {
 
   serialize() {
     return {
-      name: this.name
+      name: this.name,
+      manufacturer: this.manufacturer,
+      description: this.description,
+      tags: this.tags,
+
+      wiringMethod: this.wiringMethod,
+      rows: this.rows,
+      cols: this.cols,
+      pins: this.pins,
+
+      rowPins: this.rowPins,
+      colPins: this.colPins,
+      directPins: this.directPins,
+
+      encoders: this.encoders,
+
+      layouts: this.layouts,
+      keys: this.getKeys(),
+
+      keymap: this.keymap,
+      encoderKeymap: this.encoderKeymap
     }
   }
 }
@@ -211,8 +331,13 @@ class Keyboard {
 @VueStore
 class KeyboardStore extends Keyboard {}
 
-export const keyboardStore = new KeyboardStore({ path: undefined })
+export const keyboardStore = new KeyboardStore()
 
 // [0,2,3] index of array is the selected layout and the value its option
 export const selectedVariants = ref<number[]>([])
 export const layoutVariants = ref<(string | string[])[]>([])
+
+export const isNewKeyboardSetup = computed(() => {
+  if (router) return router.currentRoute.value.path.startsWith('/setup-wizard')
+  return false
+})

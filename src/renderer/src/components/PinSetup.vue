@@ -13,14 +13,14 @@
     </div>
   </div>
   <div class="w-full flex justify-center my-8">
-    <div
+    <button
       v-if="initialSetup"
       class="btn btn-primary"
       :class="{ 'btn-disabled': !pinsCompleted }"
       @click="$emit('next')"
     >
       Next
-    </div>
+    </button>
   </div>
   <div class="flex gap-8 mt-5 justify-center">
     <div v-if="keyboardStore.wiringMethod === 'matrix'" class="flex-grow-0">
@@ -139,6 +139,8 @@ import { useRouter } from 'vue-router'
 import { keyboardStore } from '../store'
 const router = useRouter()
 
+const props = defineProps(['initialSetup'])
+
 // validate pin count
 if (keyboardStore.wiringMethod === 'matrix') {
   if (keyboardStore.rows !== keyboardStore.rowPins.length) {
@@ -170,9 +172,6 @@ const pinsCompleted = computed(() => {
   return true
 })
 
-const initialSetup = computed(() => {
-  return router.currentRoute.value.path.startsWith('/setup-wizard')
-})
 </script>
 
 <style lang="scss" scoped>

@@ -83,12 +83,9 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import {
-  keymap,
-  selectedConfig,
-  selectedKey,
   selectedLayer,
-  selectedVariants,
   selectedKeys,
+  keyboardStore
 } from "../store";
 
 const props = defineProps(["keyData", "keyIndex", "mode"]);
@@ -98,15 +95,12 @@ const keyGap = 4;
 // hide normal labels and show the keymap thing
 const action = computed(() => {
   if (props.mode === "layout") return; //String(props.keyData.matrix)
-  if (props.keyData.matrix.length !== 2) return "";
-  if (!selectedConfig.value) return "error";
-  const matrixWidth = selectedConfig.value.matrix.cols;
-  // console.log(props.keyLayout, matrixWidth);
+  const matrixWidth = keyboardStore.cols;
   let keyIndex =
     Number(props.keyData.matrix[0]) * matrixWidth +
     Number(props.keyData.matrix[1]);
-  if (!keymap.value[selectedLayer.value]) return "l missing";
-  let keyCode = keymap.value[selectedLayer.value][keyIndex];
+  if (!keyboardStore.keymap[selectedLayer.value]) return "l missing";
+  let keyCode = keyboardStore.keymap[selectedLayer.value][keyIndex];
   // resolve readable character
   if (!keyCode || keyCode === "KC.TRNS") return "▽";
   return keyCode;
@@ -114,14 +108,14 @@ const action = computed(() => {
 
 const visible = computed(() => {
   // hide decal keys
-  if (props.keyData.d || !selectedConfig.value) {
+  if (props.keyData.d) {
     return false;
   }
   // show correct variant
-  let variant: number[] = props.keyData.variant;
-  if (variant && selectedConfig.value.selectedVariants) {
+  const variant: number[] = props.keyData.variant;
+  if (variant) {
     if (variant.length !== 2) return false;
-    return selectedConfig.value.selectedVariants[variant[0]] == variant[1];
+    return keyboardStore.layouts[variant[0]].selected === variant[1];
   }
   // show keys that don't have variant
   return true;
@@ -193,7 +187,7 @@ const keyTopHeight2 = computed(() => {
 });
 const mainLabel = computed(() => {
   if (props.mode === "layout") {
-    return String(props.keyData.matrix);
+    return props.keyData.getMatrixLabel()
   }
   if (!action.value) {
     return "";
