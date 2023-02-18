@@ -1,5 +1,10 @@
 <template>
-  <div class="btn-sm btn mb-4 p-2" @click="showConverter">Import from KLE</div>
+  <div class="flex gap-2">
+
+  <div class="btn-sm btn mb-4 p-2" @click="showConverter"><i class="mdi mdi-import"></i>Import from KLE</div>
+  <div class="btn-sm btn mb-4 p-2" @click="showRawPogOutput"><i class="mdi mdi-export"></i>export from pog</div>
+
+  </div>
   <div v-if="converterVisible">
     <div class="flex gap-2">
       <div class="text-left">
@@ -26,11 +31,7 @@
         style="line-height: 1rem"
         rows="8"
       ></textarea>
-      <textarea
-        v-if="showRawPogLayout"
-        v-model="pogOutput"
-        class="textarea-bordered textarea"
-      ></textarea>
+
     </div>
     <div class="mt-2 flex flex-col gap-2">
       <span class="text-warning">this will overwrite your existing layout</span>
@@ -38,12 +39,14 @@
     </div>
     <hr />
   </div>
-
+<div v-if="showRawPogLayout">
+  <textarea class="textarea textarea-bordered w-full" v-model="pogOutput"></textarea>
+</div>
   <div>
     <div class="flex justify-between">
       <div class="flex gap-1">
-        <button class="btn-sm btn" @click="addKey">add key</button>
-        <button class="btn-sm btn" @click="removeKey">remove key</button>
+        <button class="btn-sm btn btn-primary" @click="addKey"><i class="mdi mdi-plus"></i>add key</button>
+        <button class="btn-sm btn btn-primary" @click="removeKey" :disabled="selectedKeys.size === 0"><i class="mdi mdi-trash-can"></i>remove key</button>
       </div>
     </div>
 
@@ -62,17 +65,18 @@
 
 <script lang="ts" setup>
 import { cleanupKeymap, KleToPog, selectNextKey, selectPrevKey } from '../helpers'
-import { computed, onMounted, ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { selectedKeys, keyboardStore, Key, keyboardHistory } from '../store'
 import KeyboardLayout from './KeyboardLayout.vue'
 import { isNumber, onKeyStroke } from '@vueuse/core'
 import KeyLayoutInfo from './KeyLayoutInfo.vue'
 import VariantSwitcher from './VariantSwitcher.vue'
-import { useRouter } from 'vue-router'
+// import { useRouter } from 'vue-router'
 
-const router = useRouter()
+// const router = useRouter()
 const kleInput = ref('')
 const showRawPogLayout = ref(false)
+const pogOutput = ref("")
 selectedKeys.value.clear()
 const emit = defineEmits(['next'])
 const props = defineProps(['initialSetup'])
@@ -80,9 +84,14 @@ const converterVisible = ref(false)
 const showConverter = () => {
   converterVisible.value = !converterVisible.value
 }
+const showRawPogOutput = () => {
+  showRawPogLayout.value= !showRawPogLayout.value
+  // export
+  pogOutput.value = JSON.stringify(keyboardStore.getKeys(), null, 4)
+}
 const convert = () => {
   const layout = KleToPog(kleInput.value)
-  const pogOutput = JSON.stringify(layout, null, 4)
+  // const pogOutput = JSON.stringify(layout, null, 4)
   // extract variants
   console.log('checking for variants', layout)
   if (props.initialSetup) {
@@ -122,6 +131,7 @@ const setupDone = () => {
   )
   // save config to localstorage
   keyboardHistory.value.push({
+    id: keyboardStore.id,
     path: keyboardStore.path,
     name: keyboardStore.name,
     tags: keyboardStore.tags,
@@ -130,19 +140,19 @@ const setupDone = () => {
   emit('next')
 }
 
-const saveKeymap = async () => {
-  // const data = {
-  //   rowPins: selectedKeyboard.value.configContents.pins.rows,
-  //   colPins: selectedKeyboard.value.configContents.pins.cols,
-  //   keymap: keymap.value,
-  //   diodeDirection: selectedKeyboard.value.configContents.matrix.diodeDirection,
-  //   config: selectedKeyboard.value
-  // }
-  const data = keyboardStore.serialize()
-  console.log(data)
-  // save to pog.json
-  // const saveResponse = await window.api.saveKeymap(JSON.stringify(data))
-}
+// const saveKeymap = async () => {
+//   // const data = {
+//   //   rowPins: selectedKeyboard.value.configContents.pins.rows,
+//   //   colPins: selectedKeyboard.value.configContents.pins.cols,
+//   //   keymap: keymap.value,
+//   //   diodeDirection: selectedKeyboard.value.configContents.matrix.diodeDirection,
+//   //   config: selectedKeyboard.value
+//   // }
+//   const data = keyboardStore.serialize()
+//   console.log(data)
+//   // save to pog.json
+//   // const saveResponse = await window.api.saveKeymap(JSON.stringify(data))
+// }
 
 const addKey = () => {
   // add key to the last position (+ keywidth ) + 1
@@ -157,7 +167,7 @@ const addKey = () => {
     let lastKey = new Key({
       x: 0,
       y: 0,
-      matrix: [],
+      // matrix: [],
       w: 1
     })
     keyboardStore.keys.forEach((key) => {
@@ -173,10 +183,8 @@ const addKey = () => {
 }
 
 const removeKey = () => {
-  keyboardStore.keys.forEach((key, index) => {
-    keyboardStore.removeKeyIndex(index)
-    return
-  })
+  const keys = [...selectedKeys.value].map(key => keyboardStore.keys[key].id)
+  keyboardStore.removeKeys({ids:keys})
   selectedKeys.value.clear()
 }
 
@@ -246,10 +254,10 @@ onMounted(() => {
     keyboardStore.deltaForKeys({ keyIndexes: [...selectedKeys.value], value: 0.25, property: 'x' })
   })
 })
-
-const hasSelectedKeys = computed(() => {
-  return selectedKeys.value.size
-})
+//
+// const hasSelectedKeys = computed(() => {
+//   return selectedKeys.value.size
+// })
 </script>
 
 <style lang="scss" scoped></style>

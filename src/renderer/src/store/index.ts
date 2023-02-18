@@ -3,7 +3,7 @@ import VueStore from '@wlard/vue-class-store'
 import { ulid } from 'ulid'
 import { useRouter } from 'vue-router'
 import { matrixPositionToIndex } from '../helpers'
-import {useStorage} from "@vueuse/core";
+import { useStorage } from '@vueuse/core'
 const router = useRouter()
 // @ts-ignore will be used later
 type KeyActions = {
@@ -12,7 +12,7 @@ type KeyActions = {
   actions: KeyActions[]
 }[]
 
-export const keyboardHistory = useStorage('keyboardHistory', [])
+export const keyboardHistory = useStorage<any[]>('keyboardHistory', [])
 
 // list of key indexes that are selected
 export const selectedKeys = ref<Set<number>>(new Set())
@@ -86,11 +86,26 @@ export class Key {
     if (this.h !== 1) {
       tmpKey.h = this.h
     }
+    if (this.w2) {
+      tmpKey.w2 = this.w2
+    }
+    if (this.h2) {
+      tmpKey.h2 = this.h2
+    }
+    if (this.r) {
+      tmpKey.r = this.r
+    }
+    if (this.ry) {
+      tmpKey.ry = this.ry
+    }
+    if (this.rx) {
+      tmpKey.rx = this.rx
+    }
     if (Array.isArray(this.matrix) && this.matrix.length === 2) {
-      tmpKey.matrix = this.matrix
+      tmpKey.matrix = this.matrix.map((n) => Number(n)) as [number, number]
     }
     if (Array.isArray(this.variant) && this.variant.length === 2) {
-      tmpKey.matrix = this.variant
+      tmpKey.variant = this.variant.map((n) => Number(n)) as [number, number]
     }
     return tmpKey
   }
@@ -119,7 +134,6 @@ export class Key {
     })
 
     console.log('setting ', this.matrix, 'to', keyCode, 'at')
-    const currentKeyAction = keyboardStore.keymap[selectedLayer.value][keyIndex]
     if (!keyCode.includes('(')) {
       // TODO: could set this as arg in a key
       // if (
@@ -155,15 +169,9 @@ export class Key {
     return ''
   }
 }
-const layouts = [
-  {
-    name: 'Bottom Row',
-    options: ['Split', 'Reverse Split', '6.25U'],
-    selectedOption: 1
-  }
-]
 
 class Keyboard {
+  id = ulid()
   path?: string = undefined
   name = ''
   manufacturer = ''
@@ -199,7 +207,7 @@ class Keyboard {
   // keymaps
 
   // layer > encoder index > encoder action index > keycode
-  encoderKeymap?: EncoderLayer[] = []
+  encoderKeymap: EncoderLayer[] = []
   keymap: (string | undefined)[][] = [[]]
 
   constructor() {}
@@ -219,8 +227,9 @@ class Keyboard {
   addKey(key) {
     this.keys.push(new Key(key))
   }
-  removeKeyIndex(keyIndex) {
-    this.keys.filter((_a, index) => keyIndex !== index)
+
+  removeKeys({ ids }: { ids: string[] }) {
+    this.keys = this.keys.filter((a) => !ids.includes(a.id))
   }
   deltaForKeys({
     keyIndexes,
@@ -254,7 +263,6 @@ class Keyboard {
   import({
     path,
     configContents,
-    codeContents,
     folderContents
   }: {
     path: string
@@ -262,6 +270,7 @@ class Keyboard {
     configContents: any
     folderContents: string[]
   }) {
+    this.id = ulid()
     this.path = path
     this.driveContents = folderContents
 
@@ -270,22 +279,21 @@ class Keyboard {
     if (this.pogConfigured) {
       console.log('pog.json exists, importing keyboard features')
       this.setKeys(configContents.keys)
-      if (configContents.name) this.name = configContents.name
-      if (configContents.manufacturer) this.manufacturer = configContents.manufacturer
-      if (configContents.wiringMethod) {
-        this.wiringMethod = configContents.wiringMethod
 
-        if (configContents.rows) this.rows = configContents.rows
-        if (configContents.cols) this.cols = configContents.cols
-        if (configContents.pins) this.pins = configContents.pins
-        if (configContents.wiringMethod === 'matrix') {
-          if (configContents.rowPins) this.rowPins = configContents.rowPins
-          if (configContents.colPins) this.colPins = configContents.colPins
-          if (configContents.diodeDirection) this.diodeDirection = configContents.diodeDirection
-        } else if (configContents.wiringMethod === 'direct') {
-          if (configContents.directPins) this.directPins = configContents.directPins
-        }
-      }
+      if (configContents.id) this.id = configContents.id
+      if (configContents.name) this.name = configContents.name
+      if (configContents.description) this.description = configContents.description
+      if (configContents.tags) this.tags = configContents.tags
+      if (configContents.manufacturer) this.manufacturer = configContents.manufacturer
+      this.wiringMethod = configContents.wiringMethod || 'matrix'
+
+      if (configContents.rows) this.rows = configContents.rows
+      if (configContents.cols) this.cols = configContents.cols
+      if (configContents.pins) this.pins = configContents.pins
+      if (configContents.rowPins) this.rowPins = configContents.rowPins
+      if (configContents.colPins) this.colPins = configContents.colPins
+      if (configContents.diodeDirection) this.diodeDirection = configContents.diodeDirection
+      if (configContents.directPins) this.directPins = configContents.directPins
       if (configContents.controller) this.controller = configContents.controller
       if (configContents.keymap) this.keymap = configContents.keymap
       if (configContents.layouts) this.layouts = configContents.layouts
@@ -309,6 +317,7 @@ class Keyboard {
       tags: this.tags,
 
       wiringMethod: this.wiringMethod,
+      diodeDirection: this.diodeDirection,
       rows: this.rows,
       cols: this.cols,
       pins: this.pins,

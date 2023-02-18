@@ -4,9 +4,13 @@ export const matrixPositionToIndex = ({
   pos,
   matrixWidth
 }: {
-  pos: [number,number]
+  pos: [number, number]
   matrixWidth: number
-}) => Number(pos[0]) * matrixWidth + Number(pos[1])
+}) => {
+  console.log(pos, matrixWidth)
+  if (!pos) return 0
+  return Number(pos[0]) * matrixWidth + Number(pos[1])
+}
 
 const formatMatrixFromLabel = (label: string): [number, number] | false => {
   const matrix = label.split(',').map((a) => Number(a))
@@ -119,7 +123,7 @@ export const KleToPog = (kleString: string) => {
             // key.matrixPos = labels[0];
             const matrix = formatMatrixFromLabel(labels[0])
             if (matrix !== false) key.matrix = matrix
-            key.variant = labels[3].split(',').map((a) => Number(a))
+            key.variant = labels[3].split(',').map((a) => Number(a)) as [number, number]
           } else {
             // all labels just keep split
             // key.matrixPos = keyOrData[0];
@@ -172,4 +176,143 @@ export const selectNextKey = () => {
 }
 export const selectPrevKey = () => {
   selectedKeys.value = new Set([Math.max([...selectedKeys.value][0] - 1, 0)])
+}
+
+export const renderLabel = (keycode: string) => {
+  const keyLabels: {
+    [key: string]: { label?: string; alt?: string; icon?: string; iconWindows?: string }
+  } = {
+    // Define labels for your keycodes here
+    F1: { label: 'F1' },
+    F2: { label: 'F2' },
+    F3: { label: 'F3' },
+    F4: { label: 'F4' },
+    F5: { label: 'F5' },
+    F6: { label: 'F6' },
+    F7: { label: 'F7' },
+    F8: { label: 'F8' },
+    F9: { label: 'F9' },
+    F10: { label: 'F10' },
+    F11: { label: 'F11' },
+    F12: { label: 'F12' },
+    A: { label: 'A' },
+    B: { label: 'B' },
+    C: { label: 'C' },
+    D: { label: 'D' },
+    E: { label: 'E' },
+    F: { label: 'F' },
+    G: { label: 'G' },
+    H: { label: 'H' },
+    I: { label: 'I' },
+    J: { label: 'J' },
+    K: { label: 'K' },
+    L: { label: 'L' },
+    M: { label: 'M' },
+    N: { label: 'N' },
+    O: { label: 'O' },
+    P: { label: 'P' },
+    Q: { label: 'Q' },
+    R: { label: 'R' },
+    S: { label: 'S' },
+    T: { label: 'T' },
+    U: { label: 'U' },
+    V: { label: 'V' },
+    W: { label: 'W' },
+    X: { label: 'X' },
+    Y: { label: 'Y' },
+    Z: { label: 'Z' },
+    N1: { label: '1' },
+    N2: { label: '2' },
+    N3: { label: '3' },
+    N4: { label: '4' },
+    N5: { label: '5' },
+    N6: { label: '6' },
+    N7: { label: '7' },
+    N8: { label: '8' },
+    N9: { label: '9' },
+    N0: { label: '0' },
+    ESC: { icon: 'mdi-keyboard-esc' },
+    ENT: { icon: 'mdi-keyboard-return' },
+    SPC: { icon: 'mdi-keyboard-space' },
+    DOT: { label: '.' },
+    COMM: { label: ',' },
+    SLSH: { label: '/' },
+    SCLN: { label: ';' },
+    QUOT: { label: "'" },
+    LSFT: { icon: 'mdi-apple-keyboard-shift' },
+    RSFT: { icon: 'mdi-apple-keyboard-shift' },
+    LBRC: { label: '[' },
+    RBRC: { label: ']' },
+    BSLS: { label: '\\' },
+    MINS: { label: '-' },
+    EQL: { label: '=' },
+    CAPS: { icon: 'mdi-apple-keyboard-caps' },
+    TAB: { icon: 'mdi-keyboard-tab' },
+    BSPC: { icon: 'mdi-backspace' },
+    LCTL: { icon: 'mdi-apple-keyboard-control' },
+    RCTL: { icon: 'mdi-apple-keyboard-control' },
+    LALT: { icon: 'mdi-apple-keyboard-option' },
+    RALT: { icon: 'mdi-apple-keyboard-option' },
+    LGUI: { icon: 'mdi-apple-keyboard-command' },
+    RGUI: { icon: 'mdi-apple-keyboard-command' },
+    UP: { icon: 'mdi-arrow-up' },
+    LEFT: { icon: 'mdi-arrow-left' },
+    DOWN: { icon: 'mdi-arrow-down' },
+    RIGHT: { icon: 'mdi-arrow-right' },
+
+    // Layer
+    MO: { label: 'MO' },
+
+    // Media
+    MPLY: { label: 'Play/Pause', icon: 'mdi-play-pause' },
+    MCRWD: { label: 'Play/Pause', icon: 'mdi-play-pause' }
+  }
+
+  let label = ''
+
+  // Check if the keycode is a sequence
+  if (keycode.startsWith('simple_key_sequence(') && keycode.endsWith(')')) {
+    // Remove the sequence function wrapper and split the keys
+    const keys = keycode.slice(19, -1).split(',')
+
+    // Get the label for each key and join them with a "+"
+    label = keys.map((k) => renderLabel(k.trim())).join(' + ')
+  } else {
+    // Check for modifier keys
+    // if (keycode.includes('KC.LSHIFT') || keycode.includes('KC.RSHIFT') ||
+    //   keycode.includes('KC.LCTL') || keycode.includes('KC.RCTL') ||
+    //   keycode.includes('KC.LALT') || keycode.includes('KC.RALT')) {
+    //   label += '^ ';
+    // }
+
+    // Check for key presses
+    const keyMatch = keycode.match(/KC\.(\w+)/)
+    if (keyMatch) {
+      const key = keyMatch[1]
+      if (!keyLabels[key]) {
+        label += keycode
+      } else if (keyLabels[key].icon) {
+        label += `<i class="mdi ${keyLabels[key].icon}"></i>`
+      } else if (keyLabels[key].label) {
+        label += keyLabels[key].label
+      }
+      // if it has arguments render them as keycode as well
+      if (keycode.includes('(')) {
+        const match = keycode.match(/^[^(]+\((.*)\)$/)
+        console.log('found params', match) // prints ["0", "KC.A"]
+        if (match && match.includes(',')) {
+          const params = match[1].split(',')
+          console.log('param list', params)
+        } else if (match) {
+          // just add that key to label
+          label += ` ${match[1]}`
+        }
+      }
+    } else {
+      // custom keycodes
+      label += keycode
+    }
+  }
+
+  return label
 }

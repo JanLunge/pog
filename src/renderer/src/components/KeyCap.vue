@@ -1,7 +1,7 @@
 <template>
   <div
-    class="keycap"
     v-if="visible"
+    class="keycap"
     style="user-select: none"
     :data-index="keyIndex"
     :style="{
@@ -10,44 +10,44 @@
       width: keyWidth + 'px',
       height: keyHeight + 'px',
       transform: `rotate(${keyData.r}deg)`,
-      transformOrigin: rotationOrigin,
+      transformOrigin: rotationOrigin
     }"
     :class="{ selected: mainSelected }"
   >
     <div
-      class="keyborder-blocker"
       v-if="keyData.w2 || keyData.h2"
+      class="keyborder-blocker"
       :style="{
         left: '1px',
         top: '1px',
         width: keyWidth - 2 + 'px',
-        height: keyHeight - 2 + 'px',
+        height: keyHeight - 2 + 'px'
       }"
     ></div>
     <div
       class="keyborder"
       :style="{
         width: keyWidth + 'px',
-        height: keyHeight + 'px',
+        height: keyHeight + 'px'
       }"
     ></div>
     <div
-      class="keyborder"
       v-if="keyData.w2 || keyData.h2"
+      class="keyborder"
       :class="{ selected: mainSelected }"
       :style="{
         left: keyData.x2 * baseKeyWidth - 1 + 'px',
         width: keyWidth2 + 'px',
-        height: keyHeight2 + 'px',
+        height: keyHeight2 + 'px'
       }"
     ></div>
     <div
-      class="keytop"
       v-if="keyData.w2 || keyData.h2"
+      class="keytop"
       :style="{
         height: keyTopHeight2 + 'px',
         width: keyTopWidth2 + 'px',
-        left: keyData.x2 * baseKeyWidth + keyGap + 'px',
+        left: keyData.x2 * baseKeyWidth + keyGap + 'px'
       }"
     ></div>
     <!--    <div-->
@@ -58,7 +58,7 @@
       class="keytop"
       :style="{
         height: keyTopHeight + 'px',
-        width: keyTopWidth + 'px',
+        width: keyTopWidth + 'px'
       }"
     ></div>
     <div class="keylabels">
@@ -67,9 +67,7 @@
       <!--          {{label}}-->
       <!--        </div>-->
       <!--      </div>-->
-      <div class="keylabel keylabel-center" v-if="!hasArguments">
-        {{ mainLabel }}
-      </div>
+      <div v-if="!hasArguments" class="keylabel keylabel-center" v-html="mainLabel"></div>
       <div v-else class="keylabel">
         <div class="arg-top">{{ mainLabel }}</div>
         <div class="arg-bottom" :class="{ selected: argsSelected }">
@@ -81,138 +79,109 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
-import {
-  selectedLayer,
-  selectedKeys,
-  keyboardStore
-} from "../store";
+import { computed, ref, watch } from 'vue'
+import { selectedLayer, selectedKeys, keyboardStore } from '../store'
+import { matrixPositionToIndex, renderLabel } from '../helpers'
 
-const props = defineProps(["keyData", "keyIndex", "mode"]);
-const emit = defineEmits(["selected"]);
+const props = defineProps(['keyData', 'keyIndex', 'mode'])
+defineEmits(['selected'])
 
-const keyGap = 4;
+const keyGap = 4
 // hide normal labels and show the keymap thing
 const action = computed(() => {
-  if (props.mode === "layout") return; //String(props.keyData.matrix)
-  const matrixWidth = keyboardStore.cols;
-  let keyIndex =
-    Number(props.keyData.matrix[0]) * matrixWidth +
-    Number(props.keyData.matrix[1]);
-  if (!keyboardStore.keymap[selectedLayer.value]) return "l missing";
-  let keyCode = keyboardStore.keymap[selectedLayer.value][keyIndex];
+  if (props.mode === 'layout') return //String(props.keyData.matrix)
+  const matrixWidth = keyboardStore.cols
+  const keyIndex = matrixPositionToIndex({ pos: props.keyData.matrix, matrixWidth })
+  if (!keyboardStore.keymap[selectedLayer.value]) return 'l missing'
+  const keyCode = keyboardStore.keymap[selectedLayer.value][keyIndex]
   // resolve readable character
-  if (!keyCode || keyCode === "KC.TRNS") return "▽";
-  return keyCode;
-});
+  if (!keyCode || keyCode === 'KC.TRNS') return '▽'
+  return keyCode
+})
 
 const visible = computed(() => {
   // hide decal keys
   if (props.keyData.d) {
-    return false;
+    return false
   }
   // show correct variant
-  const variant: number[] = props.keyData.variant;
+  const variant: number[] = props.keyData.variant
   if (variant) {
-    if (variant.length !== 2) return false;
-    return keyboardStore.layouts[variant[0]].selected === variant[1];
+    if (variant.length !== 2) return false
+    return keyboardStore.layouts[variant[0]].selected === variant[1]
   }
   // show keys that don't have variant
-  return true;
-});
+  return true
+})
 
-const baseKeyWidth = ref(54);
+const baseKeyWidth = ref(54)
 const keyWidthU = computed(() => {
   // if(props.keyData.w2) return props.keyData.w2
-  return props.keyData.w || 1;
-});
+  return props.keyData.w || 1
+})
 const keyHeightU = computed(() => {
-  return props.keyData.h || 1;
-});
+  return props.keyData.h || 1
+})
 const keyWidth2U = computed(() => {
-  return props.keyData.w2 || 1;
-});
+  return props.keyData.w2 || 1
+})
 const keyHeight2U = computed(() => {
-  return props.keyData.h2 || 1;
-});
+  return props.keyData.h2 || 1
+})
 const keyWidth = computed(() => {
-  return keyWidthU.value * baseKeyWidth.value + (keyWidthU.value - 1) * keyGap;
-});
+  return keyWidthU.value * baseKeyWidth.value + (keyWidthU.value - 1) * keyGap
+})
 const keyHeight = computed(() => {
-  return (
-    keyHeightU.value * baseKeyWidth.value + (keyHeightU.value - 1) * keyGap
-  );
-});
+  return keyHeightU.value * baseKeyWidth.value + (keyHeightU.value - 1) * keyGap
+})
 const keyWidth2 = computed(() => {
-  return (
-    keyWidth2U.value * baseKeyWidth.value + (keyWidth2U.value - 1) * keyGap
-  );
-});
+  return keyWidth2U.value * baseKeyWidth.value + (keyWidth2U.value - 1) * keyGap
+})
 const keyHeight2 = computed(() => {
-  return (
-    keyHeight2U.value * baseKeyWidth.value + (keyHeight2U.value - 1) * keyGap
-  );
-});
+  return keyHeight2U.value * baseKeyWidth.value + (keyHeight2U.value - 1) * keyGap
+})
 const hasArguments = computed(() => {
-  if (!action.value) return false;
-  return action.value.includes(")");
-});
+  return false
+  // if (!action.value) return false
+  // return action.value.includes(')')
+})
 const keyTopWidth = computed(() => {
-  return keyWidth.value - keyGap * 2 - 4; //+ ((keyWidthU.value-1)*keyGap))
-});
+  return keyWidth.value - keyGap * 2 - 4 //+ ((keyWidthU.value-1)*keyGap))
+})
 const keyTopHeight = computed(() => {
-  return (
-    keyHeight.value -
-    6 * keyHeightU.value -
-    keyGap +
-    (keyHeightU.value - 1) * keyGap
-  );
-});
+  return keyHeight.value - 6 * keyHeightU.value - keyGap + (keyHeightU.value - 1) * keyGap
+})
 const keyTopWidth2 = computed(() => {
-  return (
-    keyWidth2.value -
-    6 * keyWidth2U.value -
-    keyGap -
-    2 +
-    (keyWidth2U.value - 1) * keyGap
-  );
-});
+  return keyWidth2.value - 6 * keyWidth2U.value - keyGap - 2 + (keyWidth2U.value - 1) * keyGap
+})
 const keyTopHeight2 = computed(() => {
-  return (
-    keyHeight2.value -
-    6 * keyHeight2U.value -
-    keyGap +
-    (keyHeight2U.value - 1) * keyGap
-  );
-});
+  return keyHeight2.value - 6 * keyHeight2U.value - keyGap + (keyHeight2U.value - 1) * keyGap
+})
 const mainLabel = computed(() => {
-  if (props.mode === "layout") {
+  // in Layout Mode show the matrix pos
+  if (props.mode === 'layout') {
     return props.keyData.getMatrixLabel()
   }
-  if (!action.value) {
-    return "";
-  }
-  if (!hasArguments.value && action.value.startsWith("KC.")) {
-    return action.value.split(".")[1];
-  } else if (hasArguments.value) {
-    return action.value.split("(")[0];
-  }
-  return action.value;
-});
+  // otherwise show the action from the keymap
+  if (!action.value) return ''
+
+  // render readable label
+  return renderLabel(action.value)
+})
 
 const argLabel = computed(() => {
-  if (hasArguments.value) {
-    let argAction = action.value.split("(")[1].replace(")", "");
-    if (argAction.startsWith("KC.")) {
-      return argAction.split(".")[1];
+  if (hasArguments.value && action.value) {
+    const argAction = action.value.split('(')[1].replace(')', '')
+    if (argAction.startsWith('KC.')) {
+      return argAction.split('.')[1]
     }
-    return argAction;
+    return argAction
   }
-  return;
-});
+  return
+})
 
-const mainSelected = ref(false);
-const argsSelected = ref(false);
+const mainSelected = ref(false)
+const argsSelected = ref(false)
 // const bgClick = (e:MouseEvent) => {
 //   mainSelected.value = true;
 //   argsSelected.value = false;
@@ -244,24 +213,22 @@ const argsSelected = ref(false);
 // );
 watch(
   () => [...selectedKeys.value],
-  (newValue) => {
+  (_newValue) => {
     if (selectedKeys.value.has(props.keyIndex)) {
-      mainSelected.value = true;
-      argsSelected.value = false;
+      mainSelected.value = true
+      argsSelected.value = false
     } else {
-      mainSelected.value = false;
-      argsSelected.value = false;
+      mainSelected.value = false
+      argsSelected.value = false
     }
   }
-);
+)
 const rotationOrigin = computed(() => {
-  if (!props.keyData.rx || !props.keyData.ry) return "0 0";
-  let x =
-    props.keyData.rx * 58 - props.keyData.x * (baseKeyWidth.value + keyGap);
-  let y =
-    props.keyData.ry * 58 - props.keyData.y * (baseKeyWidth.value + keyGap);
-  return `${x}px ${y}px`; // return "xpx ypx"
-});
+  if (typeof props.keyData.rx !== 'number' || typeof props.keyData.ry !== 'number') return '0 0'
+  const x = props.keyData.rx * 58 - props.keyData.x * (baseKeyWidth.value + keyGap)
+  const y = props.keyData.ry * 58 - props.keyData.y * (baseKeyWidth.value + keyGap)
+  return `${x}px ${y}px` // return "xpx ypx"
+})
 </script>
 
 <style lang="scss" scoped>
@@ -322,18 +289,19 @@ const rotationOrigin = computed(() => {
   position: absolute;
   width: 100%;
   height: calc(48px - 5px);
+
   &-0 {
     left: 8px;
     top: 2px;
-    @apply items-start justify-start flex text-center;
+    @apply flex items-start justify-start text-center;
   }
   &-3 {
     right: 8px;
     bottom: 2px;
-    @apply items-end justify-end flex text-center;
+    @apply flex items-end justify-end text-center;
   }
   &-center {
-    @apply items-center justify-center flex text-center;
+    @apply flex items-center justify-center text-center;
   }
   .arg-top {
     @apply text-center;
@@ -344,7 +312,7 @@ const rotationOrigin = computed(() => {
     font-size: 10px;
   }
   .arg-bottom {
-    @apply text-center rounded flex justify-center items-center;
+    @apply flex items-center justify-center rounded text-center;
     position: absolute;
     border: 1px solid #666;
     left: 6px;
@@ -381,4 +349,11 @@ const rotationOrigin = computed(() => {
 //    content: '';
 //  }
 //}
+</style>
+<style lang="scss">
+.keylabel {
+  i.mdi {
+    font-size: 18px;
+  }
+}
 </style>

@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import {handleSelectDrive, selectKeyboard} from './selectKeyboard'
+import { handleSelectDrive, selectKeyboard } from './selectKeyboard'
 import { updateFirmware } from './kmkUpdater'
 import { saveConfiguration } from './saveConfig'
 
@@ -26,7 +26,7 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    mainWindow.show()
+    if (mainWindow) mainWindow.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {

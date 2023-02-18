@@ -11,12 +11,12 @@ export const saveConfiguration = (data: string) => {
   })
   if (writeFirmware) {
     console.log('should also write firmware files')
+    handleKeymapSave(pogConfig)
   }
 }
 
-export const handleKeymapSave = (jsondata) => {
-  console.log('saving keymap', jsondata)
-  const data = JSON.parse(jsondata)
+export const handleKeymapSave = (pogConfig) => {
+  console.log('saving keymap', pogConfig)
   // const codeblockraw = fs.readFileSync(`${keyboardPath}/code.py`, {encoding:'utf8', flag:'r'})
   // console.log(codeblockraw)
   // const codeblock = codeblockraw.match(/# CodeBlock([\S\s]*)# \/CodeBlock/gm)[1]
@@ -26,7 +26,6 @@ export const handleKeymapSave = (jsondata) => {
   let pythonImports = ''
   let kmkAddons = ''
   let codeblock = ''
-  const pogConfig = data.config.configContents
   //layers
   if (true) {
     pythonImports += '\nfrom kmk.modules.layers import Layers\n'
@@ -91,15 +90,15 @@ keyboard = KMKKeyboard()
 ${kmkAddons}
 
 # Cols
-keyboard.col_pins = (${data.colPins.map((a) => 'board.GP' + a).join(', ')})
+keyboard.col_pins = (${pogConfig.colPins.map((a) => 'board.GP' + a).join(', ')})
 # Rows
-keyboard.row_pins = (${data.rowPins.map((a) => 'board.GP' + a).join(', ')})
+keyboard.row_pins = (${pogConfig.rowPins.map((a) => 'board.GP' + a).join(', ')})
 # Diode Direction
-keyboard.diode_orientation = DiodeOrientation.${data.diodeDirection}
+keyboard.diode_orientation = DiodeOrientation.${pogConfig.diodeDirection}
 
 # Keymap
 keyboard.keymap = [
-    ${data.keymap.map((layer) => '[' + layer.join(', ') + ']').join(', ')}
+    ${pogConfig.keymap.map((layer) => '[' + layer.join(', ') + ']').join(', ')}
 ]
 
 ${codeblock}
@@ -108,15 +107,6 @@ if __name__ == '__main__':
     keyboard.go()
 `
   fs.writeFile(currentKeyboard.path + '/code.py', keymapString, () => {
-    console.log('File written successfully\n')
+    console.log('Firmware File written successfully\n')
   })
-
-  // write pog.json
-  fs.writeFile(
-    currentKeyboard.path + '/pog.json',
-    JSON.stringify(data.config.configContents, null, 4),
-    () => {
-      console.log('pog File written successfully\n')
-    }
-  )
 }

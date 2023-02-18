@@ -30,7 +30,7 @@
           <span class="ml-2 badge badge-primary font-bold">{{ keyboardStore.rowPins.length }}</span>
         </p>
         <div
-          v-for="(pin, index) in keyboardStore.rowPins"
+          v-for="(_pin, index) in keyboardStore.rowPins"
           class="grid grid-cols-6 items-center gap-2"
         >
           <p class="mr-2 text-right">{{ index + 1 }}</p>
@@ -48,7 +48,7 @@
           <span class="ml-2 badge badge-primary font-bold">{{ keyboardStore.colPins.length }}</span>
         </p>
         <div
-          v-for="(pin, index) in keyboardStore.colPins"
+          v-for="(_pin, index) in keyboardStore.colPins"
           class="grid grid-cols-6 items-center gap-2"
         >
           <span class="mr-2 text-right">{{ index + 1 }}</span>
@@ -70,7 +70,7 @@
           }}</span>
         </p>
         <div
-          v-for="(pin, index) in keyboardStore.directPins"
+          v-for="(_pin, index) in keyboardStore.directPins"
           class="grid grid-cols-6 items-center gap-2"
         >
           <p class="mr-2 text-right">{{ index + 1 }}</p>
@@ -134,19 +134,19 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+// import { useRouter } from 'vue-router'
 import { keyboardStore } from '../store'
-const router = useRouter()
+// const router = useRouter()
 
-const props = defineProps(['initialSetup'])
+defineProps(['initialSetup'])
 
 // validate pin count
 if (keyboardStore.wiringMethod === 'matrix') {
   if (keyboardStore.rows !== keyboardStore.rowPins.length) {
     keyboardStore.rowPins = Array.from(
       { length: keyboardStore.rows },
-      (x, i) => keyboardStore.rowPins[i]
+      (_x, i) => keyboardStore.rowPins[i]
     )
     keyboardStore.rowPins = keyboardStore.rowPins.slice(0, keyboardStore.rows)
   }
@@ -154,14 +154,14 @@ if (keyboardStore.wiringMethod === 'matrix') {
   if (keyboardStore.cols !== keyboardStore.colPins.length) {
     keyboardStore.colPins = Array.from(
       { length: keyboardStore.cols },
-      (x, i) => keyboardStore.colPins[i]
+      (_x, i) => keyboardStore.colPins[i]
     )
     keyboardStore.colPins = keyboardStore.colPins.slice(0, keyboardStore.cols)
   }
 } else if (keyboardStore.wiringMethod === 'direct') {
   keyboardStore.directPins = Array.from(
     { length: keyboardStore.pins },
-    (x, i) => keyboardStore.directPins[i]
+    (_x, i) => keyboardStore.directPins[i]
   )
   keyboardStore.directPins = keyboardStore.directPins.slice(0, keyboardStore.pins)
 }

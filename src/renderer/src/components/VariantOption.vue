@@ -1,19 +1,30 @@
 <template>
-  <div v-if="layout.variants && layout.variants.length > 0" class="grid h-12 grid-cols-2 items-center gap-4">
-    <p class="text-right">
-      {{ variantName }}
-    </p>
-    <select v-model="selectedOption" class="select-bordered select" @change="selectMultiVariant">
-      <option v-for="(option, oindex) in layout.variants.filter((a, i) => i !== 0)" :value="oindex">
-        {{ option }}
-      </option>
-    </select>
-  </div>
-  <div v-else class="grid h-12 grid-cols-2 items-center gap-4">
-    <p class="text-right">
-      <input v-model="variantName" class="input-bordered input input-sm" />
-    </p>
-    <div class="flex gap-4">
+  <div class="flex items-center pr-4">
+    <div class="mr-2">
+      <button class="btn-primary btn-xs btn" @click="removeOption">
+        <i class="mdi mdi-close"></i>
+      </button>
+    </div>
+    <div
+      v-if="layout.variants && layout.variants.length > 0"
+      class="flex h-12 w-full items-center gap-2"
+    >
+      <input v-model="variantName" type="text" class="input-bordered input input-sm" />
+      <select
+        v-model="selectedOption"
+        class="select-bordered select select-sm mr-4"
+        @change="selectMultiVariant"
+      >
+        <option
+          v-for="(option, oindex) in layout.variants.filter((_a, i) => i !== 0)"
+          :value="oindex"
+        >
+          {{ option }}
+        </option>
+      </select>
+    </div>
+    <div v-else class="flex h-12 w-full items-center gap-2">
+      <input v-model="variantName" class="input-bordered input input-sm w-full" />
       <input v-model="selectedBool" type="checkbox" class="checkbox" @input="selectBool" />
     </div>
   </div>
@@ -32,7 +43,10 @@ const selectMultiVariant = () => {
   selectVariant({ layoutIndex: props.index, variant: selectedOption.value })
 }
 const selectBool = () => {
-  selectVariant({ layoutIndex: props.index, variant: !selectedBool.value ? 1 : 0 })
+  selectVariant({
+    layoutIndex: props.index,
+    variant: !selectedBool.value ? 1 : 0
+  })
 }
 const selectVariant = ({ layoutIndex, variant }: { layoutIndex: number; variant: number }) => {
   keyboardStore.layouts[layoutIndex].selected = variant
@@ -46,6 +60,9 @@ const variantName = computed({
     keyboardStore.layouts[props.index].name = newVal
   }
 })
+const removeOption = () => {
+  keyboardStore.layouts = keyboardStore.layouts.filter((_a, index) => index !== props.index)
+}
 </script>
 
 <style lang="scss" scoped></style>

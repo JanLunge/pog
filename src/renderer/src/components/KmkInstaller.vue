@@ -49,7 +49,7 @@ import { keyboardStore } from '../store'
 const progress = ref(0)
 const kmkInstallState = ref('')
 
-const props = defineProps(['initialSetup'])
+defineProps(['initialSetup'])
 
 const updateKMK = async () => {
   await window.api.updateFirmware()

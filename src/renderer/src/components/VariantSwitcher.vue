@@ -1,7 +1,6 @@
 <template>
   <div>
-    <p class="mb-4 text-xl font-bold">Layout Options</p>
-    <button class="btn-sm btn" @click="addLayoutOption">add Layout Option</button>
+    <button class="btn-sm btn btn-primary mb-4" @click="addLayoutOption"><i class="mdi mdi-plus"></i> add Layout Option</button>
     <VariantOption
       v-for="(layout, index) in keyboardStore.layouts"
       :layout="layout"

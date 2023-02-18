@@ -5,6 +5,7 @@ import {keyboardStore} from "./store";
 const store = computed(()=>{
   return keyboardStore
 })
+console.log('store initiated', store.value.path)
 </script>
 
 <template>
@@ -13,5 +14,6 @@ const store = computed(()=>{
 <style lang="scss">
 html,body,#app{
   height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont;
 }
 </style>

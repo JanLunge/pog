@@ -3,13 +3,14 @@ import LaunchScreen from '../screens/LaunchScreen.vue'
 import AddKeyboard from '../screens/AddKeyboard.vue'
 import KeyboardConfigurator from '../screens/KeyboardConfigurator.vue'
 import KmkInstaller from '../components/KmkInstaller.vue'
-import SetupWizard from "../screens/SetupWizard.vue";
-import LayoutEditor from "../components/LayoutEditor.vue";
-import KeymapEditor from "../components/KeymapEditor.vue";
-import EncoderSetup from "../components/EncoderSetup.vue";
-import MatrixSetup from "../components/MatrixSetup.vue";
-import PinSetup from "../components/PinSetup.vue";
-import RawKeymapEditor from "../components/RawKeymapEditor.vue";
+import SetupWizard from '../screens/SetupWizard.vue'
+import LayoutEditor from '../components/LayoutEditor.vue'
+import KeymapEditor from '../components/KeymapEditor.vue'
+import EncoderSetup from '../components/EncoderSetup.vue'
+import MatrixSetup from '../components/MatrixSetup.vue'
+import PinSetup from '../components/PinSetup.vue'
+import RawKeymapEditor from '../components/RawKeymapEditor.vue'
+import KeyboardName from "../components/KeyboardName.vue";
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -40,31 +41,45 @@ const router = createRouter({
         },
         {
           path: 'firmware',
-          component: KmkInstaller
+          component: KmkInstaller,
+          name: 'Firmware'
         },
         {
           path: 'layout-editor',
-          component: LayoutEditor
+          component: LayoutEditor,
+          name: 'Layout Editor'
         },
         {
           path: 'keymap',
-          component: KeymapEditor
+          component: KeymapEditor,
+          name: 'Keymap Editor'
         },
         {
           path: 'encoder',
-          component: EncoderSetup
+          component: EncoderSetup,
+          name: "Rotary Encoders"
         },
         {
           path: 'matrix',
-          component: MatrixSetup
+          component: MatrixSetup,
+          name: "Matrix Setup"
         },
         {
           path: 'pins',
-          component: PinSetup
+          component: PinSetup,
+          name: "Pin Setup"
         },
         {
           path: 'raw-keymap',
-          component: RawKeymapEditor
+          component: RawKeymapEditor,
+          name: "Raw Keymap"
+
+        },
+        {
+          path: 'info',
+          component: KeyboardName,
+          name: "info"
+
         }
       ]
     }

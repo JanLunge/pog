@@ -16,13 +16,14 @@
       <li><router-link to="/configurator/layout-editor">Keyboard Layout</router-link></li>
       <hr class="border-white border-opacity-40" />
       <li><router-link to="/configurator/encoder">Encoder</router-link></li>
+      <li><router-link to="/configurator/info">Info</router-link></li>
       <li><router-link to="/configurator/matrix">Matrix</router-link></li>
       <li><router-link to="/configurator/pins">Pins</router-link></li>
       <li><router-link to="/configurator/raw-keymap">Raw Keymap</router-link></li>
       <li><router-link to="/configurator/firmware">Firmware</router-link></li>
     </ul>
     <div class="h-screen flex-1 overflow-x-auto px-4 pt-8">
-      <h1 class="mb-8 text-center text-5xl font-bold" contenteditable="true">Keyboard Config</h1>
+      <h1 class="mb-8 text-center text-5xl font-bold" contenteditable="true">{{ currentRouteName }}</h1>
       <router-view></router-view>
       <div class="flex justify-center py-4">
         <div class="btn-primary btn-sm btn" @click="saveKeymap">Save python code to Keyboard</div>
@@ -33,19 +34,25 @@
 
 <script lang="ts" setup>
 import { keyboardStore } from '../store'
-import { useRouter } from 'vue-router'
+import {useRoute, useRouter} from 'vue-router'
+import {computed} from "vue";
 const router = useRouter()
+const route = useRoute()
 const reselectKeyboard = () => {
   router.push('/')
 }
 
-// pass pog.json to backend to convert it ? or convert it here
 const saveKeymap = async () => {
-  // save to pog.json
-  const saveResponse = await window.api.saveConfiguration(
+   await window.api.saveConfiguration(
     JSON.stringify({ pogConfig: keyboardStore.serialize(), writeFirmware: true })
   )
 }
+
+const currentRouteName = computed(() => route.matched[1].name)
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.router-link-active{
+  @apply bg-primary text-black font-bold;
+}
+</style>

@@ -2,7 +2,6 @@ import { appDir, currentKeyboard } from './store'
 import * as fs from 'fs-extra'
 import request from 'request'
 import decompress from 'decompress'
-import {ipcMain, shell} from 'electron'
 import {mainWindow} from "./index";
 
 // downloads kmk to app storage

@@ -1,24 +1,36 @@
 <template>
-  <div class="flex items-center">
-    Layers
-    <div class="tabs tabs-boxed ml-2 gap-4">
-      <div
-        class="tab"
-        :class="{ 'tab-active': index === selectedLayer }"
-        v-for="(_layer, index) in keyboardStore.keymap"
-        @click="selectedLayer = index"
+  <div class="relative">
+    <!--    <h2 class="mb-2 inline-block absolute top-6" style="transform: rotate(-90deg);  left: -15px">Layers</h2>-->
+    <div class="mb-2 flex gap-2">
+      <button class="btn-primary btn-sm btn" @click="addLayer">
+        <i class="mdi mdi-plus"></i>add Layer
+      </button>
+      <button
+        class="btn-primary btn-sm btn"
+        :disabled="keyboardStore.keymap.length === 1"
+        @click="removeLayer"
       >
-        {{ index }}
+        <i class="mdi mdi-trash-can"></i>remove Layer
+      </button>
+    </div>
+    <div class="flex items-center">
+      <div class="flex gap-2">
+        <div
+          v-for="(_layer, index) in keyboardStore.keymap"
+          class="tab"
+          :class="{ 'tab-active': index === selectedLayer }"
+          @click="selectedLayer = index"
+        >
+          {{ index }}
+        </div>
       </div>
-      <div class="tab tab-border" @click="addLayer">add Layer</div>
-      <div class="tab tab-border" @click="removeLayer">remove Layer</div>
     </div>
   </div>
   <keyboard-layout :key-layout="keyboardStore.keys" />
   <div v-if="selectedKeys.size !== 0" class="my-4">
     <p>Keycode Options for Selected Key(s)</p>
     <div class="flex gap-2">
-      <select class="select select-bordered" v-model="keycodeModeForSelection">
+      <select v-model="keycodeModeForSelection" class="select-bordered select">
         <!-- simple will just inline the keycode -->
         <option value="simple">simple</option>
         <!-- other options will create a separately linked keycode -->
@@ -33,7 +45,7 @@
         </div>
         <div v-if="keycodeModeForSelection !== 'simple'">
           <span>set custom keycode</span>
-          <input type="text" class="input input-bordered" v-model="tmpKeycode"/>
+          <input v-model="tmpKeycode" type="text" class="input-bordered input" />
         </div>
       </div>
     </div>
@@ -42,63 +54,63 @@
 </template>
 
 <script lang="ts" setup>
-import {
- keyboardStore,
-  selectedKeys,
-  selectedLayer,
-} from "../store";
-import KeyboardLayout from "./KeyboardLayout.vue";
-import KeyPicker from "./KeyPicker.vue";
-import { matrixPositionToIndex, selectNextKey } from "../helpers";
-import { ref } from "vue";
+import { keyboardStore, selectedKeys, selectedLayer } from '../store'
+import KeyboardLayout from './KeyboardLayout.vue'
+import KeyPicker from './KeyPicker.vue'
+import { cleanupKeymap, selectNextKey } from '../helpers'
+import { ref } from 'vue'
 
-const tmpKeycode = ref("")
+const tmpKeycode = ref('')
 selectedKeys.value.clear()
 
-const keycodeModeForSelection = ref<
-  "simple" | "combo" | "sequence" | "custom" | "tapdance"
->("simple");
+const keycodeModeForSelection = ref<'simple' | 'combo' | 'sequence' | 'custom' | 'tapdance'>(
+  'simple'
+)
 const setKey = (keyCode: string) => {
   selectedKeys.value.forEach((index) => {
     keyboardStore.keys[index].setOnKeymap(keyCode)
-  });
+  })
   // if one key is selected select the next
+  // TODO: only select visible keys
   if (selectedKeys.value.size === 1) {
-    selectNextKey();
+    selectNextKey()
   }
-};
+}
+cleanupKeymap()
 const addLayer = () => {
   if (!keyboardStore.keymap[0]) {
-    keyboardStore.keymap.push(
-      Array(
-        keyboardStore.cols * keyboardStore.rows
-      ).fill("KC.TRNS")
-    );
+    keyboardStore.keymap.push(Array(keyboardStore.cols * keyboardStore.rows).fill('KC.TRNS'))
   }
-  const tmpKeymap = [...keyboardStore.keymap[0]];
-  tmpKeymap.fill("KC.TRNS");
-  keyboardStore.keymap.push(tmpKeymap);
+  const tmpKeymap = [...keyboardStore.keymap[0]]
+  tmpKeymap.fill('KC.TRNS')
+  keyboardStore.keymap.push(tmpKeymap)
   // if needed also add an encoder layer
-  const encoderCount = keyboardStore.encoders.length;
+  const encoderCount = keyboardStore.encoders.length
   if (encoderCount !== 0) {
-    keyboardStore.encoderKeymap.push(
-      Array(encoderCount).fill(["KC.TRNS", "KC.TRNS"])
-    );
+    keyboardStore.encoderKeymap.push(Array(encoderCount).fill(['KC.TRNS', 'KC.TRNS']))
   }
-};
+}
 const removeLayer = () => {
-  if (selectedLayer.value === keyboardStore.keymap.length - 1) {
-    selectedLayer.value = keyboardStore.keymap.length - 2;
+  if (selectedLayer.value === keyboardStore.keymap.length - 1 && selectedLayer.value !== 0) {
+    selectedLayer.value = keyboardStore.keymap.length - 2
   }
-  if (keyboardStore.keymap.length <= 1) return;
+  if (keyboardStore.keymap.length <= 1) return
 
-  keyboardStore.keymap.splice(selectedLayer.value,1);
+  keyboardStore.keymap.splice(selectedLayer.value, 1)
   // if needed also remove the encoder layer
-  const encoderCount = keyboardStore.encoders.length;
+  const encoderCount = keyboardStore.encoders.length
   if (encoderCount !== 0) {
-    keyboardStore.encoderKeymap.splice(selectedLayer.value,1);
+    keyboardStore.encoderKeymap.splice(selectedLayer.value, 1)
   }
-};
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.tab {
+  @apply rounded;
+  background: #434343;
+}
+.tab-active {
+  @apply bg-primary font-bold text-black;
+}
+</style>

@@ -229,7 +229,7 @@
         <div
           class="key"
           @click="setKey(`KC.MO(${index})`)"
-          v-for="(layer, index) in keyboardStore.keymap"
+          v-for="(_layer, index) in keyboardStore.keymap"
         >
           MO({{ index }})
         </div>
@@ -240,7 +240,7 @@
         <div
           class="key"
           @click="setKey(`KC.TG(${index})`)"
-          v-for="(layer, index) in keyboardStore.keymap"
+          v-for="(_layer, index) in keyboardStore.keymap"
         >
           TG({{ index }})
         </div>
@@ -249,7 +249,7 @@
         <div
           class="key"
           @click="setKey(`KC.TO(${index})`)"
-          v-for="(layer, index) in keyboardStore.keymap"
+          v-for="(_layer, index) in keyboardStore.keymap"
         >
           TO({{ index }})
         </div>
@@ -258,14 +258,14 @@
         <div
           class="key"
           @click="setKey(`KC.TT(${index})`)"
-          v-for="(layer, index) in keyboardStore.keymap"
+          v-for="(_layer, index) in keyboardStore.keymap"
         >
           TT({{ index }})
         </div>
       </div>
     </div>
     <div class="bonus">
-      <div class="key" @click="setKey(index)" v-for="(layer, index) in keyboardStore.keymap">
+      <div class="key" @click="setKey(index)" v-for="(_layer, index) in keyboardStore.keymap">
         Layer {{ index }}
       </div>
     </div>

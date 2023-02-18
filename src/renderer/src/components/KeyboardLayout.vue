@@ -32,10 +32,10 @@
 
         <key-cap
           v-for="(key, keyIndex) in keyLayout"
+          :key="key.id"
           :key-data="key"
           :key-index="keyIndex"
           :mode="mode"
-          @selected="keyChanged"
         >
         </key-cap>
       </div>
@@ -45,7 +45,7 @@
 
 <script lang="ts" setup>
 import KeyCap from './KeyCap.vue'
-import { computed, onDeactivated, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { keyboardStore, selectedKeys } from '../store'
 import { SelectionArea } from '@viselect/vue'
 import type { SelectionEvent } from '@viselect/vue'
@@ -80,26 +80,6 @@ const keyboardHeight = computed(() => {
   return maxH
 })
 
-const keyChanged = ({
-  key,
-  args,
-  keyIndex,
-  added
-}: {
-  key: number[]
-  args: boolean
-  keyIndex: number
-  added: boolean
-}) => {
-  // if (added && props.mode === "layout") {
-  //   selectedKeys.value.add(keyIndex);
-  // } else {
-  //   selectedKeys.value = new Set([keyIndex]);
-  // }
-  // selectedKey.value.key = key;
-  // selectedKey.value.args = args;
-  // selectedKey.value.keyIndex = keyIndex;
-}
 const keyboardScale = ref(1)
 const updateScale = () => {
   const wrapper = document.querySelector('#keyboardlayout-wrapper')
@@ -120,16 +100,16 @@ onUnmounted(() => {
 
 const rotationOriginX = computed(() => {
   if (!selectedKeys.value.size) return 0
-  const firstSelectedKey = [...selectedKeys.value][0]
-  if (!props.keyLayout.keys[firstSelectedKey]) return '0'
-  const x = props.keyLayout.keys[firstSelectedKey].rx * 58
+  const firstSelectedKeyIndex = [...selectedKeys.value][0]
+  if (!props.keyLayout[firstSelectedKeyIndex]) return '0'
+  const x = props.keyLayout[firstSelectedKeyIndex].rx * 58
   return `${x}px` // return "xpx ypx"
 })
 const rotationOriginY = computed(() => {
   if (!selectedKeys.value.size) return 0
-  const firstSelectedKey = [...selectedKeys.value][0]
-  if (!props.keyLayout.keys[firstSelectedKey]) return '0'
-  const y = props.keyLayout.keys[firstSelectedKey].ry * 58
+  const firstSelectedKeyIndex = [...selectedKeys.value][0]
+  if (!props.keyLayout[firstSelectedKeyIndex]) return '0'
+  const y = props.keyLayout[firstSelectedKeyIndex].ry * 58
   return `${y}px` // return "xpx ypx"
 })
 
@@ -178,8 +158,7 @@ const onMove = ({
   store: {
     changed: { added, removed }
   },
-  event,
-  selection
+  event
 }: SelectionEvent) => {
   if (event?.shiftKey && props.mode === 'layout') {
     if (event instanceof MouseEvent) {

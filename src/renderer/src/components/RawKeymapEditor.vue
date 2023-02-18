@@ -11,7 +11,7 @@
       >
         <input
           class="input input-sm input-bordered"
-          v-for="(key, index) in layer"
+          v-for="(_key, index) in layer"
           v-model="keyboardStore.keymap[layerindex][index]"
           placeholder="KC.A"
         />

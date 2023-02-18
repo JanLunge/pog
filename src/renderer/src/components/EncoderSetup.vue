@@ -32,7 +32,7 @@
       <div>
         Keymap
         <EncoderLayer
-          v-for="(layer, lindex) in keymap"
+          v-for="(_layer, lindex) in keyboardStore.keymap"
           :lindex="lindex"
           :eindex="eindex"
         ></EncoderLayer>
@@ -91,14 +91,14 @@ const removeEncoder = (index: number) => {
 
   // cleanEncoders();
   keyboardStore.encoders = keyboardStore.encoders.filter(
-    (e, eindex) => {
+    (_e, eindex) => {
       return eindex !== index;
     }
   );
   // remove that index from each keymap layer
   keyboardStore.encoderKeymap.forEach((layer, lindex) => {
     keyboardStore.encoderKeymap[lindex] = layer.filter(
-      (l, eindex) => eindex !== index
+      (_l, eindex) => eindex !== index
     );
   });
 };

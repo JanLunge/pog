@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-col p-4">
     <div class="flex flex-col items-center">
-      <div class="flex gap-2 items-center">
+      <div class="flex items-center gap-2">
         <img src="../assets/icon.png" alt="" class="w-16" />
       </div>
       <p class="pt-6">Effortlessly customize your keyboard with Pog</p>
@@ -9,8 +9,8 @@
     <div class="text-2xl font-bold">Your Keyboards</div>
     <div class="divider"></div>
     <div class="my-4 flex justify-center">
-      <button class="btn btn-primary" @click="selectDrive">
-        <i class="mdi mdi-plus text-lg mr-1"></i><span class="text-xs">add new keyboard</span>
+      <button class="btn-primary btn" @click="selectDrive">
+        <i class="mdi mdi-plus mr-1 text-lg"></i><span class="text-xs">add new keyboard</span>
       </button>
     </div>
     <div class="text-center italic opacity-50">
@@ -19,13 +19,24 @@
     </div>
     <div class="">
       <div class="keyboard-list">
-        <div v-for="keyboard in keyboardHistory" :key="keyboard.id" class="keyboard-preview" @click="selectKeyboard(keyboard.path)">
+        <div
+          v-for="keyboard in keyboardHistory"
+          :key="keyboard.id"
+          class="keyboard-preview"
+          @click="selectKeyboard(keyboard.path)"
+        >
           <div class="image">
             <img :src="keyboard.image" alt="" />
           </div>
-          <div class="flex-grow flex flex-col justify-center">
+          <div class="relative flex flex-grow flex-col justify-center">
+            <button
+              class="btn-ghost btn-sm btn absolute top-0 right-0"
+              @click.stop="removeFromHistory(keyboard)"
+            >
+              <i class="mdi mdi-close"></i>
+            </button>
             <p class="font-bold">{{ keyboard.name }}</p>
-            <p class="mt-2 italic mt-2">{{ keyboard.path }}</p>
+            <p class="mt-2 mt-2 italic">{{ keyboard.path }}</p>
             <p class="mt-2">{{ keyboard.description }}</p>
             <div>
               <div
@@ -41,40 +52,14 @@
         </div>
       </div>
     </div>
-
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
-import { ulid } from 'ulid'
 import { useRouter } from 'vue-router'
-import {keyboardStore, keyboardHistory} from "../store";
+import { keyboardStore, keyboardHistory } from '../store'
 const router = useRouter()
-//
-// const keyboardHistory = ref<
-//   {
-//     id: string
-//     name: string
-//     description: string
-//     image: string
-//     path: string
-//     tags: { label: string; color: string; category: 'formfactor' }[]
-//   }[]
-// >([])
-//
-// keyboardHistory.value.push({
-//   id: ulid(),
-//   name: '0xCB New Horizons',
-//   description: '65% keyboard with rotary encoder',
-//   path: '/Volumes/Helios',
-//   image: '',
-//   tags: [{ category: 'formfactor', label: '65%', color: '#399453' }]
-// })
 
-const addKeyboard = () => {
-  router.push('/add-keyboard')
-}
 const selectDrive = async () => {
   const keyboard = await window.api.selectDrive()
   console.log(keyboard)
@@ -82,6 +67,13 @@ const selectDrive = async () => {
   console.log(keyboardStore)
   if (keyboardStore.pogConfigured) {
     router.push('/configurator')
+    // also save to history
+    keyboardHistory.value.unshift({
+      path: keyboardStore.path,
+      id: keyboardStore.id,
+      name: keyboardStore.name,
+      tags: keyboardStore.tags
+    })
   } else {
     router.push('/setup-wizard')
   }
@@ -92,20 +84,24 @@ const selectKeyboard = async (keyboardPath) => {
   keyboardStore.import(keyboard)
   router.push('/configurator')
 }
+
+const removeFromHistory = (keyboard) => {
+  keyboardHistory.value = keyboardHistory.value.filter((board) => board.id !== keyboard.id)
+}
 </script>
 
 <style lang="scss" scoped>
 .keyboard-list {
-  @apply gap-2 pb-2 mt-2 mx-auto;
+  @apply mx-auto mt-2 gap-2 pb-2;
   max-width: 700px;
 }
 .keyboard-preview {
-  @apply flex gap-4 p-4 rounded transition-all cursor-pointer border border-white border-opacity-0;
+  @apply flex cursor-pointer gap-4 rounded border border-white border-opacity-0 p-4 transition-all;
   &:hover {
-    @apply bg-base-300 border-opacity-40;
+    @apply border-opacity-40 bg-base-300;
   }
   .image {
-    @apply rounded flex items-center justify-center;
+    @apply flex items-center justify-center rounded;
     width: 250px;
     height: 130px;
     border: 1px solid #333;

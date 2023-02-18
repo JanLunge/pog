@@ -1,40 +1,31 @@
 <template>
   <div
-    class="flex gap-4 items-center mb-4"
-    v-if="
-      selectedConfig &&
-      selectedConfig.encoderKeymap[lindex] &&
-      selectedConfig.encoderKeymap[lindex][eindex]
-    "
+    v-if="keyboardStore.encoderKeymap[lindex] && keyboardStore.encoderKeymap[lindex][eindex]"
+    class="mb-4 flex items-center gap-4"
   >
     <p class="w-24">layer {{ lindex }}</p>
     <input
+      v-model="keyboardStore.encoderKeymap[lindex][eindex][0]"
       type="text"
-      class="input input-bordered"
-      v-model="selectedConfig.encoderKeymap[lindex][eindex][0]"
+      class="input-bordered input"
     />
     <input
+      v-model="keyboardStore.encoderKeymap[lindex][eindex][1]"
       type="text"
-      class="input input-bordered"
-      v-model="selectedConfig.encoderKeymap[lindex][eindex][1]"
+      class="input-bordered input"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { keyboardStore } from "../store";
-const props = defineProps(["lindex", "layer", "eindex"]);
-if (selectedConfig.value) {
-  if (!selectedConfig.value.encoderKeymap[props.lindex]) {
-    // create the layer
-    selectedConfig.value.encoderKeymap[props.lindex] = [];
-  }
-  if (!selectedConfig.value.encoderKeymap[props.lindex][props.eindex]) {
-    selectedConfig.value.encoderKeymap[props.lindex][props.eindex] = [
-      "KC.TRNS",
-      "KC.TRNS",
-    ];
-  }
+import { keyboardStore } from '../store'
+const props = defineProps(['lindex', 'layer', 'eindex'])
+if (!keyboardStore.encoderKeymap[props.lindex]) {
+  // create the layer
+  keyboardStore.encoderKeymap[props.lindex] = []
+}
+if (!keyboardStore.encoderKeymap[props.lindex][props.eindex]) {
+  keyboardStore.encoderKeymap[props.lindex][props.eindex] = ['KC.TRNS', 'KC.TRNS']
 }
 </script>
 

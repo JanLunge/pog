@@ -41,14 +41,18 @@
         @input="checkMatrix"
       ></InputLabel>
     </div>
-    <div class="mb-8 flex justify-center" v-if="initialSetup">
-      <button class="btn-primary btn" :class="{ 'btn-disabled': matrixEmpty }" @click="$emit('next')">
+    <div v-if="initialSetup" class="mb-8 flex justify-center">
+      <button
+        class="btn-primary btn"
+        :class="{ 'btn-disabled': matrixEmpty }"
+        @click="$emit('next')"
+      >
         Next
       </button>
     </div>
     <div v-if="keyboardStore.wiringMethod === 'matrix'" class="grid-visualizer">
-      <div v-for="row in keyboardStore.rows" class="row">
-        <div v-for="col in keyboardStore.cols" class="col"></div>
+      <div v-for="_row in keyboardStore.rows" class="row">
+        <div v-for="_col in keyboardStore.cols" class="col"></div>
       </div>
     </div>
   </div>
@@ -58,7 +62,7 @@
 import InputLabel from './ui/InputLabel.vue'
 import { keyboardStore } from '../store'
 import { computed } from 'vue'
-const props = defineProps(['initialSetup'])
+defineProps(['initialSetup'])
 const matrixEmpty = computed(() => {
   return !(
     keyboardStore.cols !== 0 &&

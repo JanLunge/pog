@@ -51,15 +51,12 @@
 
 <script lang="ts" setup>
 import { keyboardStore } from '../store'
-import { computed } from 'vue'
 import Multiselect from '@vueform/multiselect'
 
-const props = defineProps(['initialSetup'])
+ defineProps(['initialSetup'])
 const keyboardTags = [{ value: '65%', name: '65%', type: 'formfactor' }]
 
-const infoComplete = computed(() => {
-  return keyboardStore.name !== ''
-})
+
 </script>
 
 <style lang="scss" scoped></style>
