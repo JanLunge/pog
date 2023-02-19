@@ -3,7 +3,7 @@ keyboard flashing utility
 
 POG stands for Pog Open Gui
 
-![version](https://badgen.net/badge/version/v0.0.9/green )
+![version](https://badgen.net/badge/version/v0.5.0/green )
 
 ![logo](build/icon.png?raw=true)
 

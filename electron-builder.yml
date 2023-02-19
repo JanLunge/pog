@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: vue-vite-electron
+appId: de.heaper.pog
+productName: pog
 directories:
   buildResources: build
 files:
@@ -12,7 +12,7 @@ asarUnpack:
   - resources/*
 afterSign: build/notarize.js
 win:
-  executableName: vue-vite-electron
+  executableName: pog
 nsis:
   artifactName: ${name}-${version}-setup.${ext}
   shortcutName: ${productName}
