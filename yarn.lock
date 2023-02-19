@@ -899,11 +899,6 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.2.47.tgz#e597ef75086c6e896ff5478a6bfc0a7aa4bbd14c"
   integrity sha512-BHGyyGN3Q97EZx0taMQ+OLNuZcW3d37ZEVmEAyeoA9ERdGvm9Irc/0Fua8SNyOtV1w6BS4q25wbMzJujO9HIfQ==
 
-"@vueform/multiselect@^2.5.8":
-  version "2.5.8"
-  resolved "https://registry.yarnpkg.com/@vueform/multiselect/-/multiselect-2.5.8.tgz#2ebda7286c1bb56ae0c5c2f7f4b5a749a69217a2"
-  integrity sha512-etUJCCDlo3LDsbDLoJdDHFpvgHyl2rzcOG9VQvLJ3caNIHDYm0g+HMIbAydswWr1iWKstqRi9YkkBR75gQ9TBw==
-
 "@vueuse/core@^9.12.0":
   version "9.12.0"
   resolved "https://registry.yarnpkg.com/@vueuse/core/-/core-9.12.0.tgz#e5b20f901e081c7ae5fe0e5f3af217929034eefe"
@@ -4517,6 +4512,11 @@ vue-eslint-parser@^9.0.0, vue-eslint-parser@^9.0.1:
     esquery "^1.4.0"
     lodash "^4.17.21"
     semver "^7.3.6"
+
+vue-multiselect@^3.0.0-beta.1:
+  version "3.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/vue-multiselect/-/vue-multiselect-3.0.0-beta.1.tgz#f5c33677237fa9af0105f94783c3175330731e5a"
+  integrity sha512-V+jpydtjyHcQ+yjHsEWEBrDAopOx/pufNkSAXNVDAGQ+ESDEJ7wYejNd9H1RiCnFOYK4yf1XSGqE+Mp3HJXmdg==
 
 vue-router@^4.1.6:
   version "4.1.6"

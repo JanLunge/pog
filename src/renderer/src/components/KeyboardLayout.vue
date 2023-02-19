@@ -36,6 +36,8 @@
           :key-data="key"
           :key-index="keyIndex"
           :mode="mode"
+          :keymap="keymap"
+          :matrix-width="matrixWidth"
         >
         </key-cap>
       </div>
@@ -51,7 +53,7 @@ import { SelectionArea } from '@viselect/vue'
 import type { SelectionEvent } from '@viselect/vue'
 import { isNumber } from '@vueuse/core'
 import { useDebounceFn } from '@vueuse/core'
-const props = defineProps(['keyLayout', 'mode'])
+const props = defineProps(['keyLayout', 'keymap', 'mode', 'matrixWidth'])
 // mode can be layout or keymap
 
 // find right edge
@@ -133,6 +135,10 @@ const moving = ref(false)
 const moveStart = ref({ x: 0, y: 0 })
 const writtenDelta = ref({ x: 0, y: 0 })
 const onStart = ({ event, selection }: SelectionEvent) => {
+  if (props.mode === 'static') {
+    selection.cancel()
+    return
+  }
   if (event?.shiftKey && props.mode === 'layout') {
     if (event instanceof MouseEvent) {
       // save start point
@@ -160,6 +166,9 @@ const onMove = ({
   },
   event
 }: SelectionEvent) => {
+  if(props.mode==='static'){
+    return
+  }
   if (event?.shiftKey && props.mode === 'layout') {
     if (event instanceof MouseEvent) {
       // console.log(event, selection);

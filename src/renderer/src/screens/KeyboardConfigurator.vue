@@ -26,7 +26,7 @@
       <h1 class="mb-8 text-center text-5xl font-bold" contenteditable="true">{{ currentRouteName }}</h1>
       <router-view></router-view>
       <div class="flex justify-center py-4">
-        <div class="btn-primary btn-sm btn" @click="saveKeymap">Save python code to Keyboard</div>
+        <div class="btn-primary btn-sm btn" @click="saveKeymap"><i class="mdi mdi-content-save"></i>Save python code to Keyboard</div>
       </div>
     </div>
   </div>

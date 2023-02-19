@@ -259,6 +259,7 @@ export const renderLabel = (keycode: string) => {
     LEFT: { icon: 'mdi-arrow-left' },
     DOWN: { icon: 'mdi-arrow-down' },
     RIGHT: { icon: 'mdi-arrow-right' },
+    GRV: {label: '`'},
 
     // Layer
     MO: { label: 'MO' },

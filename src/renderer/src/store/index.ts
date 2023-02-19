@@ -13,6 +13,18 @@ type KeyActions = {
 }[]
 
 export const keyboardHistory = useStorage<any[]>('keyboardHistory', [])
+export const addToHistory = (keyboard)=>{
+  keyboardHistory.value.unshift({
+    path: keyboard.path,
+    id: keyboard.id,
+    name: keyboard.name,
+    tags: keyboard.tags,
+    description: keyboard.description,
+    keys: keyboard.keys,
+    keymap: keyboard.keymap,
+    cols: keyboard.cols
+  })
+}
 
 // list of key indexes that are selected
 export const selectedKeys = ref<Set<number>>(new Set())

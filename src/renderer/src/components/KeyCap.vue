@@ -83,17 +83,19 @@ import { computed, ref, watch } from 'vue'
 import { selectedLayer, selectedKeys, keyboardStore } from '../store'
 import { matrixPositionToIndex, renderLabel } from '../helpers'
 
-const props = defineProps(['keyData', 'keyIndex', 'mode'])
+const props = defineProps(['keyData', 'keyIndex', 'mode', 'keymap', 'matrixWidth'])
 defineEmits(['selected'])
 
 const keyGap = 4
 // hide normal labels and show the keymap thing
 const action = computed(() => {
   if (props.mode === 'layout') return //String(props.keyData.matrix)
-  const matrixWidth = keyboardStore.cols
-  const keyIndex = matrixPositionToIndex({ pos: props.keyData.matrix, matrixWidth })
-  if (!keyboardStore.keymap[selectedLayer.value]) return 'l missing'
-  const keyCode = keyboardStore.keymap[selectedLayer.value][keyIndex]
+  const keyIndex = matrixPositionToIndex({
+    pos: props.keyData.matrix,
+    matrixWidth: props.matrixWidth
+  })
+  if (!props.keymap[selectedLayer.value]) return 'l missing'
+  const keyCode = props.keymap[selectedLayer.value][keyIndex]
   // resolve readable character
   if (!keyCode || keyCode === 'KC.TRNS') return '▽'
   return keyCode

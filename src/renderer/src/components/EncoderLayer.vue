@@ -7,12 +7,12 @@
     <input
       v-model="keyboardStore.encoderKeymap[lindex][eindex][0]"
       type="text"
-      class="input-bordered input"
+      class="input-bordered input input-sm"
     />
     <input
       v-model="keyboardStore.encoderKeymap[lindex][eindex][1]"
       type="text"
-      class="input-bordered input"
+      class="input-bordered input input-sm"
     />
   </div>
 </template>

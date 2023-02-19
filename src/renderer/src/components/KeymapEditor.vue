@@ -26,7 +26,11 @@
       </div>
     </div>
   </div>
-  <keyboard-layout :key-layout="keyboardStore.keys" />
+  <keyboard-layout
+    :key-layout="keyboardStore.keys"
+    :keymap="keyboardStore.keymap"
+    :matrix-width="keyboardStore.cols"
+  />
   <div v-if="selectedKeys.size !== 0" class="my-4">
     <p>Keycode Options for Selected Key(s)</p>
     <div class="flex gap-2">

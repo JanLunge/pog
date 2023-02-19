@@ -1,21 +1,20 @@
 <template>
   <div>
-    <p>Encoder setup is currently WIP</p>
     <div
       v-for="(encoder, eindex) in keyboardStore.encoders"
       class="my-2 p-4 bg-base-300 grid gap-4"
     >
       <div class="flex gap-4 justify-between">
-        <p>Encoder {{ eindex }}</p>
+        <p class="font-bold text-lg">Encoder {{ eindex }}</p>
         <button class="btn btn-xs btn-error" @click="removeEncoder(eindex)">
-          remove encoder
+         <i class="mdi mdi-delete"></i> remove encoder
         </button>
       </div>
-      <div class="flex items-center gap-4 mb-4">
+      <div class="flex items-center gap-4 mb-2">
         <label>Pad A</label>
         <input
           type="text"
-          class="input input-bordered"
+          class="input input-bordered input-sm"
           v-model="encoder.pad_a"
           placeholder="14"
         />
@@ -24,7 +23,7 @@
         <label>Pad B</label>
         <input
           type="text"
-          class="input input-bordered"
+          class="input input-bordered input-sm"
           v-model="encoder.pad_b"
           placeholder="14"
         />
@@ -39,7 +38,7 @@
       </div>
     </div>
     <div class="btn btn-sm btn-primary mt-2" @click="addEncoder">
-      add Encoder
+      <i class="mdi mdi-plus"></i>add Encoder
     </div>
   </div>
 </template>

@@ -26,7 +26,13 @@
           @click="selectKeyboard(keyboard.path)"
         >
           <div class="image">
-            <img :src="keyboard.image" alt="" />
+            <!--            <img :src="keyboard.image" alt="" />-->
+            <keyboard-layout
+              :key-layout="keyboard.keys"
+              :keymap="keyboard.keymap"
+              :matrix-width="keyboard.cols"
+              mode="static"
+            ></keyboard-layout>
           </div>
           <div class="relative flex flex-grow flex-col justify-center">
             <button
@@ -36,7 +42,7 @@
               <i class="mdi mdi-close"></i>
             </button>
             <p class="font-bold">{{ keyboard.name }}</p>
-            <p class="mt-2 mt-2 italic">{{ keyboard.path }}</p>
+            <p class="mt-2 mt-2 italic text-xs">{{ keyboard.path }}</p>
             <p class="mt-2">{{ keyboard.description }}</p>
             <div>
               <div
@@ -57,7 +63,8 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
-import { keyboardStore, keyboardHistory } from '../store'
+import { keyboardStore, keyboardHistory, addToHistory } from '../store'
+import KeyboardLayout from '../components/KeyboardLayout.vue'
 const router = useRouter()
 
 const selectDrive = async () => {
@@ -68,12 +75,7 @@ const selectDrive = async () => {
   if (keyboardStore.pogConfigured) {
     router.push('/configurator')
     // also save to history
-    keyboardHistory.value.unshift({
-      path: keyboardStore.path,
-      id: keyboardStore.id,
-      name: keyboardStore.name,
-      tags: keyboardStore.tags
-    })
+    addToHistory(keyboardStore)
   } else {
     router.push('/setup-wizard')
   }
@@ -101,8 +103,8 @@ const removeFromHistory = (keyboard) => {
     @apply border-opacity-40 bg-base-300;
   }
   .image {
-    @apply flex items-center justify-center rounded;
-    width: 250px;
+    @apply flex items-center justify-center rounded flex-shrink-0;
+    width: 350px;
     height: 130px;
     border: 1px solid #333;
   }

@@ -2,46 +2,26 @@
   <div class="mt-8">
     <div class="mb-4">
       <p class="mb-2 text-sm">Name</p>
-      <input v-model="keyboardStore.name" type="text" class="input-bordered input" />
+      <input v-model="keyboardStore.name" type="text" class="input-bordered input w-full" />
     </div>
     <div class="mb-4">
       <p class="mb-2 text-sm">Manufacturer</p>
-      <input v-model="keyboardStore.manufacturer" type="text" class="input-bordered input" />
+      <input v-model="keyboardStore.manufacturer" type="text" class="input-bordered input w-full" />
     </div>
     <div class="mb-4">
       <p class="mb-2 text-sm">Description</p>
-      <input v-model="keyboardStore.description" type="text" class="input-bordered input" />
+      <textarea v-model="keyboardStore.description" type="text" class="textarea-bordered textarea w-full" />
     </div>
     <div class="mb-4">
       <p class="mb-2 text-sm">Tags</p>
-      <Multiselect
+      <VueMultiselect
         v-model="keyboardStore.tags"
-        mode="tags"
-        :searchable="true"
-        :create-option="false"
         :options="keyboardTags"
-        :close-on-select="false"
-        track-by="name"
-        label="name"
+        :multiple="true"
+        :taggable="true"
+        @tag="addTag"
       >
-        <template #tag="{ option, handleTagRemove, disabled }">
-          <div
-            class="multiselect-tag is-user"
-            :class="{
-              'is-disabled': disabled
-            }"
-          >
-            {{ option.name }}
-            <span
-              v-if="!disabled"
-              class="multiselect-tag-remove"
-              @mousedown.prevent="handleTagRemove(option, $event)"
-            >
-              <span class="multiselect-tag-remove-icon"></span>
-            </span>
-          </div>
-        </template>
-      </Multiselect>
+      </VueMultiselect>
     </div>
     <div class="flex justify-center mt-8">
       <button v-if="initialSetup" class="btn-primary btn" @click="$emit('next')">next</button>
@@ -51,12 +31,17 @@
 
 <script lang="ts" setup>
 import { keyboardStore } from '../store'
-import Multiselect from '@vueform/multiselect'
-
+import VueMultiselect from 'vue-multiselect'
  defineProps(['initialSetup'])
-const keyboardTags = [{ value: '65%', name: '65%', type: 'formfactor' }]
+const keyboardTags = ['65%']
 
+const addTag = (tag) => {
+  console.log(tag)
+  keyboardStore.tags.push(tag)
 
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" >
+@import 'vue-multiselect/dist/vue-multiselect.css'
+</style>
