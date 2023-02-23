@@ -4,6 +4,7 @@ import { ulid } from 'ulid'
 import { useRouter } from 'vue-router'
 import { matrixPositionToIndex } from '../helpers'
 import { useStorage } from '@vueuse/core'
+import dayjs from "dayjs";
 const router = useRouter()
 // @ts-ignore will be used later
 type KeyActions = {
@@ -13,17 +14,22 @@ type KeyActions = {
 }[]
 
 export const keyboardHistory = useStorage<any[]>('keyboardHistory', [])
-export const addToHistory = (keyboard)=>{
-  keyboardHistory.value.unshift({
-    path: keyboard.path,
-    id: keyboard.id,
-    name: keyboard.name,
-    tags: keyboard.tags,
-    description: keyboard.description,
-    keys: keyboard.keys,
-    keymap: keyboard.keymap,
-    cols: keyboard.cols
-  })
+export const addToHistory = (keyboard) => {
+  console.log("saving keyboard to history",keyboard)
+  // to get rid of reactivity and proxys while deepcloning // does not work with structured clone
+  const keyboardData = {...JSON.parse(JSON.stringify(keyboard.serialize())), path: keyboard.path}
+  if (!keyboardHistory.value.find((board) => board.id === keyboard.id)) {
+    keyboardHistory.value.unshift(keyboardData)
+  } else {
+    const index = keyboardHistory.value.findIndex((board) => board.id === keyboard.id)
+    // push this version to the backups as well
+    if(!keyboardHistory.value[index].backups) keyboardHistory.value[index].backups = []
+    const backups = [keyboardData, ...keyboardHistory.value[index].backups].slice(0, 100)
+    keyboardHistory.value[index] = {
+      ...keyboardData,
+      backups
+    }
+  }
 }
 
 // list of key indexes that are selected
@@ -51,6 +57,7 @@ export type BaseKeyInfo = {
 export type KeyInfo = BaseKeyInfo & {
   matrix?: [number, number]
   variant?: [number, number]
+  directPinIndex?: number
 }
 
 export class Key {
@@ -67,8 +74,9 @@ export class Key {
   rx = 0
   ry = 0
   matrix?: [number, number] = undefined
+  directPinIndex?: number = undefined
   variant?: [number, number] = undefined
-  constructor({ x, y, matrix, variant, h, w, x2, y2, h2, w2, r, rx, ry }: KeyInfo) {
+  constructor({ x, y, matrix, variant, h, w, x2, y2, h2, w2, r, rx, ry, directPinIndex }: KeyInfo) {
     this.x = x
     this.y = y
     if (matrix && matrix.length === 2) {
@@ -76,6 +84,9 @@ export class Key {
     }
     if (variant && variant.length === 2) {
       this.variant = variant
+    }
+    if (typeof directPinIndex === "number") {
+      this.directPinIndex = directPinIndex
     }
     if (h) this.h = h
     if (w) this.w = w
@@ -104,6 +115,12 @@ export class Key {
     if (this.h2) {
       tmpKey.h2 = this.h2
     }
+    if (this.x2) {
+      tmpKey.x2 = this.x2
+    }
+    if (this.y2) {
+      tmpKey.y2 = this.y2
+    }
     if (this.r) {
       tmpKey.r = this.r
     }
@@ -118,6 +135,9 @@ export class Key {
     }
     if (Array.isArray(this.variant) && this.variant.length === 2) {
       tmpKey.variant = this.variant.map((n) => Number(n)) as [number, number]
+    }
+    if(typeof this.directPinIndex === 'number'){
+      tmpKey.directPinIndex = this.directPinIndex
     }
     return tmpKey
   }
@@ -165,6 +185,7 @@ export class Key {
     keyboardStore.keymap[selectedLayer.value][keyIndex] = keyCode
   }
   getMatrixLabel() {
+    if(typeof this.directPinIndex === 'number') return this.directPinIndex
     if (this.matrix) {
       if (
         typeof this.matrix[0] === 'number' &&
@@ -272,6 +293,27 @@ class Keyboard {
     return this.keys.length
   }
 
+  getMatrixWidth() {
+    return this.cols
+  }
+
+  // get keymap index for matrix pos of a key
+  getKeymapIndexForKey({ key }) {
+    const keyIndex = matrixPositionToIndex({
+      pos: key.matrix,
+      matrixWidth: this.getMatrixWidth()
+    })
+    return keyIndex
+  }
+
+  getActionForKey({ key, layer }) {
+    if (!this.keymap[layer]) return 'l missing'
+    const keyCode = this.keymap[layer][this.getKeymapIndexForKey({ key })]
+    // resolve readable character
+    if (!keyCode || keyCode === 'KC.TRNS') return '▽'
+    return keyCode
+  }
+
   import({
     path,
     configContents,
@@ -323,6 +365,7 @@ class Keyboard {
 
   serialize() {
     return {
+      id: this.id,
       name: this.name,
       manufacturer: this.manufacturer,
       description: this.description,
@@ -344,7 +387,10 @@ class Keyboard {
       keys: this.getKeys(),
 
       keymap: this.keymap,
-      encoderKeymap: this.encoderKeymap
+      encoderKeymap: this.encoderKeymap,
+
+      lastEdited: dayjs().format('YYYY-MM-DD HH:mm')
+
     }
   }
 }

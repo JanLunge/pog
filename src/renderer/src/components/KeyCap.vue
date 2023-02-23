@@ -61,29 +61,24 @@
         width: keyTopWidth + 'px'
       }"
     ></div>
-    <div class="keylabels">
+    <div class="keylabels" :class="{'has-args': hasArguments }">
       <!--      <div class="keylabel" :class="['keylabel-'+index]" v-for="(label,index) in keyData.labels">-->
       <!--        <div class="keylabel-inner">-->
       <!--          {{label}}-->
       <!--        </div>-->
       <!--      </div>-->
-      <div v-if="!hasArguments" class="keylabel keylabel-center" v-html="mainLabel"></div>
-      <div v-else class="keylabel">
-        <div class="arg-top">{{ mainLabel }}</div>
-        <div class="arg-bottom" :class="{ selected: argsSelected }">
-          {{ argLabel }}
-        </div>
-      </div>
+      <div class="keylabel keylabel-center" v-html="mainLabel"></div>
+
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
-import { selectedLayer, selectedKeys, keyboardStore } from '../store'
+import { selectedLayer, selectedKeys } from '../store'
 import { matrixPositionToIndex, renderLabel } from '../helpers'
 
-const props = defineProps(['keyData', 'keyIndex', 'mode', 'keymap', 'matrixWidth'])
+const props = defineProps(['keyData', 'keyIndex', 'mode', 'keymap', 'matrixWidth', 'layouts'])
 defineEmits(['selected'])
 
 const keyGap = 4
@@ -110,7 +105,7 @@ const visible = computed(() => {
   const variant: number[] = props.keyData.variant
   if (variant) {
     if (variant.length !== 2) return false
-    return keyboardStore.layouts[variant[0]].selected === variant[1]
+    if (props.layouts[variant[0]]) return props.layouts[variant[0]].selected === variant[1]
   }
   // show keys that don't have variant
   return true
@@ -143,9 +138,8 @@ const keyHeight2 = computed(() => {
   return keyHeight2U.value * baseKeyWidth.value + (keyHeight2U.value - 1) * keyGap
 })
 const hasArguments = computed(() => {
-  return false
-  // if (!action.value) return false
-  // return action.value.includes(')')
+  if (!action.value) return false
+  return action.value.includes(')')
 })
 const keyTopWidth = computed(() => {
   return keyWidth.value - keyGap * 2 - 4 //+ ((keyWidthU.value-1)*keyGap))
@@ -171,16 +165,16 @@ const mainLabel = computed(() => {
   return renderLabel(action.value)
 })
 
-const argLabel = computed(() => {
-  if (hasArguments.value && action.value) {
-    const argAction = action.value.split('(')[1].replace(')', '')
-    if (argAction.startsWith('KC.')) {
-      return argAction.split('.')[1]
-    }
-    return argAction
-  }
-  return
-})
+// const argLabel = computed(() => {
+//   if (hasArguments.value && action.value) {
+//     const argAction = action.value.split('(')[1].replace(')', '')
+//     if (argAction.startsWith('KC.')) {
+//       return argAction.split('.')[1]
+//     }
+//     return argAction
+//   }
+//   return
+// })
 
 const mainSelected = ref(false)
 const argsSelected = ref(false)
@@ -247,7 +241,7 @@ const rotationOrigin = computed(() => {
   .selected & {
     border-color: white;
     z-index: 4;
-    box-shadow: rgba(0, 0, 0, 0.6) 2px 2px 8px 0;
+    //box-shadow: rgba(0, 0, 0, 0.6) 2px 2px 8px 0;
   }
 }
 .keyborder-blocker {
@@ -257,7 +251,7 @@ const rotationOrigin = computed(() => {
   height: 52px;
   cursor: pointer;
   @apply rounded;
-  z-index: 1;
+  z-index: 5;
 }
 .keytop {
   position: absolute;
@@ -269,9 +263,9 @@ const rotationOrigin = computed(() => {
   background: #444;
   cursor: pointer;
   @apply rounded;
-  z-index: 2;
+  //z-index: 2;
+    z-index: 6;
   .selected & {
-    z-index: 5;
   }
 }
 .keylabels {
@@ -281,9 +275,9 @@ const rotationOrigin = computed(() => {
   left: 6px;
   top: 4px;
   right: 6px;
-  z-index: 3;
+  //z-index: 3;
+    z-index: 7;
   .selected & {
-    z-index: 6;
   }
 }
 .keylabel {
@@ -291,6 +285,7 @@ const rotationOrigin = computed(() => {
   position: absolute;
   width: 100%;
   height: calc(48px - 5px);
+  @apply gap-1;
 
   &-0 {
     left: 8px;
@@ -304,6 +299,7 @@ const rotationOrigin = computed(() => {
   }
   &-center {
     @apply flex items-center justify-center text-center;
+    flex-wrap: wrap;
   }
   .arg-top {
     @apply text-center;
@@ -357,5 +353,16 @@ const rotationOrigin = computed(() => {
   i.mdi {
     font-size: 18px;
   }
+  .has-args &{
+    i.mdi{
+      font-size: 14px;
+    }
+  }
+}
+.keylabel-small{
+  font-size: 9px;
+  font-weight: bold;
+  font-style: italic;
+  width: 100%;
 }
 </style>

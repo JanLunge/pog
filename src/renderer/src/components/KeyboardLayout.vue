@@ -38,6 +38,7 @@
           :mode="mode"
           :keymap="keymap"
           :matrix-width="matrixWidth"
+          :layouts="layouts"
         >
         </key-cap>
       </div>
@@ -53,7 +54,7 @@ import { SelectionArea } from '@viselect/vue'
 import type { SelectionEvent } from '@viselect/vue'
 import { isNumber } from '@vueuse/core'
 import { useDebounceFn } from '@vueuse/core'
-const props = defineProps(['keyLayout', 'keymap', 'mode', 'matrixWidth'])
+const props = defineProps(['keyLayout', 'keymap', 'mode', 'matrixWidth','layouts'])
 // mode can be layout or keymap
 
 // find right edge

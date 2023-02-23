@@ -314,7 +314,10 @@ const setKey = (key: string | number) => {
 };
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss" >
+:root {
+  --key-size: 30px;
+}
 .key-chooser {
   gap: 4px;
   @apply flex flex-col;
@@ -332,46 +335,47 @@ const setKey = (key: string | number) => {
     @apply flex gap-1 mr-2;
   }
   .blocker-half {
-    width: 25px;
-    height: 54px;
+    width: calc(var(--key-size) / 2);
+    height: var(--key-size);
     @apply shrink-0;
   }
   .blocker-full {
-    height: 54px;
-    width: 54px;
+    height: var(--key-size);
+    width: var(--key-size);
     @apply shrink-0;
   }
   .key {
-    width: 54px;
-    height: 54px;
+    width: var(--key-size);
+    height: var(--key-size);
     background: #444444;
     @apply rounded flex items-center justify-center shrink-0 flex-col text-center;
-    font-size: 12px;
+    font-size: 10px;
+    line-height: 12px;
     border: 1px solid #555;
     cursor: pointer;
     &:hover {
       background: #555;
     }
     &-2u {
-      width: calc(54px * 2 + 4px);
+      width: calc(var(--key-size) * 2 + 4px);
     }
     &-1-25u {
-      width: calc(54px * 1.25 + 2px);
+      width: calc(var(--key-size) * 1.25 + 2px);
     }
     &-1-5u {
-      width: calc(54px * 1.5 + 2px);
+      width: calc(var(--key-size) * 1.5 + 2px);
     }
     &-1-75u {
-      width: calc(54px * 1.75 + 2px);
+      width: calc(var(--key-size) * 1.75 + 2px);
     }
     &-2-25u {
-      width: calc(54px * 2.25 + 6px);
+      width: calc(var(--key-size) * 2.25 + 6px);
     }
     &-2-5u {
-      width: calc(54px * 2.5 + 6px);
+      width: calc(var(--key-size) * 2.5 + 6px);
     }
     &-6u {
-      width: calc(54px * 6.25 + 14px);
+      width: calc(var(--key-size) * 6.25 + 14px);
     }
   }
 }

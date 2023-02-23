@@ -7,7 +7,6 @@ export const matrixPositionToIndex = ({
   pos: [number, number]
   matrixWidth: number
 }) => {
-  console.log(pos, matrixWidth)
   if (!pos) return 0
   return Number(pos[0]) * matrixWidth + Number(pos[1])
 }
@@ -259,14 +258,18 @@ export const renderLabel = (keycode: string) => {
     LEFT: { icon: 'mdi-arrow-left' },
     DOWN: { icon: 'mdi-arrow-down' },
     RIGHT: { icon: 'mdi-arrow-right' },
-    GRV: {label: '`'},
+    GRV: { label: '`' },
 
     // Layer
     MO: { label: 'MO' },
 
     // Media
     MPLY: { label: 'Play/Pause', icon: 'mdi-play-pause' },
-    MCRWD: { label: 'Play/Pause', icon: 'mdi-play-pause' }
+    MEDIA_PLAY_PAUSE: { label: 'Play/Pause', icon: 'mdi-play-pause' },
+    MRWD: { label: 'Prev Track', icon: 'mdi-skip-previous' },
+    MFFD: { label: 'Next Track', icon: 'mdi-skip-next' },
+    TD: { label: '<p class="keylabel-small">TD</p>' },
+    send_string: { label: 'String</br>' }
   }
 
   let label = ''
@@ -278,7 +281,11 @@ export const renderLabel = (keycode: string) => {
 
     // Get the label for each key and join them with a "+"
     label = keys.map((k) => renderLabel(k.trim())).join(' + ')
-  } else {
+  } else if (keycode.startsWith('send_string(') && keycode.endsWith(')')) {
+    label = '<p class="keylabel-small">String</p>'
+  } else if(keycode.startsWith('customkeys.')){
+    label = '<p class="keylabel-small">custom</p>'
+  }else {
     // Check for modifier keys
     // if (keycode.includes('KC.LSHIFT') || keycode.includes('KC.RSHIFT') ||
     //   keycode.includes('KC.LCTL') || keycode.includes('KC.RCTL') ||
@@ -301,12 +308,13 @@ export const renderLabel = (keycode: string) => {
       if (keycode.includes('(')) {
         const match = keycode.match(/^[^(]+\((.*)\)$/)
         console.log('found params', match) // prints ["0", "KC.A"]
-        if (match && match.includes(',')) {
-          const params = match[1].split(',')
+        if (match && match[1] && match[1].includes(',')) {
+          const params = match[1].split(',').map((a) => renderLabel(a))
           console.log('param list', params)
+          label += ` ${params.join(' ')}`
         } else if (match) {
           // just add that key to label
-          label += ` ${match[1]}`
+          label += ` ${renderLabel(match[1])}`
         }
       }
     } else {

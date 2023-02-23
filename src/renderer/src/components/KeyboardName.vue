@@ -10,7 +10,11 @@
     </div>
     <div class="mb-4">
       <p class="mb-2 text-sm">Description</p>
-      <textarea v-model="keyboardStore.description" type="text" class="textarea-bordered textarea w-full" />
+      <textarea
+        v-model="keyboardStore.description"
+        type="text"
+        class="textarea-bordered textarea w-full"
+      />
     </div>
     <div class="mb-4">
       <p class="mb-2 text-sm">Tags</p>
@@ -23,7 +27,7 @@
       >
       </VueMultiselect>
     </div>
-    <div class="flex justify-center mt-8">
+    <div class="mt-8 flex justify-center">
       <button v-if="initialSetup" class="btn-primary btn" @click="$emit('next')">next</button>
     </div>
   </div>
@@ -32,16 +36,15 @@
 <script lang="ts" setup>
 import { keyboardStore } from '../store'
 import VueMultiselect from 'vue-multiselect'
- defineProps(['initialSetup'])
+defineProps(['initialSetup'])
 const keyboardTags = ['65%']
 
 const addTag = (tag) => {
   console.log(tag)
   keyboardStore.tags.push(tag)
-
 }
 </script>
 
-<style lang="scss" >
-@import 'vue-multiselect/dist/vue-multiselect.css'
+<style lang="scss">
+@import 'vue-multiselect/dist/vue-multiselect.css';
 </style>

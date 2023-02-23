@@ -3,7 +3,7 @@
     <p class="py-4 max-w-md">Define the mapping for columns and rows to the microcontroller pins</p>
   </div>
 
-  <div class="flex justify-center">
+  <div class="flex justify-center" v-if="keyboardStore.wiringMethod === 'matrix'">
     <div class="max-w-md w-full">
       <p class="text-sm mb-2">Diode Direction</p>
       <select v-model="keyboardStore.diodeDirection" class="select select-bordered w-full">

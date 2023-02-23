@@ -27,6 +27,8 @@ then just run it with dev to start
 - [ ] use injection points from the pog.json for codeblocks
 - [ ] direct pin wiring support
 - [ ] bluetooth workflow
+- [ ] generate layout based on matrix + clear layout button / delete multiple
+- [ ] save a backup of the json in electron
 
 ## features
 - [x] dragging keys on the layout editor

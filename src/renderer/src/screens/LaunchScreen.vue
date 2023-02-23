@@ -31,6 +31,7 @@
               :key-layout="keyboard.keys"
               :keymap="keyboard.keymap"
               :matrix-width="keyboard.cols"
+              :layouts="keyboard.layouts"
               mode="static"
             ></keyboard-layout>
           </div>

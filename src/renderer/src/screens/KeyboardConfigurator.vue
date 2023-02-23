@@ -23,19 +23,23 @@
       <li><router-link to="/configurator/firmware">Firmware</router-link></li>
     </ul>
     <div class="h-screen flex-1 overflow-x-auto px-4 pt-8">
-      <h1 class="mb-8 text-center text-5xl font-bold" contenteditable="true">{{ currentRouteName }}</h1>
+      <h1 class="mb-8 text-center text-5xl font-bold" contenteditable="true">
+        {{ currentRouteName }}
+      </h1>
       <router-view></router-view>
       <div class="flex justify-center py-4">
-        <div class="btn-primary btn-sm btn" @click="saveKeymap"><i class="mdi mdi-content-save"></i>Save python code to Keyboard</div>
+        <div class="btn-primary btn-sm btn" @click="saveKeymap">
+          <i class="mdi mdi-content-save"></i>Save python code to Keyboard
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { keyboardStore } from '../store'
-import {useRoute, useRouter} from 'vue-router'
-import {computed} from "vue";
+import { addToHistory, keyboardStore } from '../store'
+import { useRoute, useRouter } from 'vue-router'
+import { computed } from 'vue'
 const router = useRouter()
 const route = useRoute()
 const reselectKeyboard = () => {
@@ -43,8 +47,11 @@ const reselectKeyboard = () => {
 }
 
 const saveKeymap = async () => {
-   await window.api.saveConfiguration(
-    JSON.stringify({ pogConfig: keyboardStore.serialize(), writeFirmware: true })
+  // save to keyboard history
+  const keyboardData = keyboardStore.serialize()
+  addToHistory(keyboardStore)
+  await window.api.saveConfiguration(
+    JSON.stringify({ pogConfig: keyboardData, writeFirmware: true })
   )
 }
 
@@ -52,7 +59,7 @@ const currentRouteName = computed(() => route.matched[1].name)
 </script>
 
 <style lang="scss" scoped>
-.router-link-active{
-  @apply bg-primary text-black font-bold;
+.router-link-active {
+  @apply bg-primary font-bold text-black;
 }
 </style>

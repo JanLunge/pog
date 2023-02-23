@@ -63,6 +63,7 @@
       :key-layout="keyboardStore.keys"
       :keymap="keyboardStore.keymap"
       :matrix-width="keyboardStore.cols"
+      :layouts="keyboardStore.layouts"
       mode="layout"
     />
     <div class="flex">
@@ -80,7 +81,7 @@
 <script lang="ts" setup>
 import { cleanupKeymap, KleToPog, selectNextKey, selectPrevKey } from '../helpers'
 import { onMounted, ref } from 'vue'
-import { selectedKeys, keyboardStore, Key, keyboardHistory, addToHistory } from '../store'
+import { selectedKeys, keyboardStore, Key, addToHistory } from '../store'
 import KeyboardLayout from './KeyboardLayout.vue'
 import { isNumber, onKeyStroke } from '@vueuse/core'
 import KeyLayoutInfo from './KeyLayoutInfo.vue'
