@@ -1,14 +1,16 @@
 <template>
   <SelectionArea
+    id="keyboard-container"
     class="container"
+    :class="{ 'fixed-height': fixedHeight }"
     :options="{ selectables: ['.keycap'] }"
     :on-move="onMove"
     :on-start="onStart"
   >
     <div
       id="keyboardlayout-wrapper"
-      class="relative my-5 flex items-center justify-center"
-      :style="{ height: keyboardScale * (keyboardHeight * 58) + 'px' }"
+      class="relative flex items-center justify-center"
+      :style="{ height: keyboardScale * (keyboardHeight * 58) + 'px', width: keyboardScale*(keyboardWidth*58)+'px' }"
     >
       <div
         id="keyboardlayout"
@@ -16,9 +18,9 @@
         :style="{
           width: keyboardWidth * 58 + 'px',
           height: keyboardHeight * 58 + 'px',
-          transform: `scale( ${keyboardScale})`
+          transform: `scale( ${keyboardScale})`,
+          'transform-origin': keyboardWidth>keyboardHeight? 'left center': 'center center'
         }"
-        style="transform-origin: center left"
         :class="{ dragging: moving }"
       >
         <div
@@ -48,13 +50,13 @@
 
 <script lang="ts" setup>
 import KeyCap from './KeyCap.vue'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
 import { keyboardStore, selectedKeys } from '../store'
 import { SelectionArea } from '@viselect/vue'
 import type { SelectionEvent } from '@viselect/vue'
 import { isNumber } from '@vueuse/core'
 import { useDebounceFn } from '@vueuse/core'
-const props = defineProps(['keyLayout', 'keymap', 'mode', 'matrixWidth','layouts'])
+const props = defineProps(['keyLayout', 'keymap', 'mode', 'matrixWidth', 'layouts', 'fixedHeight'])
 // mode can be layout or keymap
 
 // find right edge
@@ -85,10 +87,17 @@ const keyboardHeight = computed(() => {
 
 const keyboardScale = ref(1)
 const updateScale = () => {
-  const wrapper = document.querySelector('#keyboardlayout-wrapper')
+  const wrapper = document.querySelector('#keyboard-container')
   if (wrapper) {
     const wrapperWidth = wrapper.clientWidth
-    keyboardScale.value = Math.min(wrapperWidth / (keyboardWidth.value * 58), 1)
+    const widthScale = Math.min(wrapperWidth / (keyboardWidth.value * 58), 1)
+    let heightScale = 1
+    if (props.fixedHeight) {
+      const wrapperHeight = wrapper.clientHeight
+
+      heightScale = Math.min(wrapperHeight / (keyboardHeight.value * 58), 1)
+    }
+    keyboardScale.value = Math.min(heightScale, widthScale)
   }
 }
 onMounted(() => {
@@ -100,7 +109,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('resize', updateScale)
 })
-
+watch(()=>props.keyLayout,()=> updateScale())
 const rotationOriginX = computed(() => {
   if (!selectedKeys.value.size) return 0
   const firstSelectedKeyIndex = [...selectedKeys.value][0]
@@ -167,7 +176,7 @@ const onMove = ({
   },
   event
 }: SelectionEvent) => {
-  if(props.mode==='static'){
+  if (props.mode === 'static') {
     return
   }
   if (event?.shiftKey && props.mode === 'layout') {
@@ -178,21 +187,18 @@ const onMove = ({
       const delta = { x: 0, y: 0 }
       delta.x = (event.clientX - moveStart.value.x) * (1 / keyboardScale.value)
       delta.y = (event.clientY - moveStart.value.y) * (1 / keyboardScale.value)
-      console.log(delta)
       // snap in every 0.25 of a key width 58
       const deltaTmp = {
         x: roundNearQtr(delta.x / 58),
         y: roundNearQtr(delta.y / 58)
       }
       // subtract already written distance
-      console.log(deltaTmp)
       const writableDelta = {
         x: deltaTmp.x - writtenDelta.value.x,
         y: deltaTmp.y - writtenDelta.value.y
       }
       writtenDelta.value.x = deltaTmp.x
       writtenDelta.value.y = deltaTmp.y
-      console.log(writableDelta)
       // write to each key
       selectedKeys.value.forEach((keyIndex) => {
         keyboardStore.keys[keyIndex].delta({ property: 'x', value: writableDelta.x })
@@ -205,7 +211,6 @@ const onMove = ({
   }
   extractIndexes(added).forEach((id) => selectedKeys.value.add(id))
   extractIndexes(removed).forEach((id) => selectedKeys.value.delete(id))
-  console.log(added, removed)
 }
 const resetMoving = useDebounceFn(() => {
   moving.value = false
@@ -225,7 +230,12 @@ const resetMoving = useDebounceFn(() => {
 
 .container {
   user-select: none;
-  @apply p-4;
+  height: 100%;
+  width: 100%;
+  @apply flex justify-center items-center;
+}
+.keyboard-layout{
+
 }
 </style>
 <style lang="scss">

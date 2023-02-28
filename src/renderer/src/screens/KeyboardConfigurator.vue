@@ -19,6 +19,7 @@
       <li><router-link to="/configurator/info">Info</router-link></li>
       <li><router-link to="/configurator/matrix">Matrix</router-link></li>
       <li><router-link to="/configurator/pins">Pins</router-link></li>
+      <li><router-link to="/configurator/coordmap">CoordMap</router-link></li>
       <li><router-link to="/configurator/raw-keymap">Raw Keymap</router-link></li>
       <li><router-link to="/configurator/firmware">Firmware</router-link></li>
     </ul>
@@ -27,7 +28,24 @@
         {{ currentRouteName }}
       </h1>
       <router-view></router-view>
-      <div class="flex justify-center py-4">
+      <div class="flex items-center justify-center gap-2 py-4">
+        <Popper :hover="true">
+          <label class="flex items-center justify-center">
+            <i class="mdi mdi-auto-fix mr-2"></i>
+            <input v-model="flashingMode" type="checkbox" class="checkbox" />
+          </label>
+          <template #content>
+            <div class="tooltip">
+              <p class="font-bold">Manual / Automatic</p>
+              <p>
+                when enabled pog will manage your files, when disabled pog will only write to the
+                keymap file, this means you need to manage imports in the code.py yourself and sync
+                any changes for the matrix width or direct pin order in pog for proper keycode
+                lookup.
+              </p>
+            </div>
+          </template>
+        </Popper>
         <div class="btn-primary btn-sm btn" @click="saveKeymap">
           <i class="mdi mdi-content-save"></i>Save python code to Keyboard
         </div>
@@ -37,6 +55,7 @@
 </template>
 
 <script lang="ts" setup>
+import Popper from '@wlard/vue3-popper'
 import { addToHistory, keyboardStore } from '../store'
 import { useRoute, useRouter } from 'vue-router'
 import { computed } from 'vue'
@@ -48,14 +67,25 @@ const reselectKeyboard = () => {
 
 const saveKeymap = async () => {
   // save to keyboard history
+  keyboardStore.coordMapSetup = false
   const keyboardData = keyboardStore.serialize()
   addToHistory(keyboardStore)
+  console.log(keyboardStore.coordMapSetup)
   await window.api.saveConfiguration(
     JSON.stringify({ pogConfig: keyboardData, writeFirmware: true })
   )
 }
 
 const currentRouteName = computed(() => route.matched[1].name)
+
+const flashingMode = computed({
+  get() {
+    return keyboardStore.flashingMode === 'automatic'
+  },
+  set(newVal) {
+    keyboardStore.flashingMode = newVal ? 'automatic' : 'manual'
+  }
+})
 </script>
 
 <style lang="scss" scoped>

@@ -113,7 +113,7 @@
       </div>
     </div>
   </template>
-  <div v-else>
+  <div>
     <p>Direct Pin Index</p>
     <input v-model="tmpKey.directPinIndex" type="text" class="keyinfo-input" @change="updateKey" />
   </div>
@@ -200,12 +200,19 @@ const tmpKey = ref<{
 // );
 
 const updateSelectedKey = () => {
+  console.log('updating selected keys')
   if ([...selectedKeys.value].length === 1) {
-    const keyToLoad = JSON.parse(JSON.stringify(props.layout[[...selectedKeys.value][0]]))
+    const keyToLoad = props.layout[[...selectedKeys.value][0]]
+    console.log(keyToLoad)
+
     tmpKey.value = {
-      matrix: ['', ''],
-      variant: ['', ''],
       ...keyToLoad
+    }
+    if (keyToLoad.variant == undefined) {
+      tmpKey.value.variant = ['', '']
+    }
+    if (keyToLoad.matrix == undefined) {
+      tmpKey.value.matrix = ['', '']
     }
   } else {
     // set every property that has different values to ""
@@ -230,21 +237,15 @@ const updateSelectedKey = () => {
 }
 
 updateSelectedKey()
-// watch(
-//   () => [...selectedKeys.value],
-//   () => updateSelectedKey()
-// );
+watch(selectedKeys, () => {
+  console.log('selected keys changed')
+  updateSelectedKey()
+})
 
-watch(
-  () => {
-    return JSON.stringify(
-      props.layout.filter((_a, index: number) => {
-        return selectedKeys.value.has(index)
-      })
-    )
-  },
-  () => updateSelectedKey()
-)
+// watch(
+// //    selectedKeys,
+//   () => updateSelectedKey()
+// )
 
 const updateKey = () => {
   selectedKeys.value.forEach((keyIndex) => {

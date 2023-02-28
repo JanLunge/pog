@@ -25,35 +25,44 @@
         </div>
       </div>
     </div>
-    <div v-if="keyboardStore.firmwareInstalled && initialSetup" class="mt-8 flex justify-center">
-      <button class="btn-primary btn mt-4 block" @click="$emit('next')">Next</button>
+    <div class="mt-8 flex justify-center">
+      <button class="btn-primary btn mt-4 block" @click="$emit('next')">
+        {{ keyboardStore.firmwareInstalled ? 'Next' : 'skip' }}
+      </button>
     </div>
-    <div v-else-if="kmkInstallState !== 'done'" class="mt-8 flex justify-center">
+    <div v-if="[''].includes(kmkInstallState)" class="mt-8 flex justify-center items-center flex-col">
       <button class="btn-primary btn mt-8" @click="updateKMK">install KMK</button>
+
     </div>
-    <div v-if="['downloading'].includes(kmkInstallState)">
-      <p class="m-4 mt-8">{{ kmkInstallState }}</p>
-      <div
-        class="radial-progress border-4 border-primary bg-primary text-primary-content"
-        :style="{ '--value': progress }"
-      >
-        {{ isNaN(progress) ? 'Done' : progress }}%
-      </div>
+    <div class="mt-4 flex flex-col items-center justify-center" v-if="['downloading', 'copying', 'unpacking'].includes(kmkInstallState)" >
+      <p class="m-4 mt-8">{{ kmkInstallState || '' }}</p>
+      <progress
+        class="progress progress-primary w-56"
+        :value="progress"
+        max="100"
+      ></progress>
+      <span v-if="progress !== 0">
+      {{ isNaN(progress) ? 'Done' : progress }}%
+      </span>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { keyboardStore } from '../store'
+import dayjs from "dayjs";
 
 const progress = ref(0)
 const kmkInstallState = ref('')
 
 defineProps(['initialSetup'])
 
+const startTime = ref(dayjs())
+const endTime = ref(dayjs())
 const updateKMK = async () => {
   await window.api.updateFirmware()
   kmkInstallState.value = 'downloading'
+  startTime.value = dayjs()
 }
 
 window.api.onUpdateFirmwareInstallProgress(
@@ -65,8 +74,9 @@ window.api.onUpdateFirmwareInstallProgress(
       console.log('progress', value.progress)
       progress.value = Math.round(value.progress)
       if (value.state === 'done') {
-        // TODO: save kmk support to keyboard
         keyboardStore.firmwareInstalled = true
+        endTime.value = dayjs()
+        console.log(startTime.value, endTime.value)
       }
     }
   }

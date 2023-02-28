@@ -5,11 +5,11 @@
       <input v-model="keyboardStore.name" type="text" class="input-bordered input w-full" />
     </div>
     <div class="mb-4">
-      <p class="mb-2 text-sm">Manufacturer</p>
+      <p class="mb-2 text-sm">Manufacturer (optional)</p>
       <input v-model="keyboardStore.manufacturer" type="text" class="input-bordered input w-full" />
     </div>
     <div class="mb-4">
-      <p class="mb-2 text-sm">Description</p>
+      <p class="mb-2 text-sm">Description (optional)</p>
       <textarea
         v-model="keyboardStore.description"
         type="text"
@@ -17,13 +17,14 @@
       />
     </div>
     <div class="mb-4">
-      <p class="mb-2 text-sm">Tags</p>
+      <p class="mb-2 text-sm">Tags (optional)</p>
       <VueMultiselect
         v-model="keyboardStore.tags"
         :options="keyboardTags"
         :multiple="true"
         :taggable="true"
         @tag="addTag"
+        class="w-full"
       >
       </VueMultiselect>
     </div>
@@ -47,4 +48,12 @@ const addTag = (tag) => {
 
 <style lang="scss">
 @import 'vue-multiselect/dist/vue-multiselect.css';
+.multiselect__tags{
+  width: 100%;
+  background: transparent;
+  border:none;
+}
+.multiselect__placeholder {
+  background: transparent;
+}
 </style>

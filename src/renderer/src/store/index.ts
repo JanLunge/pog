@@ -4,7 +4,7 @@ import { ulid } from 'ulid'
 import { useRouter } from 'vue-router'
 import { matrixPositionToIndex } from '../helpers'
 import { useStorage } from '@vueuse/core'
-import dayjs from "dayjs";
+import dayjs from 'dayjs'
 const router = useRouter()
 // @ts-ignore will be used later
 type KeyActions = {
@@ -15,15 +15,15 @@ type KeyActions = {
 
 export const keyboardHistory = useStorage<any[]>('keyboardHistory', [])
 export const addToHistory = (keyboard) => {
-  console.log("saving keyboard to history",keyboard)
+  console.log('saving keyboard to history', keyboard)
   // to get rid of reactivity and proxys while deepcloning // does not work with structured clone
-  const keyboardData = {...JSON.parse(JSON.stringify(keyboard.serialize())), path: keyboard.path}
+  const keyboardData = { ...JSON.parse(JSON.stringify(keyboard.serialize())), path: keyboard.path }
   if (!keyboardHistory.value.find((board) => board.id === keyboard.id)) {
     keyboardHistory.value.unshift(keyboardData)
   } else {
     const index = keyboardHistory.value.findIndex((board) => board.id === keyboard.id)
     // push this version to the backups as well
-    if(!keyboardHistory.value[index].backups) keyboardHistory.value[index].backups = []
+    if (!keyboardHistory.value[index].backups) keyboardHistory.value[index].backups = []
     const backups = [keyboardData, ...keyboardHistory.value[index].backups].slice(0, 100)
     keyboardHistory.value[index] = {
       ...keyboardData,
@@ -58,6 +58,7 @@ export type KeyInfo = BaseKeyInfo & {
   matrix?: [number, number]
   variant?: [number, number]
   directPinIndex?: number
+  keyboard?: any
 }
 
 export class Key {
@@ -76,7 +77,24 @@ export class Key {
   matrix?: [number, number] = undefined
   directPinIndex?: number = undefined
   variant?: [number, number] = undefined
-  constructor({ x, y, matrix, variant, h, w, x2, y2, h2, w2, r, rx, ry, directPinIndex }: KeyInfo) {
+  keyboard?: any
+  constructor({
+    x,
+    y,
+    matrix,
+    variant,
+    h,
+    w,
+    x2,
+    y2,
+    h2,
+    w2,
+    r,
+    rx,
+    ry,
+    directPinIndex,
+    keyboard
+  }: KeyInfo) {
     this.x = x
     this.y = y
     if (matrix && matrix.length === 2) {
@@ -85,7 +103,7 @@ export class Key {
     if (variant && variant.length === 2) {
       this.variant = variant
     }
-    if (typeof directPinIndex === "number") {
+    if (typeof directPinIndex === 'number') {
       this.directPinIndex = directPinIndex
     }
     if (h) this.h = h
@@ -97,6 +115,7 @@ export class Key {
     if (r) this.r = r
     if (rx) this.rx = rx
     if (ry) this.ry = ry
+    this.keyboard = keyboard
   }
   serialize() {
     const tmpKey: KeyInfo = {
@@ -136,7 +155,7 @@ export class Key {
     if (Array.isArray(this.variant) && this.variant.length === 2) {
       tmpKey.variant = this.variant.map((n) => Number(n)) as [number, number]
     }
-    if(typeof this.directPinIndex === 'number'){
+    if (typeof this.directPinIndex === 'number') {
       tmpKey.directPinIndex = this.directPinIndex
     }
     return tmpKey
@@ -158,14 +177,23 @@ export class Key {
       this[property] = value
     }
   }
+  getKeymapIndex() {
+    // if (!this.matrix && typeof this.directPinIndex !== 'number') return undefined
+    // if (this.keyboard.wiringMethod === 'matrix') {
+    //   return matrixPositionToIndex({
+    //     pos: this.matrix || [0,0],
+    //     matrixWidth: keyboardStore.cols
+    //   })
+    // } else {
+    return this.directPinIndex
+    // }
+  }
   setOnKeymap(keyCode) {
-    if (!this.matrix) return
-    const keyIndex = matrixPositionToIndex({
-      pos: this.matrix,
-      matrixWidth: keyboardStore.cols
-    })
+    const keyIndex = this.getKeymapIndex()
+    console.log('index', keyIndex, keyCode)
+    if (typeof keyIndex !== 'number') return
 
-    console.log('setting ', this.matrix, 'to', keyCode, 'at')
+    console.log('setting ', this.id, 'to', keyCode, 'at', keyIndex)
     if (!keyCode.includes('(')) {
       // TODO: could set this as arg in a key
       // if (
@@ -185,7 +213,7 @@ export class Key {
     keyboardStore.keymap[selectedLayer.value][keyIndex] = keyCode
   }
   getMatrixLabel() {
-    if(typeof this.directPinIndex === 'number') return this.directPinIndex
+    if (typeof this.directPinIndex === 'number') return this.directPinIndex
     if (this.matrix) {
       if (
         typeof this.matrix[0] === 'number' &&
@@ -213,6 +241,9 @@ class Keyboard {
 
   driveContents: string[] = []
 
+  //manage the code.py yourself
+  flashingMode: 'automatic' | 'manual' = 'automatic'
+
   pogConfigured = false
   firmwareInstalled = false
 
@@ -220,7 +251,7 @@ class Keyboard {
   keys: Key[] = []
   // Layout options
   layouts: { name: string; variants: string[]; selected: number }[] = []
-
+  coordMap: string[][] = []
   // wiring
 
   controller = ''
@@ -232,10 +263,13 @@ class Keyboard {
   rowPins: string[] = []
   colPins: string[] = []
   directPins: string[] = []
+  coordMapSetup = false
 
+  pinPrefix = 'gp'
   // features
 
   encoders: { pad_a: string; pad_b: string }[] = []
+  split = false
 
   // keymaps
 
@@ -249,7 +283,7 @@ class Keyboard {
   setKeys(keys: KeyInfo[]) {
     this.keys = []
     keys.forEach((key) => {
-      const tmpKey = new Key(key)
+      const tmpKey = new Key({ ...key, keyboard: this })
       this.keys.push(tmpKey)
     })
   }
@@ -258,7 +292,7 @@ class Keyboard {
   }
 
   addKey(key) {
-    this.keys.push(new Key(key))
+    this.keys.push(new Key({ ...key, keyboard: this }))
   }
 
   removeKeys({ ids }: { ids: string[] }) {
@@ -284,8 +318,16 @@ class Keyboard {
 
   // count keys on the matrix
   physicalKeyCount() {
-    if (this.wiringMethod === 'matrix') return this.rows * this.cols
-    return this.pins
+    let keycount = 0
+    if (this.wiringMethod === 'matrix') {
+      keycount = this.rows * this.cols
+    } else {
+      keycount = this.pins
+    }
+    if (this.split) {
+      keycount = keycount * 2
+    }
+    return keycount
   }
 
   // count keys in the layout (including variant keys so duplicate physical keys)
@@ -294,7 +336,16 @@ class Keyboard {
   }
 
   getMatrixWidth() {
-    return this.cols
+    let width = 0
+    if (this.wiringMethod === 'matrix') {
+      width = this.cols
+    } else {
+      width = this.pins
+    }
+    if (this.split) {
+      width = width * 2
+    }
+    return width
   }
 
   // get keymap index for matrix pos of a key
@@ -308,7 +359,7 @@ class Keyboard {
 
   getActionForKey({ key, layer }) {
     if (!this.keymap[layer]) return 'l missing'
-    const keyCode = this.keymap[layer][this.getKeymapIndexForKey({ key })]
+    const keyCode = this.keymap[layer][key.getKeymapIndex()]
     // resolve readable character
     if (!keyCode || keyCode === 'KC.TRNS') return '▽'
     return keyCode
@@ -340,7 +391,11 @@ class Keyboard {
       if (configContents.tags) this.tags = configContents.tags
       if (configContents.manufacturer) this.manufacturer = configContents.manufacturer
       this.wiringMethod = configContents.wiringMethod || 'matrix'
+      this.flashingMode = configContents.flashingMode || 'automatic'
+      this.pinPrefix = configContents.pinPrefix || 'gp'
+      this.coordMapSetup = configContents.coordMapSetup || false
 
+      if (configContents.coordMap) this.coordMap = configContents.coordMap
       if (configContents.rows) this.rows = configContents.rows
       if (configContents.cols) this.cols = configContents.cols
       if (configContents.pins) this.pins = configContents.pins
@@ -352,6 +407,8 @@ class Keyboard {
       if (configContents.keymap) this.keymap = configContents.keymap
       if (configContents.layouts) this.layouts = configContents.layouts
 
+      if (configContents.split) this.split = configContents.split
+
       // encoders
       if (configContents.encoders) this.encoders = configContents.encoders
       if (configContents.encoderKeymap) this.encoderKeymap = configContents.encoderKeymap
@@ -361,6 +418,7 @@ class Keyboard {
   clear() {
     this.pogConfigured = false
     this.path = ''
+    this.coordMap = []
   }
 
   serialize() {
@@ -389,8 +447,13 @@ class Keyboard {
       keymap: this.keymap,
       encoderKeymap: this.encoderKeymap,
 
-      lastEdited: dayjs().format('YYYY-MM-DD HH:mm')
+      split: this.split,
+      coordMap: this.coordMap,
+      pinPrefix: this.pinPrefix,
+      coordMapSetup: this.coordMapSetup,
 
+      flashingMode: this.flashingMode,
+      lastEdited: dayjs().format('YYYY-MM-DD HH:mm')
     }
   }
 }
@@ -408,3 +471,5 @@ export const isNewKeyboardSetup = computed(() => {
   if (router) return router.currentRoute.value.path.startsWith('/setup-wizard')
   return false
 })
+
+export const notifications = ref<{label:string}[]>([])

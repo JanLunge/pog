@@ -25,15 +25,20 @@
           class="keyboard-preview"
           @click="selectKeyboard(keyboard.path)"
         >
-          <div class="image">
+          <div class="image py-5">
             <!--            <img :src="keyboard.image" alt="" />-->
+            <div class=" w-full h-full">
+
             <keyboard-layout
               :key-layout="keyboard.keys"
               :keymap="keyboard.keymap"
               :matrix-width="keyboard.cols"
               :layouts="keyboard.layouts"
               mode="static"
+              :fixed-height="true"
             ></keyboard-layout>
+
+            </div>
           </div>
           <div class="relative flex flex-grow flex-col justify-center">
             <button
@@ -64,7 +69,7 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
-import { keyboardStore, keyboardHistory, addToHistory } from '../store'
+import {keyboardStore, keyboardHistory, addToHistory, notifications} from '../store'
 import KeyboardLayout from '../components/KeyboardLayout.vue'
 const router = useRouter()
 
@@ -84,6 +89,13 @@ const selectDrive = async () => {
 const selectKeyboard = async (keyboardPath) => {
   const keyboard = await window.api.selectKeyboard(keyboardPath)
   console.log(keyboard)
+  if(keyboard.error){
+    if(keyboard.error === 'pathNotFound'){
+      console.log('keyboard is not connected')
+      notifications.value.push({label: 'Keyboard not connected'})
+    }
+    return
+  }
   keyboardStore.import(keyboard)
   router.push('/configurator')
 }

@@ -1,19 +1,55 @@
 <script setup lang="ts">
-import {computed} from "vue";
-import {keyboardStore} from "./store";
+import { computed } from 'vue'
+import { keyboardStore, notifications } from './store'
 
-const store = computed(()=>{
+const store = computed(() => {
   return keyboardStore
 })
 console.log('store initiated', store.value.path)
 </script>
 
 <template>
- <router-view></router-view>
+  <div class="notifications">
+    <div v-for="(notification, nindex) in notifications" class="alert alert-error shadow-lg">
+      <div>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6 flex-shrink-0 stroke-current"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
+          />
+        </svg>
+        <span>{{ notification.label }}</span>
+        <button class="btn-ghost btn-sm btn" @click="notifications.splice(nindex,1)">
+          <i class="mdi mdi-close"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <router-view></router-view>
 </template>
 <style lang="scss">
-html,body,#app{
+html,
+body,
+#app {
   height: 100%;
-  font-family: -apple-system, BlinkMacSystemFont;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell,
+    Helvetica Neue, sans-serif;
+}
+.tooltip {
+  @apply rounded bg-base-300 p-4 shadow;
+  max-width: 300px;
+}
+.notifications {
+  position: absolute;
+  top: 0;
+  display: flex;
+  @apply flex-col gap-4 p-4 z-20;
 }
 </style>

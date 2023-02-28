@@ -10,7 +10,8 @@ import EncoderSetup from '../components/EncoderSetup.vue'
 import MatrixSetup from '../components/MatrixSetup.vue'
 import PinSetup from '../components/PinSetup.vue'
 import RawKeymapEditor from '../components/RawKeymapEditor.vue'
-import KeyboardName from "../components/KeyboardName.vue";
+import KeyboardName from '../components/KeyboardName.vue'
+import CoordMap from "../components/CoordMap.vue";
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -57,29 +58,32 @@ const router = createRouter({
         {
           path: 'encoder',
           component: EncoderSetup,
-          name: "Rotary Encoders"
+          name: 'Rotary Encoders'
         },
         {
           path: 'matrix',
           component: MatrixSetup,
-          name: "Matrix Setup"
+          name: 'Matrix Setup'
         },
         {
           path: 'pins',
           component: PinSetup,
-          name: "Pin Setup"
+          name: 'Pin Setup'
         },
         {
           path: 'raw-keymap',
           component: RawKeymapEditor,
-          name: "Raw Keymap"
-
+          name: 'Raw Keymap'
         },
         {
           path: 'info',
           component: KeyboardName,
-          name: "info"
-
+          name: 'info'
+        },
+        {
+          path: 'coordmap',
+          component: CoordMap,
+          name: 'CoordMap'
         }
       ]
     }

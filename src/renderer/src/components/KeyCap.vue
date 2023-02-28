@@ -61,14 +61,13 @@
         width: keyTopWidth + 'px'
       }"
     ></div>
-    <div class="keylabels" :class="{'has-args': hasArguments }">
+    <div class="keylabels" :class="{ 'has-args': hasArguments }">
       <!--      <div class="keylabel" :class="['keylabel-'+index]" v-for="(label,index) in keyData.labels">-->
       <!--        <div class="keylabel-inner">-->
       <!--          {{label}}-->
       <!--        </div>-->
       <!--      </div>-->
       <div class="keylabel keylabel-center" v-html="mainLabel"></div>
-
     </div>
   </div>
 </template>
@@ -76,19 +75,26 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
 import { selectedLayer, selectedKeys } from '../store'
-import { matrixPositionToIndex, renderLabel } from '../helpers'
+import { renderLabel } from '../helpers'
 
-const props = defineProps(['keyData', 'keyIndex', 'mode', 'keymap', 'matrixWidth', 'layouts'])
+const props = defineProps([
+  'keyData',
+  'keyIndex',
+  'mode',
+  'keymap',
+  'matrixWidth',
+  'layouts',
+  'wiringMethod'
+])
 defineEmits(['selected'])
 
 const keyGap = 4
 // hide normal labels and show the keymap thing
 const action = computed(() => {
   if (props.mode === 'layout') return //String(props.keyData.matrix)
-  const keyIndex = matrixPositionToIndex({
-    pos: props.keyData.matrix,
-    matrixWidth: props.matrixWidth
-  })
+  let keyIndex = 0
+
+  keyIndex = props.keyData.directPinIndex
   if (!props.keymap[selectedLayer.value]) return 'l missing'
   const keyCode = props.keymap[selectedLayer.value][keyIndex]
   // resolve readable character
@@ -264,7 +270,7 @@ const rotationOrigin = computed(() => {
   cursor: pointer;
   @apply rounded;
   //z-index: 2;
-    z-index: 6;
+  z-index: 6;
   .selected & {
   }
 }
@@ -276,7 +282,7 @@ const rotationOrigin = computed(() => {
   top: 4px;
   right: 6px;
   //z-index: 3;
-    z-index: 7;
+  z-index: 7;
   .selected & {
   }
 }
@@ -353,13 +359,13 @@ const rotationOrigin = computed(() => {
   i.mdi {
     font-size: 18px;
   }
-  .has-args &{
-    i.mdi{
+  .has-args & {
+    i.mdi {
       font-size: 14px;
     }
   }
 }
-.keylabel-small{
+.keylabel-small {
   font-size: 9px;
   font-weight: bold;
   font-style: italic;

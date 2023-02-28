@@ -3,6 +3,9 @@
     <div class="btn-sm btn mb-4 p-2" @click="showConverter">
       <i class="mdi mdi-import"></i>Import from KLE
     </div>
+    <div class="btn-sm btn mb-4 p-2" @click="showQmkConverter">
+      <i class="mdi mdi-import"></i>Import from Qmk info json
+    </div>
     <div class="btn-sm btn mb-4 p-2" @click="showRawPogOutput">
       <i class="mdi mdi-export"></i>export from pog
     </div>
@@ -40,6 +43,12 @@
     </div>
     <hr />
   </div>
+  <div v-if="qmkConverterVisible">
+    <div>
+      <textarea v-model="qmkJson" class="textarea-bordered textarea w-full"></textarea>
+      <button class="btn" @click="convertqmk">convert</button>
+    </div>
+  </div>
   <div v-if="showRawPogLayout">
     <textarea v-model="pogOutput" class="textarea-bordered textarea w-full"></textarea>
   </div>
@@ -58,14 +67,15 @@
         </button>
       </div>
     </div>
-
-    <keyboard-layout
-      :key-layout="keyboardStore.keys"
-      :keymap="keyboardStore.keymap"
-      :matrix-width="keyboardStore.cols"
-      :layouts="keyboardStore.layouts"
-      mode="layout"
-    />
+    <div style="max-height: 300px" class="my-5">
+      <keyboard-layout
+        :key-layout="keyboardStore.keys"
+        :keymap="keyboardStore.keymap"
+        :matrix-width="keyboardStore.cols"
+        :layouts="keyboardStore.layouts"
+        mode="layout"
+      />
+    </div>
     <div class="flex">
       <div class="w-1/2 border-r">
         <variant-switcher></variant-switcher>
@@ -98,6 +108,26 @@ const props = defineProps(['initialSetup'])
 const converterVisible = ref(false)
 const showConverter = () => {
   converterVisible.value = !converterVisible.value
+}
+const qmkConverterVisible = ref(false)
+const qmkJson = ref(`{"layout": [
+{ "label": "K10", "matrix": [1, 0], "w": 1, "x": 0, "y": 0 },
+{ "label": "K11", "matrix": [1, 1], "w": 1, "x": 1, "y": 0 },
+{ "label": "K02", "matrix": [0, 2], "w": 1, "x": 2, "y": 0 }
+]
+}`)
+const showQmkConverter = () => {
+  qmkConverterVisible.value = !qmkConverterVisible.value
+}
+const convertqmk = () => {
+  console.log('converting qmk to pog')
+  try {
+    const keys = JSON.parse(qmkJson.value).layout
+    console.log(keys)
+    keyboardStore.setKeys(keys)
+  } catch (e) {
+    console.log(e)
+  }
 }
 const showRawPogOutput = () => {
   showRawPogLayout.value = !showRawPogLayout.value
@@ -141,6 +171,7 @@ const setupDone = () => {
   // if (!selectedConfig.value.layouts) selectedConfig.value.layouts = { keymap: [], labels: [] }
   // selectedConfig.value.layouts.keymap = tmpLayout.value;
   // save
+  keyboardStore.coordMapSetup = false
   window.api.saveConfiguration(
     JSON.stringify({ pogConfig: keyboardStore.serialize(), writeFirmware: false })
   )

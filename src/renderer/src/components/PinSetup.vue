@@ -1,33 +1,33 @@
 <template>
   <div class="flex items-center justify-center">
-    <p class="py-4 max-w-md">Define the mapping for columns and rows to the microcontroller pins</p>
+    <p class="max-w-md py-4">Define the mapping for columns and rows to the microcontroller pins</p>
   </div>
 
-  <div class="flex justify-center" v-if="keyboardStore.wiringMethod === 'matrix'">
-    <div class="max-w-md w-full">
-      <p class="text-sm mb-2">Diode Direction</p>
-      <select v-model="keyboardStore.diodeDirection" class="select select-bordered w-full">
+  <div v-if="keyboardStore.wiringMethod === 'matrix'" class="flex justify-center">
+    <div class="w-full max-w-md">
+      <p class="mb-2 text-sm">Diode Direction</p>
+      <select v-model="keyboardStore.diodeDirection" class="select-bordered select w-full">
         <option value="COL2ROW">COL2ROW</option>
         <option value="ROW2COL">ROW2COL</option>
       </select>
     </div>
   </div>
-  <div class="w-full flex justify-center my-8">
+  <div class="my-8 flex w-full justify-center">
     <button
       v-if="initialSetup"
-      class="btn btn-primary"
+      class="btn-primary btn"
       :class="{ 'btn-disabled': !pinsCompleted }"
       @click="$emit('next')"
     >
       Next
     </button>
   </div>
-  <div class="flex gap-8 mt-5 justify-center">
+  <div class="mt-5 flex justify-center gap-8">
     <div v-if="keyboardStore.wiringMethod === 'matrix'" class="flex-grow-0">
-      <div class="rounded bg-base-300 p-2 grid grid-cols-1 gap-2 mb-4 py-8" style="width: 350px">
-        <p class="pb-4 font-bold text-xl flex items-center justify-center">
+      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-300 p-2 py-8" style="width: 350px">
+        <p class="flex items-center justify-center pb-4 text-xl font-bold">
           Row Pins
-          <span class="ml-2 badge badge-primary font-bold">{{ keyboardStore.rowPins.length }}</span>
+          <span class="badge-primary badge ml-2 font-bold">{{ keyboardStore.rowPins.length }}</span>
         </p>
         <div
           v-for="(_pin, index) in keyboardStore.rowPins"
@@ -36,16 +36,16 @@
           <p class="mr-2 text-right">{{ index + 1 }}</p>
           <input
             v-model="keyboardStore.rowPins[index]"
-            class="input input-sm input-bordered col-span-4"
+            class="input-bordered input input-sm col-span-4"
             type="text"
             placeholder="17"
           />
         </div>
       </div>
-      <div class="rounded bg-base-300 p-2 grid grid-cols-1 gap-2 mb-4 py-8">
-        <p class="pb-4 font-bold text-xl flex items-center justify-center">
+      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-300 p-2 py-8">
+        <p class="flex items-center justify-center pb-4 text-xl font-bold">
           Column Pins
-          <span class="ml-2 badge badge-primary font-bold">{{ keyboardStore.colPins.length }}</span>
+          <span class="badge-primary badge ml-2 font-bold">{{ keyboardStore.colPins.length }}</span>
         </p>
         <div
           v-for="(_pin, index) in keyboardStore.colPins"
@@ -54,7 +54,7 @@
           <span class="mr-2 text-right">{{ index + 1 }}</span>
           <input
             v-model="keyboardStore.colPins[index]"
-            class="input input-sm input-bordered col-span-4"
+            class="input-bordered input input-sm col-span-4"
             type="text"
             placeholder="17"
           />
@@ -62,10 +62,10 @@
       </div>
     </div>
     <div v-if="keyboardStore.wiringMethod === 'direct'" class="flex-grow-0">
-      <div class="rounded bg-base-300 p-2 grid grid-cols-1 gap-2 mb-4 py-8" style="width: 350px">
-        <p class="pb-4 font-bold text-xl flex items-center justify-center">
+      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-300 p-2 py-8" style="width: 350px">
+        <p class="flex items-center justify-center pb-4 text-xl font-bold">
           Direct Pins
-          <span class="ml-2 badge badge-primary font-bold">{{
+          <span class="badge-primary badge ml-2 font-bold">{{
             keyboardStore.directPins.length
           }}</span>
         </p>
@@ -76,27 +76,40 @@
           <p class="mr-2 text-right">{{ index + 1 }}</p>
           <input
             v-model="keyboardStore.directPins[index]"
-            class="input input-sm input-bordered col-span-4"
+            class="input-bordered input input-sm col-span-4"
             type="text"
             placeholder="17"
           />
         </div>
       </div>
     </div>
-    <div class="w-1/2 flex flex-col items-center" style="width: 400px">
-      <div class="w-full">
 
-      <p class="text-sm mb-2">Microcontroller</p>
-      <select v-model="keyboardStore.controller" class="select select-bordered w-full">
-        <option value="0xcb-helios">0xCB Helios</option>
-        <option value="">other</option>
-      </select>
+    <div class="flex w-1/2 flex-col items-center" style="width: 400px">
+      <div class="w-full">
+        <p class="mb-2 text-sm">Pin Prefix</p>
+        <select v-model="keyboardStore.pinPrefix" class="select-bordered select w-full mb-2">
+          <option value="gp">GP</option>
+          <option value="none">none</option>
+          <option value="board">board</option>
+          <option value="quickpin">quickpin</option>
+        </select>
+        <p v-if="keyboardStore.pinPrefix === 'gp'">generates `board.GP1` like pins from numbers</p>
+        <p v-if="keyboardStore.pinPrefix === 'board'">generates `board.yourpin` like pins from text</p>
+        <p v-if="keyboardStore.pinPrefix === 'none'">generates `yourpin` like pins from text</p>
+        <p v-if="keyboardStore.pinPrefix === 'quickpin'">generates `pins[1]` like pins from numbers</p>
+      </div>
+      <div class="w-full mt-4">
+        <p class="mb-2 text-sm">Microcontroller</p>
+        <select v-model="keyboardStore.controller" class="select-bordered select w-full">
+          <option value="0xcb-helios">0xCB Helios</option>
+          <option value="">other</option>
+        </select>
       </div>
       <div v-if="keyboardStore.controller === '0xcb-helios'">
         <p class="py-4">
           The
           <a
-            class="link link-primary"
+            class="link-primary link"
             target="_blank"
             href="https://keeb.supply/products/0xcb-helios"
             >0xCB Helios</a
@@ -114,7 +127,7 @@
         <ul class="py-4">
           <li>
             <a
-              class="link link-primary"
+              class="link-primary link"
               target="_blank"
               href="https://datasheets.raspberrypi.com/pico/Pico-R3-A4-Pinout.pdf"
               >Pi Pico</a
@@ -171,12 +184,11 @@ const pinsCompleted = computed(() => {
   if (keyboardStore.rowPins.includes('')) return false
   return true
 })
-
 </script>
 
 <style lang="scss" scoped>
 .controller-labels {
-  @apply grid absolute;
+  @apply absolute grid;
   width: 130px;
   padding-top: 15px;
   font-size: 14px;
@@ -184,7 +196,7 @@ const pinsCompleted = computed(() => {
   font-family: Monospaced 'Lucida Console';
   z-index: 2;
   &-right {
-    @apply text-left right-0;
+    @apply right-0 text-left;
     //width: 188px;
   }
   &-left {
@@ -197,7 +209,7 @@ const pinsCompleted = computed(() => {
     left: 128px;
   }
   & > div {
-    @apply px-3 rounded;
+    @apply rounded px-3;
     &:hover {
       background: #666666;
     }

@@ -39,7 +39,7 @@ export const cleanupKeymap = () => {
     return []
   })
   if (filledKeymap) keyboardStore.keymap = filledKeymap
-  console.log('set new keymap to ', filledKeymap)
+  console.log('fixed & set new keymap to ', filledKeymap)
 }
 
 const pickKeyAttributes = ({
@@ -285,6 +285,8 @@ export const renderLabel = (keycode: string) => {
     label = '<p class="keylabel-small">String</p>'
   } else if(keycode.startsWith('customkeys.')){
     label = '<p class="keylabel-small">custom</p>'
+    const customcode = keycode.substring(11)
+    label += `<p style="overflow: hidden">${customcode}</p>`
   }else {
     // Check for modifier keys
     // if (keycode.includes('KC.LSHIFT') || keycode.includes('KC.RSHIFT') ||

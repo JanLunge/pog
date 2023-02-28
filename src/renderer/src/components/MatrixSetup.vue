@@ -41,6 +41,13 @@
         @input="checkMatrix"
       ></InputLabel>
     </div>
+    <div>
+      <label class="flex items-center gap-2">
+        <input v-model="keyboardStore.split" type="checkbox" class="checkbox"
+        />
+        <span>Split</span>
+      </label>
+    </div>
     <div v-if="initialSetup" class="mb-8 flex justify-center">
       <button
         class="btn-primary btn"

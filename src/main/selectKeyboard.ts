@@ -12,6 +12,9 @@ export const handleSelectDrive = async () => {
   return await loadKeyboard(filePaths[0])
 }
 const loadKeyboard = async (path) => {
+  if(!fs.existsSync(`${path}`)){
+    return {error: 'pathNotFound'}
+  }
   const folderContents = await fs.promises.readdir(`${path}`)
   // check for kmk, code.py and boot.py
   currentKeyboard.path = path

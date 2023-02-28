@@ -12,6 +12,12 @@
       >
         <i class="mdi mdi-trash-can"></i>remove Layer
       </button>
+      <button
+        class="btn-primary btn-sm btn"
+        @click="duplicateLayer"
+      >
+        <i class="mdi mdi-content-duplicate"></i>Duplicate Layer
+      </button>
     </div>
     <div class="flex items-center">
       <div class="flex gap-2">
@@ -26,13 +32,17 @@
       </div>
     </div>
   </div>
+  <div style="max-height: 300px" class="my-5">
+
   <keyboard-layout
     :key-layout="keyboardStore.keys"
     :keymap="keyboardStore.keymap"
     :matrix-width="keyboardStore.cols"
     :layouts="keyboardStore.layouts"
   />
-  <div v-if="selectedKeys.size !== 0" class="my-4">
+
+  </div>
+  <div class="my-4">
     <p class="mb-2 text-sm font-bold">Keycode Options for Selected Key(s)</p>
     <div class="flex gap-2">
       <select
@@ -49,7 +59,7 @@
         <option value="custom">custom</option>
       </select>
       <div class="flex-grow">
-        <input v-model="currentKeyCode" type="text" class="input-bordered input input-sm w-full" />
+        <input :disabled="selectedKeys.size === 0" v-model="currentKeyCode" type="text" class="input-bordered input input-sm w-full" />
       </div>
     </div>
     <div v-if="keycodeModeForSelection === 'custom'" class="p-2 text-sm italic">
@@ -108,6 +118,9 @@ const removeLayer = () => {
     keyboardStore.encoderKeymap.splice(selectedLayer.value, 1)
   }
 }
+const duplicateLayer = () => {
+  keyboardStore.keymap.push([...keyboardStore.keymap[selectedLayer.value]])
+}
 const currentKeyCode = computed({
   get() {
     const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
@@ -121,6 +134,7 @@ const currentKeyCode = computed({
   },
   set(newVal) {
     if(newVal === "▽") return
+    if(selectedKeys.value.size === 0 ) return
     const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
     keys.forEach((key) => {
       key.setOnKeymap(newVal)
@@ -132,11 +146,11 @@ const switchedKeyCodeType = () => {
   const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
   keys.forEach((key) => {
     if (keycodeModeForSelection.value === 'sequence') {
-      key.setOnKeymap('simple_key_sequence()')
+      key.setOnKeymap('simple_key_sequence((KC.A, KC.B))')
     } else if (keycodeModeForSelection.value === 'string') {
       key.setOnKeymap('send_string("")')
     }else if(keycodeModeForSelection.value === 'tapdance'){
-      key.setOnKeymap('KC.TD()')
+      key.setOnKeymap('KC.TD(KC.A,KC.B)')
     }else if(keycodeModeForSelection.value === 'custom'){
       key.setOnKeymap('customkeys.MyKey')
     }
