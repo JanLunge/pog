@@ -24,6 +24,11 @@ tapdance = TapDance()
 tapdance.tap_time = 200
 keyboard.modules.append(tapdance)
 
+from kmk.modules.modtap import ModTap; keyboard.modules.append(ModTap())
+from kmk.modules.mouse_keys import MouseKeys; keyboard.modules.append(MouseKeys())
+from kmk.modules.power import Power; keyboard.modules.append(Power())
+
+
 # Keymap
 if not pog.coordMappingAssistant:
     import keymap
