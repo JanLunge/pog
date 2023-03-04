@@ -236,32 +236,64 @@ export const renderLabel = (keycode: string) => {
     DOT: { label: '.' },
     COMM: { label: ',' },
     SLSH: { label: '/' },
+    KP_SLASH: { label: '/' },
     SCLN: { label: ';' },
     QUOT: { label: "'" },
     LSFT: { icon: 'mdi-apple-keyboard-shift' },
     RSFT: { icon: 'mdi-apple-keyboard-shift' },
     LBRC: { label: '[' },
     RBRC: { label: ']' },
+    LABK: { label: '<' },
+    RABK: { label: '>' },
+    LCBR: { label: '{' },
+    RCBR: { label: '}' },
+    LEFT_PAREN: { label: '(' },
+    RIGHT_PAREN: { label: ')' },
+    DQT: { label: '"' },
+    COLN: { label: ':' },
+    EXLM: { label: '!' },
+    PERCENT: { label: '%' },
+    AMPERSAND: { label: '&' },
+    TILDE: { label: '~' },
+    PIPE: { label: '|' },
+    DOLLAR: { label: '$' },
+    HASH: { label: '#' },
+    QUES: { label: '?' },
     BSLS: { label: '\\' },
     MINS: { label: '-' },
     EQL: { label: '=' },
     CAPS: { icon: 'mdi-apple-keyboard-caps' },
     TAB: { icon: 'mdi-keyboard-tab' },
     BSPC: { icon: 'mdi-backspace' },
+    DEL: { icon: 'mdi-backspace-reverse' },
     LCTL: { icon: 'mdi-apple-keyboard-control' },
     RCTL: { icon: 'mdi-apple-keyboard-control' },
     LALT: { icon: 'mdi-apple-keyboard-option' },
     RALT: { icon: 'mdi-apple-keyboard-option' },
     LGUI: { icon: 'mdi-apple-keyboard-command' },
     RGUI: { icon: 'mdi-apple-keyboard-command' },
-    UP: { icon: 'mdi-arrow-up' },
-    LEFT: { icon: 'mdi-arrow-left' },
-    DOWN: { icon: 'mdi-arrow-down' },
-    RIGHT: { icon: 'mdi-arrow-right' },
+    HOME: { icon: 'mdi-arrow-top-left' },
+    END: { icon: 'mdi-arrow-bottom-right' },
+    PGDOWN: { icon: 'mdi-arrow-down' },
+    PGUP: { icon: 'mdi-arrow-up' },
+    UP: { icon: 'mdi-arrow-up-thin' },
+    LEFT: { icon: 'mdi-arrow-left-thin' },
+    DOWN: { icon: 'mdi-arrow-down-thin' },
+    RIGHT: { icon: 'mdi-arrow-right-thin' },
     GRV: { label: '`' },
+    PLUS: { label: '+' },
+    AT: { label: '@' },
+    UNDERSCORE: { label: '_' },
+    CIRCUMFLEX: { label: '^' },
+    ASTERISK: { label: '*' },
+
 
     // Layer
     MO: { label: 'MO' },
+    MT: { label: 'MT' },
+    LT: {
+      label: 'LT'
+    },
 
     // Media
     MPLY: { label: 'Play/Pause', icon: 'mdi-play-pause' },
@@ -299,21 +331,28 @@ export const renderLabel = (keycode: string) => {
     const keyMatch = keycode.match(/KC\.(\w+)/)
     if (keyMatch) {
       const key = keyMatch[1]
-      if (!keyLabels[key]) {
+      const foundKey = keyLabels[key]
+      if (!foundKey) {
         label += keycode
-      } else if (keyLabels[key].icon) {
-        label += `<i class="mdi ${keyLabels[key].icon}"></i>`
-      } else if (keyLabels[key].label) {
-        label += keyLabels[key].label
+      } else if (foundKey.icon) {
+        label += `<i class="mdi ${foundKey.icon}"></i>`
+      } else if (foundKey.label) {
+        label += foundKey.label
       }
       // if it has arguments render them as keycode as well
       if (keycode.includes('(')) {
         const match = keycode.match(/^[^(]+\((.*)\)$/)
         console.log('found params', match) // prints ["0", "KC.A"]
+        // dont render options for some keys eg. MT
+
         if (match && match[1] && match[1].includes(',')) {
           const params = match[1].split(',').map((a) => renderLabel(a))
           console.log('param list', params)
-          label += ` ${params.join(' ')}`
+          let maxParams = 10
+          if(['LT', 'MT'].includes(key)){
+            maxParams =2
+          }
+          label += ` ${params.slice(0,maxParams).join(' ')}`
         } else if (match) {
           // just add that key to label
           label += ` ${renderLabel(match[1])}`

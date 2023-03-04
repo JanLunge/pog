@@ -11,7 +11,8 @@ import MatrixSetup from '../components/MatrixSetup.vue'
 import PinSetup from '../components/PinSetup.vue'
 import RawKeymapEditor from '../components/RawKeymapEditor.vue'
 import KeyboardName from '../components/KeyboardName.vue'
-import CoordMap from "../components/CoordMap.vue";
+import CoordMap from '../components/CoordMap.vue'
+import Community from "../components/Community.vue";
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -84,6 +85,11 @@ const router = createRouter({
           path: 'coordmap',
           component: CoordMap,
           name: 'CoordMap'
+        },
+        {
+          path: 'community',
+          component: Community,
+          name: 'Community'
         }
       ]
     }

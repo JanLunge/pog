@@ -40,6 +40,11 @@ for i, item in enumerate(config["directPins"]):
     pinsArray.append(renderPin(item))
 pins = ",".join(pinsArray)
 
+if config['wiringMethod'] == 'matrix':
+    keyCount = len(rowPinsArray) * len(colPinsArray)
+else:
+    keyCount = len(pinsArray)
+
 # encoders
 hasEncoders = len(config['encoders']) != 0
 

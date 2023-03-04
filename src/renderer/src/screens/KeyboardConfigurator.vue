@@ -22,6 +22,7 @@
       <li><router-link to="/configurator/coordmap">CoordMap</router-link></li>
       <li><router-link to="/configurator/raw-keymap">Raw Keymap</router-link></li>
       <li><router-link to="/configurator/firmware">Firmware</router-link></li>
+<!--      <li><router-link to="/configurator/community">Community</router-link></li>-->
     </ul>
     <div class="h-screen flex-1 overflow-x-auto px-4 pt-8">
       <h1 class="mb-8 text-center text-5xl font-bold" contenteditable="true">
@@ -57,10 +58,17 @@
 <script lang="ts" setup>
 import Popper from '@wlard/vue3-popper'
 import { addToHistory, keyboardStore } from '../store'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter} from 'vue-router'
 import { computed } from 'vue'
 const router = useRouter()
 const route = useRoute()
+
+// nav guard
+console.log('path is',keyboardStore.path)
+if(!keyboardStore.path){
+  router.push('/')
+}
+
 const reselectKeyboard = () => {
   router.push('/')
 }
@@ -86,6 +94,7 @@ const flashingMode = computed({
     keyboardStore.flashingMode = newVal ? 'automatic' : 'manual'
   }
 })
+
 </script>
 
 <style lang="scss" scoped>

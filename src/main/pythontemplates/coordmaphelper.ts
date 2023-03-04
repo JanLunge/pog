@@ -2,10 +2,11 @@ export const coordmaphelperpy = `# coordmaphelper.py helper script to get your c
 from kmk.handlers.sequences import simple_key_sequence
 from kmk.keys import KC
 from kb import KMKKeyboard as _KMKKeyboard
+import pog
 class KMKKeyboard(_KMKKeyboard):
     # *2 for split keyboards, which will typically manage twice the number of keys
     # of one side. Having this N too large will have no impact (maybe slower boot..)
-    N = len(_KMKKeyboard.col_pins) * len(_KMKKeyboard.row_pins) *2
+    N = pog.keyCount * 2
     coord_mapping = list(range(N))
 
     layer = []
