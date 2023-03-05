@@ -49,7 +49,6 @@ const pickKeyAttributes = ({
   h2,
   x,
   x2,
-  y,
   y2
 }: {
   w: number
@@ -58,7 +57,7 @@ const pickKeyAttributes = ({
   h2: number
   x: number
   x2: number
-  y: number
+  y?: number
   y2: number
 }) => ({
   w,
@@ -67,7 +66,7 @@ const pickKeyAttributes = ({
   h2,
   x,
   x2,
-  y,
+  // y,
   y2
 })
 
@@ -134,7 +133,7 @@ export const KleToPog = (kleString: string) => {
           // Position data
           if (keydata) {
             key = { ...key, ...pickKeyAttributes(keydata) }
-            if (keydata.y) currentY = keydata.y
+            if (keydata.y) currentY += keydata.y
             if (keydata.x) currentX = keydata.x + currentX
             if (firstKeyInRow) {
               key.x = currentX
@@ -287,24 +286,40 @@ export const renderLabel = (keycode: string) => {
     CIRCUMFLEX: { label: '^' },
     ASTERISK: { label: '*' },
 
-
     // Layer
     MO: { label: 'MO' },
     MT: { label: 'MT' },
-    LT: {
-      label: 'LT'
-    },
+    LT: { label: 'LT' },
+    TT: { label: 'TT' },
+    TG: { label: 'TG' },
+    TO: { label: 'TO' },
 
     // Media
     MPLY: { label: 'Play/Pause', icon: 'mdi-play-pause' },
     MEDIA_PLAY_PAUSE: { label: 'Play/Pause', icon: 'mdi-play-pause' },
     MRWD: { label: 'Prev Track', icon: 'mdi-skip-previous' },
     MFFD: { label: 'Next Track', icon: 'mdi-skip-next' },
-    TD: { label: '<p class="keylabel-small">TD</p>' },
-    send_string: { label: 'String</br>' }
+    TD: { label: 'TD' },
+    send_string: { label: 'String' }
   }
 
-  let label = ''
+  const keylabel: {
+    simple: boolean
+    action: string
+    main: string
+    lower: string
+    params: any[]
+    layer: number | null
+    layerNamePosition: string
+  } = {
+    simple: true,
+    action: '',
+    params: [],
+    layer: null,
+    main: '',
+    lower: '',
+    layerNamePosition: ''
+  }
 
   // Check if the keycode is a sequence
   if (keycode.startsWith('simple_key_sequence(') && keycode.endsWith(')')) {
@@ -312,14 +327,14 @@ export const renderLabel = (keycode: string) => {
     const keys = keycode.slice(19, -1).split(',')
 
     // Get the label for each key and join them with a "+"
-    label = keys.map((k) => renderLabel(k.trim())).join(' + ')
+    keylabel.action = keys.map((k) => renderLabel(k.trim())).join(' + ')
   } else if (keycode.startsWith('send_string(') && keycode.endsWith(')')) {
-    label = '<p class="keylabel-small">String</p>'
-  } else if(keycode.startsWith('customkeys.')){
-    label = '<p class="keylabel-small">custom</p>'
+    keylabel.action = '<p class="keylabel-small">String</p>'
+  } else if (keycode.startsWith('customkeys.')) {
+    keylabel.action = '<p class="keylabel-small">custom</p>'
     const customcode = keycode.substring(11)
-    label += `<p style="overflow: hidden">${customcode}</p>`
-  }else {
+    keylabel.action += `<p style="overflow: hidden">${customcode}</p>`
+  } else {
     // Check for modifier keys
     // if (keycode.includes('KC.LSHIFT') || keycode.includes('KC.RSHIFT') ||
     //   keycode.includes('KC.LCTL') || keycode.includes('KC.RCTL') ||
@@ -333,36 +348,66 @@ export const renderLabel = (keycode: string) => {
       const key = keyMatch[1]
       const foundKey = keyLabels[key]
       if (!foundKey) {
-        label += keycode
+        keylabel.action = keycode
       } else if (foundKey.icon) {
-        label += `<i class="mdi ${foundKey.icon}"></i>`
+        keylabel.action = `<i class="mdi ${foundKey.icon}"></i>`
       } else if (foundKey.label) {
-        label += foundKey.label
+        keylabel.action += foundKey.label
       }
       // if it has arguments render them as keycode as well
       if (keycode.includes('(')) {
         const match = keycode.match(/^[^(]+\((.*)\)$/)
-        console.log('found params', match) // prints ["0", "KC.A"]
         // dont render options for some keys eg. MT
-
-        if (match && match[1] && match[1].includes(',')) {
+        if (match && match[1]) {
           const params = match[1].split(',').map((a) => renderLabel(a))
-          console.log('param list', params)
           let maxParams = 10
-          if(['LT', 'MT'].includes(key)){
-            maxParams =2
+          if (['LT', 'MT'].includes(key)) {
+            // keycodes that have a label at the top
+            maxParams = 2
           }
-          label += ` ${params.slice(0,maxParams).join(' ')}`
-        } else if (match) {
-          // just add that key to label
-          label += ` ${renderLabel(match[1])}`
+          switch (key) {
+            case 'LT':
+              keylabel.main = String(params[1].action)
+              keylabel.lower = params[0].action
+              keylabel.layer = Number(params[0].action)
+              keylabel.simple = false
+              keylabel.layerNamePosition = 'lower'
+              break
+            case 'MT':
+              keylabel.main = String(params[0].action)
+              keylabel.lower = String(params[1].action)
+              keylabel.simple = false
+              break
+            case 'TT':
+              keylabel.main = String(params[0].action)
+              keylabel.layer = Number(params[0].action)
+              keylabel.simple = false
+              break
+            case 'TO':
+              keylabel.main = String(params[0].action)
+              keylabel.layer = Number(params[0].action)
+              keylabel.simple = false
+              break
+            case 'TG':
+              keylabel.main = String(params[0].action)
+              keylabel.layer = Number(params[0].action)
+              keylabel.simple = false
+              break
+            case 'MO':
+              keylabel.main = String(params[0].action)
+              keylabel.layer = Number(params[0].action)
+              keylabel.simple = false
+              keylabel.layerNamePosition = 'main'
+              break
+          }
+          keylabel.params = params.slice(0, maxParams)
         }
       }
     } else {
       // custom keycodes
-      label += keycode
+      keylabel.action = keycode
     }
   }
 
-  return label
+  return keylabel
 }

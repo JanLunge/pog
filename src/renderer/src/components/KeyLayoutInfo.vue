@@ -117,16 +117,22 @@
     <p>Direct Pin Index</p>
     <input v-model="tmpKey.directPinIndex" type="text" class="keyinfo-input" @change="updateKey" />
   </div>
-  <span>variant</span>
-  <input v-model="tmpKey.variant[0]" type="text" class="keyinfo-input" @change="updateKey" />
-  <span>variant option</span>
-  <input v-model="tmpKey.variant[1]" type="text" class="keyinfo-input" @change="updateKey" />
+  <div v-if="keyboardStore.layouts.length !== 0" class="flex gap-1">
+    <label>
+      <span>variant</span>
+      <input v-model="tmpKey.variant[0]" type="text" class="keyinfo-input" @change="updateKey" />
+    </label>
+    <label>
+      <span>variant option</span>
+      <input v-model="tmpKey.variant[1]" type="text" class="keyinfo-input" @change="updateKey" />
+    </label>
+  </div>
   <span>rotation</span>
-  <div class="flex">
+  <div class="flex gap-1">
     <input
       v-model="tmpKey.r"
       type="number"
-      step="15"
+      step="1"
       class="keyinfo-input w-1/3"
       @change="updateKey"
     />deg
@@ -135,6 +141,7 @@
       type="number"
       step="1"
       class="keyinfo-input w-1/3"
+      placeholder="rotation x"
       @change="updateKey"
     />
     <input
@@ -142,6 +149,7 @@
       type="number"
       step="1"
       class="keyinfo-input w-1/3"
+      placeholder="rotation y"
       @change="updateKey"
     />
   </div>
@@ -187,23 +195,41 @@ const tmpKey = ref<{
   rx: 0,
   ry: 0
 })
-// watch(
-//   () => selectedKey.value.keyIndex,
-//   () => {
-//     console.log("key changed");
-//     tmpKey.value = {
-//       matrix: [NaN, NaN],
-//       variant: [NaN, NaN],
-//       ...props.layout[selectedKey.value.keyIndex],
-//     };
-//   }
-// );
 
+const isAttrSame = (keys, attr) => {
+  return keys.reduce((acc, val) => acc.add(val[attr]), new Set()).size === 1
+}
+const getSameKeyAttrs = (keys) => {
+  console.log(keys)
+  const sameAttrs = new Map()
+  ;[
+    'y',
+    'y2',
+    'x',
+    'x2',
+    'w',
+    'w2',
+    'h',
+    'h2',
+    'r',
+    'ry',
+    'rx'
+  ].forEach((attr) => {
+    if (isAttrSame(keys, attr) && keys[0][attr] !== undefined) {
+      console.log('attr is same',attr)
+      sameAttrs.set(attr, keys[0][attr])
+    }
+  })
+  const returnObj = Object.fromEntries(sameAttrs)
+  console.log(returnObj)
+  return returnObj
+}
 const updateSelectedKey = () => {
   console.log('updating selected keys')
   if ([...selectedKeys.value].length === 1) {
     const keyToLoad = props.layout[[...selectedKeys.value][0]]
-    console.log(keyToLoad)
+
+    // only load overlapping data from all selected keys
 
     tmpKey.value = {
       ...keyToLoad
@@ -233,19 +259,15 @@ const updateSelectedKey = () => {
       rx: '',
       ry: ''
     }
+    const attrs = getSameKeyAttrs(props.layout.filter((_a, i) => selectedKeys.value.has(i)))
+    tmpKey.value = { ...tmpKey.value, ...attrs }
   }
 }
-
 updateSelectedKey()
-watch(selectedKeys, () => {
-  console.log('selected keys changed')
+
+watch(selectedKeys.value, () => {
   updateSelectedKey()
 })
-
-// watch(
-// //    selectedKeys,
-//   () => updateSelectedKey()
-// )
 
 const updateKey = () => {
   selectedKeys.value.forEach((keyIndex) => {
@@ -258,6 +280,8 @@ const updateKey = () => {
     if (tmpKey.value.y !== '') props.layout[keyIndex].y = Number(tmpKey.value.y)
     if (tmpKey.value.w !== '') props.layout[keyIndex].w = Number(tmpKey.value.w)
     if (tmpKey.value.h !== '') props.layout[keyIndex].h = Number(tmpKey.value.h)
+    if (tmpKey.value.w2 !== '') props.layout[keyIndex].w2 = Number(tmpKey.value.w2)
+    if (tmpKey.value.h2 !== '') props.layout[keyIndex].h2 = Number(tmpKey.value.h2)
     if (tmpKey.value.r !== '') props.layout[keyIndex].r = Number(tmpKey.value.r)
     if (tmpKey.value.rx !== '') props.layout[keyIndex].rx = Number(tmpKey.value.rx)
     if (tmpKey.value.ry !== '') props.layout[keyIndex].ry = Number(tmpKey.value.ry)

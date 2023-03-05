@@ -3,6 +3,7 @@
     v-if="visible"
     class="keycap"
     style="user-select: none"
+    :ref="keyElem"
     :data-index="keyIndex"
     :style="{
       left: keyData.x * (baseKeyWidth + keyGap) + 'px',
@@ -12,23 +13,24 @@
       transform: `rotate(${keyData.r}deg)`,
       transformOrigin: rotationOrigin
     }"
-    :class="{ selected: mainSelected }"
+    :class="{ selected: mainSelected, 'is-trns': isTRNS }"
   >
     <div
       v-if="keyData.w2 || keyData.h2"
       class="keyborder-blocker"
       :style="{
         left: '1px',
-        top: '1px',
+        top: '4px',
         width: keyWidth - 2 + 'px',
-        height: keyHeight - 2 + 'px'
+        height: keyHeight - 8 + 'px'
       }"
     ></div>
     <div
       class="keyborder"
       :style="{
         width: keyWidth + 'px',
-        height: keyHeight + 'px'
+        height: keyHeight + 'px',
+        backgroundColor: keyColorDark
       }"
     ></div>
     <div
@@ -46,8 +48,8 @@
       class="keytop"
       :style="{
         height: keyTopHeight2 + 'px',
-        width: keyTopWidth2 + 'px',
-        left: keyData.x2 * baseKeyWidth + keyGap + 'px'
+        left: keyData.x2 * (baseKeyWidth + keyGap) + 1 + 'px',
+        backgroundColor: keyColor
       }"
     ></div>
     <!--    <div-->
@@ -55,28 +57,48 @@
     <!--      @click="bgClick"-->
     <!--    ></div>-->
     <div
+      v-else
       class="keytop"
       :style="{
+        top: !mainLabel || mainLabel.simple ? '4px' : '14px',
         height: keyTopHeight + 'px',
-        width: keyTopWidth + 'px'
+        background: keyColor
       }"
     ></div>
-    <div class="keylabels" :class="{ 'has-args': hasArguments }">
+    <div v-if="!mainLabel.simple" class="keylabel-action">{{ mainLabel.action }}</div>
+    <div
+      class="keylabels"
+      :class="{ 'has-args': !mainLabel.simple }"
+      :style="{ height: keyTopHeight + 'px', top: !mainLabel || mainLabel.simple ? '4px' : '14px' }"
+    >
       <!--      <div class="keylabel" :class="['keylabel-'+index]" v-for="(label,index) in keyData.labels">-->
       <!--        <div class="keylabel-inner">-->
       <!--          {{label}}-->
       <!--        </div>-->
       <!--      </div>-->
-      <div class="keylabel keylabel-center" v-html="mainLabel"></div>
+      <div v-if="mainLabel" class="keylabel keylabel-center">
+        <span v-if="mainLabel.simple" v-html="mainLabel.action"></span>
+        <div v-else class="flex h-full flex-col justify-between p-1">
+          <span class="keylabel-main" v-html="mainLabel.layerNamePosition==='main'?mainLabel.main+' '+layerName:mainLabel.main"></span>
+          <span
+            class="keylabel-lower"
+            v-html="
+              mainLabel.layerNamePosition === 'lower'
+                ? mainLabel.lower + ' ' + layerName
+                : mainLabel.lower
+            "
+          ></span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
-import { selectedLayer, selectedKeys } from '../store'
+import {computed, ref, VNodeRef, watch} from 'vue'
+import { selectedLayer, selectedKeys, userSettings } from '../store'
 import { renderLabel } from '../helpers'
-
+import chroma from 'chroma-js'
 const props = defineProps([
   'keyData',
   'keyIndex',
@@ -100,6 +122,10 @@ const action = computed(() => {
   // resolve readable character
   if (!keyCode || keyCode === 'KC.TRNS') return '▽'
   return keyCode
+})
+
+const isTRNS = computed(() => {
+  return action.value === '▽'
 })
 
 const visible = computed(() => {
@@ -143,29 +169,40 @@ const keyWidth2 = computed(() => {
 const keyHeight2 = computed(() => {
   return keyHeight2U.value * baseKeyWidth.value + (keyHeight2U.value - 1) * keyGap
 })
-const hasArguments = computed(() => {
-  if (!action.value) return false
-  return action.value.includes(')')
-})
-const keyTopWidth = computed(() => {
-  return keyWidth.value - keyGap * 2 - 4 //+ ((keyWidthU.value-1)*keyGap))
-})
+// const hasArguments = computed(() => {
+//   if (!action.value) return false
+//   return action.value.includes(')')
+// })
+// const keyTopWidth = computed(() => {
+//   return keyWidth.value - keyGap * 2 - 4 //+ ((keyWidthU.value-1)*keyGap))
+// })
 const keyTopHeight = computed(() => {
-  return keyHeight.value - 6 * keyHeightU.value - keyGap + (keyHeightU.value - 1) * keyGap
+  let padding = 3
+  if (mainLabel.value && !mainLabel.value.simple) padding += 10
+  return keyHeight.value - padding * keyHeightU.value - keyGap + (keyHeightU.value - 1) * keyGap
 })
-const keyTopWidth2 = computed(() => {
-  return keyWidth2.value - 6 * keyWidth2U.value - keyGap - 2 + (keyWidth2U.value - 1) * keyGap
-})
+// const keyTopWidth2 = computed(() => {
+//   const padding = 0
+//    return keyWidth2.value - padding * keyWidth2U.value - keyGap - 2 + (keyWidth2U.value - 1) * keyGap
+// })
 const keyTopHeight2 = computed(() => {
-  return keyHeight2.value - 6 * keyHeight2U.value - keyGap + (keyHeight2U.value - 1) * keyGap
+  const padding = 3
+  return keyHeight2.value - padding * keyHeight2U.value - keyGap + (keyHeight2U.value - 1) * keyGap
 })
 const mainLabel = computed(() => {
   // in Layout Mode show the matrix pos
   if (props.mode === 'layout') {
-    return props.keyData.getMatrixLabel()
+    return {
+      simple: true,
+      action: props.keyData.getMatrixLabel(),
+      layer: null,
+      lower: '',
+      main: '',
+      layerNamePosition: ''
+    }
   }
   // otherwise show the action from the keymap
-  if (!action.value) return ''
+  // if (!action.value) return {simple: true,action: '',}
 
   // render readable label
   return renderLabel(action.value)
@@ -231,45 +268,74 @@ const rotationOrigin = computed(() => {
   const y = props.keyData.ry * 58 - props.keyData.y * (baseKeyWidth.value + keyGap)
   return `${x}px ${y}px` // return "xpx ypx"
 })
+
+const keyColor = computed(() => {
+  if (userSettings.value.reduceKeymapColors) return undefined
+  if (mainLabel.value && mainLabel.value.layer && props.keyData.keyboard) {
+    if (props.keyData.keyboard.layers[mainLabel.value.layer]) {
+      return props.keyData.keyboard.layers[mainLabel.value.layer].color
+    }
+  } else if (mainLabel.value && mainLabel.value.action === 'MT') {
+    return '#592424'
+  }
+  return undefined
+})
+const keyColorDark = computed(() => {
+  if (keyColor.value) {
+    return chroma(keyColor.value).darken(2).hex()
+  }
+  return undefined
+})
+const layerName = computed(() => {
+  if (!props.keyData.keyboard) return ''
+  if(!mainLabel.value.layer) return ''
+  const layer = props.keyData.keyboard.layers[mainLabel.value.layer]
+  return layer ? layer.name : ''
+})
+const keyElem = ref<VNodeRef|null>(null)
+const fixLabelWidth = () => {
+  console.log('scaling labels based on their container')
+}
+fixLabelWidth()
 </script>
 
 <style lang="scss" scoped>
 .keyborder {
   // outer key outline and background
-  background: #333;
+  background: #171717;
+  background-image: url('../assets/keycaptophighlight.png');
+  background-repeat: repeat-x;
   position: absolute;
   width: 54px;
   height: 54px;
-  border: 1px solid transparent;
   cursor: pointer;
-  @apply rounded;
   z-index: 0;
+  border-radius: 10px;
   .selected & {
     border-color: white;
     z-index: 4;
-    //box-shadow: rgba(0, 0, 0, 0.6) 2px 2px 8px 0;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 1);
   }
 }
 .keyborder-blocker {
-  background: #333;
+  background: #3e3e3e;
   position: absolute;
   width: 52px;
   height: 52px;
   cursor: pointer;
-  @apply rounded;
+  border-radius: 12px;
   z-index: 5;
 }
 .keytop {
   position: absolute;
   height: 42px;
-  width: calc(100% - 12px);
-  left: 6px;
+  width: calc(100% - 2px);
+  left: 1px;
   top: 4px;
-  right: 6px;
-  background: #444;
+  right: 1px;
+  background: #3e3e3e;
   cursor: pointer;
-  @apply rounded;
-  //z-index: 2;
+  border-radius: 12px;
   z-index: 6;
   .selected & {
   }
@@ -281,16 +347,16 @@ const rotationOrigin = computed(() => {
   left: 6px;
   top: 4px;
   right: 6px;
+  line-height: 1rem;
   //z-index: 3;
   z-index: 7;
   .selected & {
   }
 }
 .keylabel {
-  font-size: 12px;
   position: absolute;
   width: 100%;
-  height: calc(48px - 5px);
+  height: 100%; //calc(48px - 5px);
   @apply gap-1;
 
   &-0 {
@@ -318,7 +384,7 @@ const rotationOrigin = computed(() => {
   .arg-bottom {
     @apply flex items-center justify-center rounded text-center;
     position: absolute;
-    border: 1px solid #666;
+    //border: 1px solid #666;
     left: 6px;
     right: 6px;
     bottom: 2px;
@@ -332,11 +398,12 @@ const rotationOrigin = computed(() => {
 }
 .keycap {
   position: absolute;
-  //width: 54px;
-  //height: 54px;
   @apply transition-all;
   .dragging & {
     transition: all 0.08s ease-out;
+  }
+  &.is-trns {
+    opacity: 0.3;
   }
 }
 //.keycap {
@@ -356,19 +423,37 @@ const rotationOrigin = computed(() => {
 </style>
 <style lang="scss">
 .keylabel {
+  font-weight: bold;
+  font-size: 18px;
+  text-shadow: 1px 2px 6px rgba(0, 0, 0, 0.6);
   i.mdi {
     font-size: 18px;
   }
+}
+.keylabel-main {
+  white-space: nowrap;
   .has-args & {
     i.mdi {
       font-size: 14px;
     }
   }
 }
-.keylabel-small {
-  font-size: 9px;
+.keylabel-lower {
+  font-size: 10px;
   font-weight: bold;
   font-style: italic;
   width: 100%;
+  i.mdi {
+    font-size: 12px;
+  }
+}
+.keylabel-action {
+  font-size: 10px;
+  font-weight: bold;
+  //font-style: italic;
+  width: 100%;
+  position: absolute;
+  z-index: 10;
+  text-align: center;
 }
 </style>

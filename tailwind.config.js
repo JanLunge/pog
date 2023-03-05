@@ -20,6 +20,17 @@ module.exports = {
   },
   plugins: [require('daisyui')],
   daisyui: {
-    darkTheme: 'halloween'
+    darkTheme: 'halloween',
+    themes:[
+      {
+        halloween:{
+          ...require("daisyui/src/colors/themes")["[data-theme=halloween]"],
+          primary: '#ef8f4c',
+          'base-100': '#171717',
+          'base-200': '#252525',
+          'base-300': '#383838',
+        }
+      }
+    ]
   }
 }

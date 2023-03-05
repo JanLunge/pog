@@ -12,9 +12,8 @@
       </select>
     </div>
   </div>
-  <div class="my-8 flex w-full justify-center">
+  <div v-if="initialSetup" class="my-8 flex w-full justify-center">
     <button
-      v-if="initialSetup"
       class="btn-primary btn"
       :class="{ 'btn-disabled': !pinsCompleted }"
       @click="$emit('next')"
@@ -24,7 +23,7 @@
   </div>
   <div class="mt-5 flex justify-center gap-8">
     <div v-if="keyboardStore.wiringMethod === 'matrix'" class="flex-grow-0">
-      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-300 p-2 py-8" style="width: 350px">
+      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-100 p-2 py-8" style="width: 350px">
         <p class="flex items-center justify-center pb-4 text-xl font-bold">
           Row Pins
           <span class="badge-primary badge ml-2 font-bold">{{ keyboardStore.rowPins.length }}</span>
@@ -33,7 +32,7 @@
           v-for="(_pin, index) in keyboardStore.rowPins"
           class="grid grid-cols-6 items-center gap-2"
         >
-          <p class="mr-2 text-right">{{ index + 1 }}</p>
+          <p class="mr-2 text-right">{{ index }}</p>
           <input
             v-model="keyboardStore.rowPins[index]"
             class="input-bordered input input-sm col-span-4"
@@ -42,7 +41,7 @@
           />
         </div>
       </div>
-      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-300 p-2 py-8">
+      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-100 p-2 py-8">
         <p class="flex items-center justify-center pb-4 text-xl font-bold">
           Column Pins
           <span class="badge-primary badge ml-2 font-bold">{{ keyboardStore.colPins.length }}</span>
@@ -51,7 +50,7 @@
           v-for="(_pin, index) in keyboardStore.colPins"
           class="grid grid-cols-6 items-center gap-2"
         >
-          <span class="mr-2 text-right">{{ index + 1 }}</span>
+          <span class="mr-2 text-right">{{ index }}</span>
           <input
             v-model="keyboardStore.colPins[index]"
             class="input-bordered input input-sm col-span-4"
@@ -62,7 +61,7 @@
       </div>
     </div>
     <div v-if="keyboardStore.wiringMethod === 'direct'" class="flex-grow-0">
-      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-300 p-2 py-8" style="width: 350px">
+      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-100 p-2 py-8" style="width: 350px">
         <p class="flex items-center justify-center pb-4 text-xl font-bold">
           Direct Pins
           <span class="badge-primary badge ml-2 font-bold">{{
@@ -73,7 +72,7 @@
           v-for="(_pin, index) in keyboardStore.directPins"
           class="grid grid-cols-6 items-center gap-2"
         >
-          <p class="mr-2 text-right">{{ index + 1 }}</p>
+          <p class="mr-2 text-right">{{ index }}</p>
           <input
             v-model="keyboardStore.directPins[index]"
             class="input-bordered input input-sm col-span-4"
@@ -87,18 +86,15 @@
     <div class="flex w-1/2 flex-col items-center" style="width: 400px">
       <div class="w-full">
         <p class="mb-2 text-sm">Pin Prefix</p>
-        <select v-model="keyboardStore.pinPrefix" class="select-bordered select w-full mb-2">
+        <select v-model="keyboardStore.pinPrefix" class="select-bordered select mb-2 w-full">
           <option value="gp">GP</option>
           <option value="none">none</option>
           <option value="board">board</option>
           <option value="quickpin">quickpin</option>
         </select>
-        <p v-if="keyboardStore.pinPrefix === 'gp'">generates `board.GP1` like pins from numbers</p>
-        <p v-if="keyboardStore.pinPrefix === 'board'">generates `board.yourpin` like pins from text</p>
-        <p v-if="keyboardStore.pinPrefix === 'none'">generates `yourpin` like pins from text</p>
-        <p v-if="keyboardStore.pinPrefix === 'quickpin'">generates `pins[1]` like pins from numbers</p>
+        <p>{{ pinPfrefixHint }}</p>
       </div>
-      <div class="w-full mt-4">
+      <div class="mt-4 w-full">
         <p class="mb-2 text-sm">Microcontroller</p>
         <select v-model="keyboardStore.controller" class="select-bordered select w-full">
           <option value="0xcb-helios">0xCB Helios</option>
@@ -149,7 +145,7 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 // import { useRouter } from 'vue-router'
-import { keyboardStore } from '../store'
+import { keyboardStore, pinPfrefixHint } from '../store'
 // const router = useRouter()
 
 defineProps(['initialSetup'])

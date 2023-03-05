@@ -231,7 +231,7 @@ export class Key {
   }
 }
 
-class Keyboard {
+export class Keyboard {
   id = ulid()
   path?: string = undefined
   name = ''
@@ -276,6 +276,7 @@ class Keyboard {
   // layer > encoder index > encoder action index > keycode
   encoderKeymap: EncoderLayer[] = []
   keymap: (string | undefined)[][] = [[]]
+  layers: { name: string; color: string|undefined }[] = []
 
   constructor() {}
 
@@ -375,6 +376,7 @@ class Keyboard {
     configContents: any
     folderContents: string[]
   }) {
+    this.clear()
     this.id = ulid()
     this.path = path
     this.driveContents = folderContents
@@ -406,6 +408,7 @@ class Keyboard {
       if (configContents.controller) this.controller = configContents.controller
       if (configContents.keymap) this.keymap = configContents.keymap
       if (configContents.layouts) this.layouts = configContents.layouts
+      if (configContents.layers) this.layers = configContents.layers
 
       if (configContents.split) this.split = configContents.split
 
@@ -419,6 +422,28 @@ class Keyboard {
     this.pogConfigured = false
     this.path = ''
     this.coordMap = []
+    this.layers = []
+    this.name = ''
+    this.description = ''
+    this.tags = []
+    this.manufacturer = ''
+    this.wiringMethod = 'matrix'
+    this.flashingMode = 'automatic'
+    this.pinPrefix = 'gp'
+    this.coordMapSetup = false
+    this.rows = 1
+    this.cols = 1
+    this.pins = 1
+    this.rowPins = []
+    this.colPins = []
+    this.directPins = []
+    this.diodeDirection = 'COL2ROW'
+    this.controller = ''
+    this.keymap = []
+    this.layouts = []
+    this.split = false
+    this.encoders = []
+    this.encoderKeymap = []
   }
 
   serialize() {
@@ -428,6 +453,7 @@ class Keyboard {
       manufacturer: this.manufacturer,
       description: this.description,
       tags: this.tags,
+      controller: this.controller,
 
       wiringMethod: this.wiringMethod,
       diodeDirection: this.diodeDirection,
@@ -446,6 +472,7 @@ class Keyboard {
 
       keymap: this.keymap,
       encoderKeymap: this.encoderKeymap,
+      layers: this.layers,
 
       split: this.split,
       coordMap: this.coordMap,
@@ -459,7 +486,7 @@ class Keyboard {
 }
 
 @VueStore
-class KeyboardStore extends Keyboard {}
+export class KeyboardStore extends Keyboard {}
 
 export const keyboardStore = new KeyboardStore()
 
@@ -472,4 +499,23 @@ export const isNewKeyboardSetup = computed(() => {
   return false
 })
 
-export const notifications = ref<{label:string}[]>([])
+export const notifications = ref<{ label: string }[]>([])
+
+export const pinPfrefixHint = computed(() => {
+  switch (keyboardStore.pinPrefix) {
+    case 'gp':
+      return 'generates `board.GP1` like pins from numbers'
+      break
+    case 'board':
+      return 'generates `board.yourpin` like pins from text'
+      break
+    case 'none':
+      return 'generates `yourpin` like pins from text'
+      break
+    case 'quickpin':
+      return 'generates `pins[1]` like pins from numbers'
+    default:
+      return ''
+  }
+})
+export const userSettings = useStorage('user-settings', {reduceKeymapColors: false, autoSelectNextKey: false})

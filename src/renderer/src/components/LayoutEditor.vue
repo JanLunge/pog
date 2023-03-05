@@ -67,7 +67,7 @@
         </button>
       </div>
     </div>
-    <div style="max-height: 300px" class="my-5">
+    <div class="my-5">
       <keyboard-layout
         :key-layout="keyboardStore.keys"
         :keymap="keyboardStore.keymap"
@@ -76,11 +76,11 @@
         mode="layout"
       />
     </div>
-    <div class="flex">
-      <div class="w-1/2 border-r">
+    <div class="flex gap-2">
+      <div class="w-1/2">
         <variant-switcher></variant-switcher>
       </div>
-      <div class="w-1/2 pl-2">
+      <div class="w-1/2">
         <key-layout-info :layout="keyboardStore.keys"></key-layout-info>
       </div>
     </div>
@@ -163,6 +163,8 @@ const convert = () => {
     // saveKeymap()
   }
   if (layout.length > 0) {
+    keyboardStore.setKeys(layout)
+    cleanupKeymap()
     converterVisible.value = false
   }
 }

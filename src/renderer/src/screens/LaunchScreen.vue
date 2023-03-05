@@ -8,7 +8,8 @@
     </div>
     <div class="text-2xl font-bold">Your Keyboards</div>
     <div class="divider"></div>
-    <div class="my-4 flex justify-center">
+    <div class="my-4 flex justify-center items-center flex-col gap-2">
+      <p>select the circuit python drive of your keyboard</p>
       <button class="btn-primary btn" @click="selectDrive">
         <i class="mdi mdi-plus mr-1 text-lg"></i><span class="text-xs">add new keyboard</span>
       </button>
@@ -69,9 +70,12 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
-import {keyboardStore, keyboardHistory, addToHistory, notifications} from '../store'
+import {keyboardStore, keyboardHistory, addToHistory, notifications, KeyboardStore, selectedLayer} from '../store'
 import KeyboardLayout from '../components/KeyboardLayout.vue'
+import {ref} from "vue";
 const router = useRouter()
+
+selectedLayer.value = 0
 
 const selectDrive = async () => {
   const keyboard = await window.api.selectDrive()
@@ -103,6 +107,14 @@ const selectKeyboard = async (keyboardPath) => {
 const removeFromHistory = (keyboard) => {
   keyboardHistory.value = keyboardHistory.value.filter((board) => board.id !== keyboard.id)
 }
+
+const keyboards = ref<any[]>([])
+keyboardHistory.value.forEach(keyb=>{
+  const keyboard = new KeyboardStore()
+  keyboard.import({configContents:keyb, path:keyb.path, folderContents:['pog.json'], codeContents:''})
+  keyboards.value.push(keyboard)
+
+})
 </script>
 
 <style lang="scss" scoped>
@@ -113,7 +125,7 @@ const removeFromHistory = (keyboard) => {
 .keyboard-preview {
   @apply flex cursor-pointer gap-4 rounded border border-white border-opacity-0 p-4 transition-all;
   &:hover {
-    @apply border-opacity-40 bg-base-300;
+    @apply border-opacity-40 bg-base-200;
   }
   .image {
     @apply flex items-center justify-center rounded flex-shrink-0;

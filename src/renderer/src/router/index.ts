@@ -79,7 +79,7 @@ const router = createRouter({
         {
           path: 'info',
           component: KeyboardName,
-          name: 'info'
+          name: 'Info'
         },
         {
           path: 'coordmap',

@@ -1,71 +1,82 @@
 <template>
-  <div class="flex">
-    <ul class="menu w-56 flex-shrink-0 border-r border-white border-opacity-40 bg-base-100">
-      <li class="flex items-center p-4 text-xl font-bold">
+  <div class="flex h-screen">
+    <ul
+      class="menu flex-shrink-0 bg-base-100"
+      :class="{
+        'menu-open': menuOpen
+      }"
+    >
+      <li class="flex items-center p-4 text-xl font-bold" @click="iconClick">
         <img src="@renderer/assets/icon.png" alt="" class="w-24 rounded" />
       </li>
-      <li class="py-2 pl-4 text-xs">Selected Keyboard</li>
       <li class="flex items-center p-4 pt-0">
         <span
-          class="w-full cursor-pointer rounded bg-primary text-center text-xs text-black opacity-70 hover:opacity-100"
+          class="w-full cursor-pointer rounded bg-base-300 text-center text-xs"
           @click="reselectKeyboard"
-          >{{ keyboardStore.name }}</span
+        >
+          <i class="mdi mdi-keyboard"></i>
+          {{ keyboardStore.name }}</span
         >
       </li>
-      <li><router-link to="/configurator/keymap">Keymap</router-link></li>
-      <li><router-link to="/configurator/layout-editor">Keyboard Layout</router-link></li>
-      <hr class="border-white border-opacity-40" />
-      <li><router-link to="/configurator/encoder">Encoder</router-link></li>
-      <li><router-link to="/configurator/info">Info</router-link></li>
-      <li><router-link to="/configurator/matrix">Matrix</router-link></li>
-      <li><router-link to="/configurator/pins">Pins</router-link></li>
-      <li><router-link to="/configurator/coordmap">CoordMap</router-link></li>
-      <li><router-link to="/configurator/raw-keymap">Raw Keymap</router-link></li>
-      <li><router-link to="/configurator/firmware">Firmware</router-link></li>
-<!--      <li><router-link to="/configurator/community">Community</router-link></li>-->
+      <li>
+        <router-link to="/configurator/keymap"
+          ><i class="mdi mdi-alphabetical-variant"></i>Keymap</router-link
+        >
+      </li>
+      <li>
+        <router-link to="/configurator/layout-editor"
+          ><i class="mdi mdi-keyboard-variant"></i>Keyboard Layout</router-link
+        >
+      </li>
+      <hr class="border-white border-opacity-20" />
+      <li>
+        <router-link to="/configurator/encoder"
+          ><i class="mdi mdi-axis-z-rotate-clockwise"></i>Encoder</router-link
+        >
+      </li>
+      <li>
+        <router-link to="/configurator/info"
+          ><i class="mdi mdi-information-outline"></i>Info</router-link
+        >
+      </li>
+      <li><router-link to="/configurator/matrix"><i class="mdi mdi-grid"></i>Matrix</router-link></li>
+      <li><router-link to="/configurator/pins"><i class="mdi mdi-electric-switch"></i>Pins</router-link></li>
+      <li><router-link to="/configurator/coordmap"><i class="mdi mdi-sort-numeric-ascending"></i>CoordMap</router-link></li>
+      <li><router-link to="/configurator/raw-keymap"><i class="mdi mdi-code-brackets"></i>Raw Keymap</router-link></li>
+      <li><router-link to="/configurator/firmware"><i class="mdi mdi-flash"></i>Firmware</router-link></li>
+      <!--      <li><router-link to="/configurator/community">Community</router-link></li>-->
     </ul>
-    <div class="h-screen flex-1 overflow-x-auto px-4 pt-8">
-      <h1 class="mb-8 text-center text-5xl font-bold" contenteditable="true">
-        {{ currentRouteName }}
-      </h1>
-      <router-view></router-view>
-      <div class="flex items-center justify-center gap-2 py-4">
-        <Popper :hover="true">
-          <label class="flex items-center justify-center">
-            <i class="mdi mdi-auto-fix mr-2"></i>
-            <input v-model="flashingMode" type="checkbox" class="checkbox" />
-          </label>
-          <template #content>
-            <div class="tooltip">
-              <p class="font-bold">Manual / Automatic</p>
-              <p>
-                when enabled pog will manage your files, when disabled pog will only write to the
-                keymap file, this means you need to manage imports in the code.py yourself and sync
-                any changes for the matrix width or direct pin order in pog for proper keycode
-                lookup.
-              </p>
-            </div>
-          </template>
-        </Popper>
-        <div class="btn-primary btn-sm btn" @click="saveKeymap">
-          <i class="mdi mdi-content-save"></i>Save python code to Keyboard
+    <div class="flex h-full flex-col overflow-y-auto w-full">
+      <div class="py-4 flex items-center justify-between bg-base-100 shadow-xl z-10">
+        <h1
+          class="flex-grow text-center text-4xl font-bold overflow-auto"
+          contenteditable="true"
+          spellcheck="false"
+          style="line-height: 48px; max-height: 100px "
+        >
+          {{ currentRouteName }}
+        </h1>
+        <div class="btn-primary btn mr-4" @click="saveKeymap">
+          <i class="mdi mdi-content-save text-xl"></i>
         </div>
+      </div>
+      <div class="flex-grow overflow-y-auto px-4 pt-4 bg-base-200">
+        <router-view></router-view>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import Popper from '@wlard/vue3-popper'
 import { addToHistory, keyboardStore } from '../store'
-import { useRoute, useRouter} from 'vue-router'
-import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
 const router = useRouter()
 const route = useRoute()
 
 // nav guard
-console.log('path is',keyboardStore.path)
-if(!keyboardStore.path){
+console.log('path is', keyboardStore.path)
+if (!keyboardStore.path) {
   router.push('/')
 }
 
@@ -86,19 +97,43 @@ const saveKeymap = async () => {
 
 const currentRouteName = computed(() => route.matched[1].name)
 
-const flashingMode = computed({
-  get() {
-    return keyboardStore.flashingMode === 'automatic'
-  },
-  set(newVal) {
-    keyboardStore.flashingMode = newVal ? 'automatic' : 'manual'
-  }
-})
+const menuOpen = ref(true)
 
+const iconClick = () => {
+  menuOpen.value = !menuOpen.value
+}
 </script>
 
 <style lang="scss" scoped>
 .router-link-active {
-  @apply bg-primary font-bold text-black;
+  @apply font-bold text-primary;
+}
+.menu {
+  width: 80px;
+  //position: absolute;
+  //height: 100px;
+  overflow: hidden;
+  overflow-y: auto;
+  //border: none;
+  //white-space: nowrap;
+  flex-wrap: nowrap;
+  * {
+    white-space: nowrap;
+  }
+  li a {
+    opacity: 0.5;
+    &.router-link-active {
+      opacity: 1;
+    }
+    &:focus {
+      background: transparent;
+      @apply text-primary;
+    }
+  }
+}
+.menu-open {
+  width: 200px;
+  position: relative;
+  height: 100vh;
 }
 </style>

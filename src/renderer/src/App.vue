@@ -5,7 +5,7 @@ import { keyboardStore, notifications } from './store'
 const store = computed(() => {
   return keyboardStore
 })
-console.log('store initiated', store.value.path)
+console.log('store added to debug menu', store)
 </script>
 
 <template>

@@ -43,11 +43,12 @@ const web3modal = new Web3Modal(
   },
   ethereumClient
 )
+console.log(web3modal)
 // const unsubscribe = web3modal.subscribeModal((newState) =>
 // console.log(newState)
 // );
 const accountAddress = ref('')
-const unwatch = watchAccount((account) => {
+watchAccount((account) => {
   if (account.address) {
     console.log('account changed', account.address)
     accountAddress.value = account.address
