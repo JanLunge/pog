@@ -1,7 +1,7 @@
 <template>
   <SelectionArea
-    id="keyboard-container"
-    class="container"
+    ref="keyboardContainer"
+    class="keyboard-container container"
     :class="{ 'fixed-height': fixedHeight }"
     :options="{ selectables: ['.keycap'] }"
     :on-move="onMove"
@@ -9,17 +9,20 @@
   >
     <div
       id="keyboardlayout-wrapper"
-      class="relative flex items-center justify-center"
-      :style="{ height: keyboardScale * (keyboardHeight * 58) + 'px', width: keyboardScale*(keyboardWidth*58)+'px' }"
+      class="relative flex justify-center"
+      :style="{
+        height: keyboardHeight + 'px',
+        width: keyboardScale * (keyboardWidth * 58) + 'px'
+      }"
     >
       <div
         id="keyboardlayout"
-        class="relative h-64 w-full"
+        class="relative w-full"
         :style="{
           width: keyboardWidth * 58 + 'px',
-          height: keyboardHeight * 58 + 'px',
+          // height: keyboardHeight * 58 + 'px',
           transform: `scale( ${keyboardScale})`,
-          'transform-origin': keyboardWidth>keyboardHeight? 'left center': 'center center'
+          'transform-origin': 'left top'
         }"
         :class="{ dragging: moving }"
       >
@@ -50,7 +53,7 @@
 
 <script lang="ts" setup>
 import KeyCap from './KeyCap.vue'
-import {computed, onMounted, onUnmounted, ref, watch} from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, VNodeRef, watch } from 'vue'
 import { keyboardStore, selectedKeys } from '../store'
 import { SelectionArea } from '@viselect/vue'
 import type { SelectionEvent } from '@viselect/vue'
@@ -58,7 +61,7 @@ import { isNumber } from '@vueuse/core'
 import { useDebounceFn } from '@vueuse/core'
 const props = defineProps(['keyLayout', 'keymap', 'mode', 'matrixWidth', 'layouts', 'fixedHeight'])
 // mode can be layout or keymap
-
+const keyboardContainer = ref<VNodeRef>(null)
 // find right edge
 const keyboardWidth = computed(() => {
   let maxW = 0
@@ -73,43 +76,74 @@ const keyboardWidth = computed(() => {
 })
 
 // find bottom edge
-const keyboardHeight = computed(() => {
-  let maxH = 0
-  props.keyLayout.forEach((k) => {
-    const height = k.h || 1
-    const bottomEdge = k.y + height
-    if (bottomEdge > maxH) {
-      maxH = bottomEdge
-    }
-  })
-  return maxH
-})
+// const keyboardHeight = computed(() => {
+//   let maxH = 0
+//   props.keyLayout.forEach((k) => {
+//     const height = k.h || 1
+//     const bottomEdge = k.y + height
+//     if (bottomEdge > maxH) {
+//       maxH = bottomEdge
+//     }
+//   })
+//   return maxH
+// })
 
 const keyboardScale = ref(1)
-const updateScale = () => {
-  const wrapper = document.querySelector('#keyboard-container')
-  if (wrapper) {
-    const wrapperWidth = wrapper.clientWidth
-    const widthScale = Math.min(wrapperWidth / (keyboardWidth.value * 58), 1)
-    let heightScale = 1
-    if (props.fixedHeight) {
-      const wrapperHeight = wrapper.clientHeight
-
-      heightScale = Math.min(wrapperHeight / (keyboardHeight.value * 58), 1)
+const keyboardHeight = ref(200)
+const updateHeight = () => {
+  // check all keys
+  const wrapper = keyboardContainer.value.$el
+  const keys = wrapper.querySelectorAll('.keycap')
+  let lowestKey = 0
+  keys.forEach((key) => {
+    const box = key.getBoundingClientRect()
+    const height = box.height + box.top - key.parentNode.getBoundingClientRect().top
+    if (height > lowestKey) {
+      lowestKey = height
     }
+  })
+   if(props.fixedHeight &&  keyboardHeight.value < lowestKey ){
+     console.log('lowest key ignored', lowestKey,keyboardHeight.value)
+     return
+   }
+  keyboardHeight.value = lowestKey
+}
+const updateScale = () => {
+  // updateHeight()
+  const wrapper = keyboardContainer.value.$el
+  let heightScale = 1
+  let widthScale = 1
+  if (wrapper) {
+    const wrapperWidth = wrapper.getBoundingClientRect().width
+    widthScale = Math.min(wrapperWidth / (keyboardWidth.value * 58), 1)
+    // if (props.fixedHeight) {
+    //   const wrapperHeight = wrapper.parentNode.getBoundingClientRect().height
+    //   heightScale = Math.min(wrapperHeight / keyboardHeight.value, 1)
+    //   if (heightScale < 1){
+    //     console.log('needed scale', heightScale, wrapperHeight, keyboardHeight.value)
+    //   }
+    // }
     keyboardScale.value = Math.min(heightScale, widthScale)
   }
+
+  updateHeight()
 }
-onMounted(() => {
+onMounted(async () => {
   // adjust keyboard size to fit
   updateScale()
+  await nextTick()
+  updateScale()
+  // updateHeight()
   window.addEventListener('resize', updateScale)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', updateScale)
 })
-watch(()=>props.keyLayout,()=> updateScale())
+watch(
+  () => props.keyLayout,
+  () => updateScale()
+)
 const rotationOriginX = computed(() => {
   if (!selectedKeys.value.size) return 0
   const firstSelectedKeyIndex = [...selectedKeys.value][0]
@@ -215,6 +249,8 @@ const onMove = ({
 const resetMoving = useDebounceFn(() => {
   moving.value = false
 }, 1000)
+
+defineExpose({ keyboardContainer })
 </script>
 
 <style lang="scss" scoped>
@@ -232,10 +268,9 @@ const resetMoving = useDebounceFn(() => {
   user-select: none;
   height: 100%;
   width: 100%;
-  @apply flex justify-center items-center;
+  @apply flex items-center justify-center p-4;
 }
-.keyboard-layout{
-
+.keyboard-layout {
 }
 </style>
 <style lang="scss">

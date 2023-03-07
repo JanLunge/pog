@@ -3,26 +3,26 @@
     class="tab font-bold"
     :class="{ 'tab-active': index === selectedLayer }"
     :style="{
-      background: layerDetails.color || '#434343',
+      background: keyboardStore.layers[index].color || '#434343',
       color: 'white'
     }"
     @click="selectedLayer = index"
   >
-    {{ index }} {{ layerDetails.name }}
+    {{ index }} {{ keyboardStore.layers[index].name }}
     <Popper>
       <span class="edit-btn ml-4 px-1"><i class="mdi mdi-cog"></i></span>
       <template #content>
         <div class="popover text-left">
           <span>Name</span>
-          <input v-model="layerDetails.name" class="input-bordered input input-sm" />
+          <input v-model="keyboardStore.layers[index].name" class="input-bordered input input-sm" />
           <span>Color</span>
           <label class="relative">
             <div
-              class="h-8 w-full rounded border border-white border-opacity-40 cursor-pointer"
-              :style="{ background: layerDetails.color }"
+              class="h-8 w-full cursor-pointer rounded border border-white border-opacity-40"
+              :style="{ background: keyboardStore.layers[index].color }"
             ></div>
             <input
-              v-model="layerDetails.color"
+              v-model="keyboardStore.layers[index].color"
               type="color"
               style="visibility: hidden; position: absolute"
             />
@@ -31,22 +31,22 @@
             <div
               class="colorswatch"
               style="background: #333"
-              @click="layerDetails.color = undefined"
+              @click="keyboardStore.layers[index].color = undefined"
             ></div>
             <div
               class="colorswatch"
               style="background: #0ca508"
-              @click="layerDetails.color = '#0ca508'"
+              @click="keyboardStore.layers[index].color = '#0ca508'"
             ></div>
             <div
               class="colorswatch"
               style="background: #259eb9"
-              @click="layerDetails.color = '#259eb9'"
+              @click="keyboardStore.layers[index].color= '#259eb9'"
             ></div>
             <div
               class="colorswatch"
               style="background: #f28c18"
-              @click="layerDetails.color = '#f28c18'"
+              @click="keyboardStore.layers[index].color = '#f28c18'"
             ></div>
           </div>
         </div>
@@ -59,14 +59,8 @@ import Popper from '@wlard/vue3-popper'
 import { keyboardStore, selectedLayer } from '../store'
 import { computed } from 'vue'
 const props = defineProps(['layer', 'index'])
-const layerDetails = computed({
-  get() {
-    return keyboardStore.layers[props.index] || {}
-  },
-  set(newVal) {
-    keyboardStore.layers[props.index] = newVal
-  }
-})
+if(!keyboardStore.layers[props.index]) keyboardStore.layers[props.index] = {name:'', color:undefined}
+
 </script>
 <style lang="scss" scoped>
 .tab {
@@ -90,11 +84,11 @@ const layerDetails = computed({
   opacity: 1;
 }
 .popover {
-  @apply rounded bg-base-100 p-2 shadow-2xl border border-opacity-40 border-white;
+  @apply rounded border border-white border-opacity-40 bg-base-100 p-2 shadow-2xl;
 }
 .colorswatch {
   height: 28px;
   width: 28px;
-  @apply rounded cursor-pointer;
+  @apply cursor-pointer rounded;
 }
 </style>

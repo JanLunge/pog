@@ -7,7 +7,7 @@
       }"
     >
       <li class="flex items-center p-4 text-xl font-bold" @click="iconClick">
-        <img src="@renderer/assets/icon.png" alt="" class="w-24 rounded" />
+        <img src="@renderer/assets/icon.png" alt="" class="h-24 rounded" />
       </li>
       <li class="flex items-center p-4 pt-0">
         <span

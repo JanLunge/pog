@@ -26,9 +26,9 @@
           class="keyboard-preview"
           @click="selectKeyboard(keyboard.path)"
         >
-          <div class="image py-5">
+          <div class="image">
             <!--            <img :src="keyboard.image" alt="" />-->
-            <div class=" w-full h-full">
+            <div class=" w-full h-full p-2 overflow-hidden">
 
             <keyboard-layout
               :key-layout="keyboard.keys"
