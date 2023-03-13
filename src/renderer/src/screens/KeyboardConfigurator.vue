@@ -39,20 +39,36 @@
           ><i class="mdi mdi-information-outline"></i>Info</router-link
         >
       </li>
-      <li><router-link to="/configurator/matrix"><i class="mdi mdi-grid"></i>Matrix</router-link></li>
-      <li><router-link to="/configurator/pins"><i class="mdi mdi-electric-switch"></i>Pins</router-link></li>
-      <li><router-link to="/configurator/coordmap"><i class="mdi mdi-sort-numeric-ascending"></i>CoordMap</router-link></li>
-      <li><router-link to="/configurator/raw-keymap"><i class="mdi mdi-code-brackets"></i>Raw Keymap</router-link></li>
-      <li><router-link to="/configurator/firmware"><i class="mdi mdi-flash"></i>Firmware</router-link></li>
+      <li>
+        <router-link to="/configurator/matrix"><i class="mdi mdi-grid"></i>Matrix</router-link>
+      </li>
+      <li>
+        <router-link to="/configurator/pins"
+          ><i class="mdi mdi-electric-switch"></i>Pins</router-link
+        >
+      </li>
+      <li>
+        <router-link to="/configurator/coordmap"
+          ><i class="mdi mdi-sort-numeric-ascending"></i>CoordMap</router-link
+        >
+      </li>
+      <li>
+        <router-link to="/configurator/raw-keymap"
+          ><i class="mdi mdi-code-brackets"></i>Raw Keymap</router-link
+        >
+      </li>
+      <li>
+        <router-link to="/configurator/firmware"><i class="mdi mdi-flash"></i>Firmware</router-link>
+      </li>
       <!--      <li><router-link to="/configurator/community">Community</router-link></li>-->
     </ul>
-    <div class="flex h-full flex-col overflow-y-auto w-full">
-      <div class="py-4 flex items-center justify-between bg-base-100 shadow-xl z-10">
+    <div class="flex h-full w-full flex-col overflow-y-auto">
+      <div class="z-10 flex items-center justify-between bg-base-100 py-4 shadow-xl">
         <h1
-          class="flex-grow text-center text-4xl font-bold overflow-auto"
+          class="flex-grow overflow-auto text-center text-4xl font-bold"
           contenteditable="true"
           spellcheck="false"
-          style="line-height: 48px; max-height: 100px "
+          style="line-height: 48px; max-height: 100px"
         >
           {{ currentRouteName }}
         </h1>
@@ -60,7 +76,7 @@
           <i class="mdi mdi-content-save text-xl"></i>
         </div>
       </div>
-      <div class="flex-grow overflow-y-auto px-4 pt-4 bg-base-200">
+      <div class="flex-grow overflow-y-auto bg-base-200 px-4 pt-4">
         <router-view></router-view>
       </div>
     </div>
@@ -76,11 +92,12 @@ const route = useRoute()
 
 // nav guard
 console.log('path is', keyboardStore.path)
-if (!keyboardStore.path) {
+if (!keyboardStore.path && !keyboardStore.usingSerial) {
   router.push('/')
 }
 
 const reselectKeyboard = () => {
+  window.api.deselectKeyboard()
   router.push('/')
 }
 
@@ -91,7 +108,7 @@ const saveKeymap = async () => {
   addToHistory(keyboardStore)
   console.log(keyboardStore.coordMapSetup)
   await window.api.saveConfiguration(
-    JSON.stringify({ pogConfig: keyboardData, writeFirmware: true })
+    JSON.stringify({ pogConfig: keyboardData, serial: keyboardStore.usingSerial })
   )
 }
 

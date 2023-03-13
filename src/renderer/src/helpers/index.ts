@@ -293,14 +293,21 @@ export const renderLabel = (keycode: string) => {
     TT: { label: 'TT' },
     TG: { label: 'TG' },
     TO: { label: 'TO' },
+    TD: { label: 'TD' },
+
+    HT: { label: 'HT' },
+    OS: { label: 'OS' },
+
 
     // Media
     MPLY: { label: 'Play/Pause', icon: 'mdi-play-pause' },
+    VOLU: { label: 'Vol up', icon: 'mdi-volume-plus' },
+    VOLD: { label: 'Vol down', icon: 'mdi-volume-minus' },
     MEDIA_PLAY_PAUSE: { label: 'Play/Pause', icon: 'mdi-play-pause' },
     MRWD: { label: 'Prev Track', icon: 'mdi-skip-previous' },
     MFFD: { label: 'Next Track', icon: 'mdi-skip-next' },
-    TD: { label: 'TD' },
-    send_string: { label: 'String' }
+    send_string: { label: 'String' },
+    RESET: {label: 'Reset'}
   }
 
   const keylabel: {

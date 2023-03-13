@@ -4,6 +4,9 @@ from kmk.keys import KC
 from kb import KMKKeyboard as _KMKKeyboard
 import pog
 class KMKKeyboard(_KMKKeyboard):
+    def __init__(self):
+        print("running coord_mapping assistant")
+        print("press each key to get its coord_mapping value")
     # *2 for split keyboards, which will typically manage twice the number of keys
     # of one side. Having this N too large will have no impact (maybe slower boot..)
     N = pog.keyCount * 2

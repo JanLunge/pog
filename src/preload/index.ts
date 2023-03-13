@@ -8,7 +8,16 @@ export const API = {
   saveConfiguration: (data) => ipcRenderer.send('saveConfiguration', data),
   selectKeyboard: (data) => ipcRenderer.invoke('selectKeyboard', data),
   onUpdateFirmwareInstallProgress: (callback) =>
-    ipcRenderer.on('onUpdateFirmwareInstallProgress', callback)
+    ipcRenderer.on('onUpdateFirmwareInstallProgress', callback),
+  keyboardScan: (callback) => {
+    ipcRenderer.on('keyboardScan', callback)
+  },
+  serialKeyboardPogConfig: (callback) => {
+    ipcRenderer.on('serialKeyboardPogConfig', callback)
+  },
+  rescanKeyboards: () => ipcRenderer.invoke('rescanKeyboards'),
+  deselectKeyboard: () => ipcRenderer.invoke('deselectKeyboard')
+
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

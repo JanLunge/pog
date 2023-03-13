@@ -117,6 +117,10 @@
     <p>Direct Pin Index</p>
     <input v-model="tmpKey.directPinIndex" type="text" class="keyinfo-input" @change="updateKey" />
   </div>
+  <div>
+    <p>Encoder Index</p>
+    <input v-model="tmpKey.encoderIndex" type="text" class="keyinfo-input" @change="updateKey" />
+  </div>
   <div v-if="keyboardStore.layouts.length !== 0" class="flex gap-1">
     <label>
       <span>variant</span>
@@ -175,6 +179,7 @@ const tmpKey = ref<{
   matrix: (number | '')[]
   variant: (number | '')[]
   directPinIndex?: number | ''
+  encoderIndex?: number | ''
   r: number | ''
   rx: number | ''
   ry: number | ''
@@ -191,6 +196,7 @@ const tmpKey = ref<{
   matrix: ['', ''],
   variant: ['', ''],
   directPinIndex: '',
+  encoderIndex: '',
   r: 0,
   rx: 0,
   ry: 0
@@ -213,7 +219,8 @@ const getSameKeyAttrs = (keys) => {
     'h2',
     'r',
     'ry',
-    'rx'
+    'rx',
+    'encoderIndex'
   ].forEach((attr) => {
     if (isAttrSame(keys, attr) && keys[0][attr] !== undefined) {
       console.log('attr is same',attr)
@@ -246,6 +253,7 @@ const updateSelectedKey = () => {
       matrix: ['', ''],
       variant: ['', ''],
       directPinIndex: '',
+      encoderIndex: '',
       x2: '',
       x: '',
       y2: '',
@@ -287,7 +295,8 @@ const updateKey = () => {
     if (tmpKey.value.ry !== '') props.layout[keyIndex].ry = Number(tmpKey.value.ry)
     if (tmpKey.value.directPinIndex !== '')
       props.layout[keyIndex].directPinIndex = Number(tmpKey.value.directPinIndex)
-
+    if (tmpKey.value.encoderIndex !== '')
+      props.layout[keyIndex].encoderIndex = Number(tmpKey.value.encoderIndex)
     // if (
     //   (tmpKey.value.matrix &&
     //     tmpKey.value.matrix.length == 2 &&

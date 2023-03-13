@@ -4,13 +4,18 @@ import board
 from kmk.keys import KC
 
 config = {}
+configbuffer = bytearray()
+configbufferlen = 0
 try:
     with open("/pog.json", "r") as fp:
         x = fp.read()
         # parse x:
         config = json.loads(x)
+        configbuffer = json.dumps(config)
+        configbufferlen = len(configbuffer)
 except OSError as e:
-    raise Exception("Could not read pog.json file.")
+    microcontroller.nvm[0] = 1
+    raise Exception("Could not read pog.json file. mounting drive")
 
 print("starting keyboard %s (%s)" % (config["name"], config["id"]))
 
@@ -40,10 +45,16 @@ for i, item in enumerate(config["directPins"]):
     pinsArray.append(renderPin(item))
 pins = ",".join(pinsArray)
 
+matrixWiring = False
+directWiring = False
+
 if config['wiringMethod'] == 'matrix':
+    matrixWiring = True
     keyCount = len(rowPinsArray) * len(colPinsArray)
 else:
+    directWiring = True
     keyCount = len(pinsArray)
+
 
 # encoders
 hasEncoders = len(config['encoders']) != 0

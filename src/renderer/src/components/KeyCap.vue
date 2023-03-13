@@ -1,9 +1,9 @@
 <template>
   <div
     v-if="visible"
+    :ref="keyElem"
     class="keycap"
     style="user-select: none"
-    :ref="keyElem"
     :data-index="keyIndex"
     :style="{
       left: keyData.x * (baseKeyWidth + keyGap) + 'px',
@@ -13,7 +13,11 @@
       transform: `rotate(${keyData.r}deg)`,
       transformOrigin: rotationOrigin
     }"
-    :class="{ selected: mainSelected, 'is-trns': isTRNS }"
+    :class="{
+      selected: mainSelected,
+      'is-trns': isTRNS,
+      encoder: typeof keyData.encoderIndex === 'number'
+    }"
   >
     <div
       v-if="keyData.w2 || keyData.h2"
@@ -60,16 +64,28 @@
       v-else
       class="keytop"
       :style="{
-        top: !mainLabel || mainLabel.simple ? '4px' : '14px',
+        top: !mainLabel || isSimple ? '4px' : '14px',
         height: keyTopHeight + 'px',
         background: keyColor
       }"
     ></div>
-    <div v-if="!mainLabel.simple" class="keylabel-action">{{ mainLabel.action }}</div>
+    <div v-if="!isSimple && mode!=='layout'" class="keylabel-action">
+      <div
+        v-if="typeof keyData.encoderIndex === 'number' && mode !== 'layout'"
+        class="encoder-labels"
+      >
+        <div v-html="encoderActionA"></div>
+        <div v-html="encoderActionB"></div>
+      </div>
+      <span v-else>
+        {{ mainLabel.action }}
+      </span>
+    </div>
+<!--    <div class="keylabel-action"></div>-->
     <div
       class="keylabels"
-      :class="{ 'has-args': !mainLabel.simple }"
-      :style="{ height: keyTopHeight + 'px', top: !mainLabel || mainLabel.simple ? '4px' : '14px' }"
+      :class="{ 'has-args': !isSimple }"
+      :style="{ height: keyTopHeight + 'px', top: !mainLabel || isSimple ? '4px' : '14px' }"
     >
       <!--      <div class="keylabel" :class="['keylabel-'+index]" v-for="(label,index) in keyData.labels">-->
       <!--        <div class="keylabel-inner">-->
@@ -77,9 +93,16 @@
       <!--        </div>-->
       <!--      </div>-->
       <div v-if="mainLabel" class="keylabel keylabel-center">
-        <span v-if="mainLabel.simple" v-html="mainLabel.action"></span>
+        <span v-if="isSimple||typeof keyData.encoderIndex==='number'" v-html="mainLabel.action"></span>
         <div v-else class="flex h-full flex-col justify-between p-1">
-          <span class="keylabel-main" v-html="mainLabel.layerNamePosition==='main'?mainLabel.main+' '+layerName:mainLabel.main"></span>
+          <span
+            class="keylabel-main"
+            v-html="
+              mainLabel.layerNamePosition === 'main'
+                ? mainLabel.main + ' ' + layerName
+                : mainLabel.main
+            "
+          ></span>
           <span
             class="keylabel-lower"
             v-html="
@@ -95,7 +118,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, ref, VNodeRef, watch} from 'vue'
+import { computed, ref, VNodeRef, watch } from 'vue'
 import { selectedLayer, selectedKeys, userSettings } from '../store'
 import { renderLabel } from '../helpers'
 import chroma from 'chroma-js'
@@ -288,11 +311,29 @@ const keyColorDark = computed(() => {
 })
 const layerName = computed(() => {
   if (!props.keyData.keyboard) return ''
-  if(!mainLabel.value.layer) return ''
+  if (!mainLabel.value.layer) return ''
   const layer = props.keyData.keyboard.layers[mainLabel.value.layer]
   return layer ? layer.name : ''
 })
-const keyElem = ref<VNodeRef|null>(null)
+
+const encoderActionA = computed(() => {
+  // get encoder index then lookup current keycode
+  if(!props.keyData.getEncoderLabel)return
+  return renderLabel(props.keyData.getEncoderLabel().a).action
+})
+
+const encoderActionB = computed(() => {
+  // get encoder index then lookup current keycode
+  if(!props.keyData.getEncoderLabel)return
+  return renderLabel(props.keyData.getEncoderLabel().b).action
+})
+
+const isSimple = computed(() => {
+  if (typeof props.keyData.encoderIndex === 'number') return false
+  return mainLabel.value.simple
+})
+
+const keyElem = ref<VNodeRef | null>(null)
 const fixLabelWidth = () => {
   console.log('scaling labels based on their container')
 }
@@ -311,10 +352,25 @@ fixLabelWidth()
   cursor: pointer;
   z-index: 0;
   border-radius: 10px;
+  .encoder & {
+    border-bottom-left-radius: 50%;
+    border-bottom-right-radius: 50%;
+  }
   .selected & {
     border-color: white;
     z-index: 4;
     box-shadow: 0 0 0 1px rgba(255, 255, 255, 1);
+  }
+}
+.encoder-labels {
+  position: absolute;
+  top: 2px;
+  z-index: 10;
+  @apply flex w-full justify-between;
+  & > div {
+    //background: #646464;
+    line-height: 15px;
+    @apply rounded px-1.5;
   }
 }
 .keyborder-blocker {
@@ -337,7 +393,11 @@ fixLabelWidth()
   cursor: pointer;
   border-radius: 12px;
   z-index: 6;
-  .selected & {
+  .encoder & {
+    border-radius: 50%;
+  }
+  .selected.encoder &{
+    border-bottom: 1px solid white;
   }
 }
 .keylabels {
@@ -425,7 +485,7 @@ fixLabelWidth()
 .keylabel {
   font-weight: bold;
   font-size: 18px;
-  text-shadow: 1px 2px 6px rgba(0, 0, 0, 0.6);
+  //text-shadow: 1px 2px 6px rgba(0, 0, 0, 0.6);
   i.mdi {
     font-size: 18px;
   }

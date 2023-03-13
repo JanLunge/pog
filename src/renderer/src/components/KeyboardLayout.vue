@@ -110,6 +110,7 @@ const updateHeight = () => {
 }
 const updateScale = () => {
   // updateHeight()
+  if(!keyboardContainer.value)return
   const wrapper = keyboardContainer.value.$el
   let heightScale = 1
   let widthScale = 1

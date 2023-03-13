@@ -2,7 +2,10 @@
 from kmk.keys import KC
 from kmk.handlers.sequences import send_string, simple_key_sequence
 import pog
-import customkeys
+import customkey
+from kmk.modules.combos import Chord, Sequence
+from kb import combos
+
 keymap = [
     []
 ]
@@ -14,3 +17,5 @@ for l, layer in enumerate(pog.config['encoderKeymap']):
         layerEncoders.append(tuple(map(eval, encoder)))
     encoderKeymap.append(tuple(layerEncoders))
 
+combos.combos = [
+]

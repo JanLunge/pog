@@ -17,7 +17,10 @@ export const keyboardHistory = useStorage<any[]>('keyboardHistory', [])
 export const addToHistory = (keyboard) => {
   console.log('saving keyboard to history', keyboard)
   // to get rid of reactivity and proxys while deepcloning // does not work with structured clone
-  const keyboardData = { ...JSON.parse(JSON.stringify(keyboard.serialize())), path: keyboard.path }
+  const keyboardData = {
+    ...JSON.parse(JSON.stringify(keyboard.serialize())),
+    ...(keyboard.path && { path: keyboard.path })
+  }
   if (!keyboardHistory.value.find((board) => board.id === keyboard.id)) {
     keyboardHistory.value.unshift(keyboardData)
   } else {
@@ -58,6 +61,7 @@ export type KeyInfo = BaseKeyInfo & {
   matrix?: [number, number]
   variant?: [number, number]
   directPinIndex?: number
+  encoderIndex?: number
   keyboard?: any
 }
 
@@ -76,6 +80,7 @@ export class Key {
   ry = 0
   matrix?: [number, number] = undefined
   directPinIndex?: number = undefined
+  encoderIndex?: number = undefined
   variant?: [number, number] = undefined
   keyboard?: any
   constructor({
@@ -93,6 +98,7 @@ export class Key {
     rx,
     ry,
     directPinIndex,
+    encoderIndex,
     keyboard
   }: KeyInfo) {
     this.x = x
@@ -115,6 +121,7 @@ export class Key {
     if (r) this.r = r
     if (rx) this.rx = rx
     if (ry) this.ry = ry
+    if (typeof encoderIndex === 'number') this.encoderIndex = encoderIndex
     this.keyboard = keyboard
   }
   serialize() {
@@ -157,6 +164,9 @@ export class Key {
     }
     if (typeof this.directPinIndex === 'number') {
       tmpKey.directPinIndex = this.directPinIndex
+    }
+    if (typeof this.encoderIndex === 'number') {
+      tmpKey.encoderIndex = this.encoderIndex
     }
     return tmpKey
   }
@@ -229,11 +239,19 @@ export class Key {
     }
     return ''
   }
+  getEncoderLabel() {
+    if (typeof this.encoderIndex !== 'number') return { a: '', b: '' }
+    return {
+      a: this.keyboard.encoderKeymap[0][this.encoderIndex][0],
+      b: this.keyboard.encoderKeymap[0][this.encoderIndex][1]
+    }
+  }
 }
 
 export class Keyboard {
   id = ulid()
   path?: string = undefined
+  usingSerial = false
   name = ''
   manufacturer = ''
   tags: string[] = []
@@ -276,7 +294,7 @@ export class Keyboard {
   // layer > encoder index > encoder action index > keycode
   encoderKeymap: EncoderLayer[] = []
   keymap: (string | undefined)[][] = [[]]
-  layers: { name: string; color: string|undefined }[] = []
+  layers: { name: string; color: string | undefined }[] = []
 
   constructor() {}
 
@@ -369,18 +387,20 @@ export class Keyboard {
   import({
     path,
     configContents,
-    folderContents
+    folderContents,
+    serial
   }: {
     path: string
     codeContents: string
     configContents: any
     folderContents: string[]
+    serial: boolean
   }) {
     this.clear()
     this.id = ulid()
     this.path = path
     this.driveContents = folderContents
-
+    this.usingSerial = serial === true
     this.pogConfigured = this.hasFile('pog.json')
     this.firmwareInstalled = this.hasFile('kmk')
     if (this.pogConfigured) {
@@ -518,4 +538,9 @@ export const pinPfrefixHint = computed(() => {
       return ''
   }
 })
-export const userSettings = useStorage('user-settings', {reduceKeymapColors: false, autoSelectNextKey: false})
+export const userSettings = useStorage('user-settings', {
+  reduceKeymapColors: false,
+  autoSelectNextKey: false
+})
+
+export const serialKeyboards = ref([])

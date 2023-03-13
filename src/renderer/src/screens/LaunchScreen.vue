@@ -8,7 +8,7 @@
     </div>
     <div class="text-2xl font-bold">Your Keyboards</div>
     <div class="divider"></div>
-    <div class="my-4 flex justify-center items-center flex-col gap-2">
+    <div class="my-4 flex flex-col items-center justify-center gap-2">
       <p>select the circuit python drive of your keyboard</p>
       <button class="btn-primary btn" @click="selectDrive">
         <i class="mdi mdi-plus mr-1 text-lg"></i><span class="text-xs">add new keyboard</span>
@@ -18,30 +18,47 @@
       (Note: your controller needs to be running
       <a href="https://circuitpython.org/downloads" target="_blank" class="link">circuit python</a>)
     </div>
+    <div>
+      <p>keyboards connected via serial</p>
+      <div v-for="keyboard in serialKeyboards">
+        {{ keyboard.name }}
+        <button class="btn-primary btn" @click="selectKeyboard(keyboard)">use</button>
+      </div>
+    </div>
     <div class="">
       <div class="keyboard-list">
         <div
           v-for="keyboard in keyboardHistory"
           :key="keyboard.id"
           class="keyboard-preview"
-          @click="selectKeyboard(keyboard.path)"
+          @click="selectKeyboard(keyboard)"
         >
           <div class="image">
-            <!--            <img :src="keyboard.image" alt="" />-->
-            <div class=" w-full h-full p-2 overflow-hidden">
-
-            <keyboard-layout
-              :key-layout="keyboard.keys"
-              :keymap="keyboard.keymap"
-              :matrix-width="keyboard.cols"
-              :layouts="keyboard.layouts"
-              mode="static"
-              :fixed-height="true"
-            ></keyboard-layout>
-
+            <div class="h-full w-full overflow-hidden p-2">
+              <keyboard-layout
+                :key-layout="keyboard.keys"
+                :keymap="keyboard.keymap"
+                :matrix-width="keyboard.cols"
+                :layouts="keyboard.layouts"
+                mode="static"
+                :fixed-height="true"
+              ></keyboard-layout>
             </div>
           </div>
-          <div class="relative flex flex-grow flex-col justify-center">
+          <div class="relative flex flex-grow flex-col">
+            <p v-if="serialKeyboards.find((a) => a.id === keyboard.id && !a.driveMounted)">
+              <span class="rounded bg-info p-1 text-xs"> Serial </span>
+            </p>
+            <p v-else-if="keyboard.path">
+              <span
+                v-if="serialKeyboards.find((a) => a.id === keyboard.id)"
+                class="mr-2 rounded bg-gray-600 p-1 text-xs"
+              >
+                Serial available
+              </span>
+              <span class="rounded bg-accent p-1 text-xs">USB Drive</span>
+            </p>
+            <p v-else><span class="rounded bg-error p-1 text-xs">Read Only Serial</span></p>
             <button
               class="btn-ghost btn-sm btn absolute top-0 right-0"
               @click.stop="removeFromHistory(keyboard)"
@@ -49,7 +66,7 @@
               <i class="mdi mdi-close"></i>
             </button>
             <p class="font-bold">{{ keyboard.name }}</p>
-            <p class="mt-2 mt-2 italic text-xs">{{ keyboard.path }}</p>
+            <p class="mt-2 mt-2 text-xs italic">{{ keyboard.path }}</p>
             <p class="mt-2">{{ keyboard.description }}</p>
             <div>
               <div
@@ -70,9 +87,17 @@
 
 <script lang="ts" setup>
 import { useRouter } from 'vue-router'
-import {keyboardStore, keyboardHistory, addToHistory, notifications, KeyboardStore, selectedLayer} from '../store'
+import {
+  keyboardStore,
+  keyboardHistory,
+  addToHistory,
+  notifications,
+  KeyboardStore,
+  selectedLayer,
+  serialKeyboards
+} from '../store'
 import KeyboardLayout from '../components/KeyboardLayout.vue'
-import {ref} from "vue";
+import { onMounted, ref } from 'vue'
 const router = useRouter()
 
 selectedLayer.value = 0
@@ -90,18 +115,25 @@ const selectDrive = async () => {
     router.push('/setup-wizard')
   }
 }
-const selectKeyboard = async (keyboardPath) => {
-  const keyboard = await window.api.selectKeyboard(keyboardPath)
-  console.log(keyboard)
-  if(keyboard.error){
-    if(keyboard.error === 'pathNotFound'){
-      console.log('keyboard is not connected')
-      notifications.value.push({label: 'Keyboard not connected'})
+
+const selectKeyboard = async (keyboard) => {
+  const isSerial = serialKeyboards.value.find((a) => a.id === keyboard.id && !a.driveMounted)
+  if (isSerial || !keyboard.path) {
+    console.log('connectiong keyboard via serial')
+    window.api.selectKeyboard({ id: keyboard.id })
+  } else {
+    const keyboardData = await window.api.selectKeyboard({ path: keyboard.path })
+    console.log('connecting to keyboard via files')
+    if (keyboardData.error) {
+      if (keyboardData.error === 'pathNotFound') {
+        console.log('keyboard is not connected')
+        notifications.value.push({ label: 'Keyboard not connected' })
+      }
+      return
     }
-    return
+    keyboardStore.import(keyboardData)
+    router.push('/configurator')
   }
-  keyboardStore.import(keyboard)
-  router.push('/configurator')
 }
 
 const removeFromHistory = (keyboard) => {
@@ -109,11 +141,20 @@ const removeFromHistory = (keyboard) => {
 }
 
 const keyboards = ref<any[]>([])
-keyboardHistory.value.forEach(keyb=>{
+keyboardHistory.value.forEach((keyb) => {
   const keyboard = new KeyboardStore()
-  keyboard.import({configContents:keyb, path:keyb.path, folderContents:['pog.json'], codeContents:''})
+  keyboard.import({
+    configContents: keyb,
+    path: keyb.path,
+    folderContents: ['pog.json'],
+    codeContents: ''
+  })
   keyboards.value.push(keyboard)
+})
 
+
+onMounted(() => {
+  window.api.rescanKeyboards()
 })
 </script>
 
@@ -128,7 +169,7 @@ keyboardHistory.value.forEach(keyb=>{
     @apply border-opacity-40 bg-base-200;
   }
   .image {
-    @apply flex items-center justify-center rounded flex-shrink-0;
+    @apply flex flex-shrink-0 items-center justify-center rounded;
     width: 350px;
     height: 130px;
     border: 1px solid #333;

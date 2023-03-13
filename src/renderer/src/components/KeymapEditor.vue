@@ -67,6 +67,7 @@
           type="text"
           class="input-bordered input input-sm w-full"
         />
+
       </div>
     </div>
     <div v-if="keycodeModeForSelection === 'custom'" class="p-2 text-sm italic">

@@ -4,9 +4,11 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { handleSelectDrive, selectKeyboard } from './selectKeyboard'
 import { updateFirmware } from './kmkUpdater'
-import { saveConfiguration } from './saveConfig'
+import { handleKeymapSave, saveConfiguration } from './saveConfig'
 import { autoUpdater } from 'electron-updater'
-
+import serialPort from 'serialport'
+import { ReadlineParser } from '@serialport/parser-readline'
+import { log } from 'util'
 let mainWindow: BrowserWindow | null = null
 export { mainWindow }
 
@@ -110,7 +112,7 @@ const template: unknown = [
 const menu = Menu.buildFromTemplate(template as Electron.MenuItem[])
 Menu.setApplicationMenu(menu)
 
-function createWindow(): void {
+const createWindow = async () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
     width: 1100,
@@ -148,7 +150,7 @@ function createWindow(): void {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('de.heaper.pog')
 
@@ -166,6 +168,7 @@ app.whenReady().then(() => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
+  scanForKeyboards().then((boards) => console.log(boards))
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -185,6 +188,8 @@ app.on('window-all-closed', () => {
 // save keymap
 
 ipcMain.handle('selectDrive', () => handleSelectDrive())
+ipcMain.handle('deselectKeyboard', () => deselectKeyboard())
+ipcMain.handle('rescanKeyboards', () => scanForKeyboards())
 ipcMain.handle('updateFirmware', () => updateFirmware())
 ipcMain.on('saveConfiguration', (_event, data) => saveConfiguration(data))
 ipcMain.handle('selectKeyboard', (_event, data) => selectKeyboard(data))
@@ -195,3 +200,231 @@ autoUpdater.on('update-available', () => {
 autoUpdater.on('update-downloaded', () => {
   if (mainWindow) mainWindow.webContents.send('update_downloaded')
 })
+
+const baudRate = 9600
+const startTime = new Date()
+let currentChunk = 0
+let sendMode = ''
+export let pogconfigbuffer = ''
+export let keymapbuffer = ''
+let total_chunks = 0
+const chunksize = 1200
+
+const getBoardInfo = (port) => {
+  return new Promise((res, rej) => {
+    // connect to port and get the response
+    const sport = new serialPort.SerialPort(
+      { path: port.path, baudRate, autoOpen: true },
+      (e) => {}
+    )
+    const sparser = sport.pipe(new ReadlineParser({ delimiter: '\n' }))
+    sparser.once('data', (data) => {
+      sport.close()
+      res({ ...port, ...JSON.parse(data) })
+    })
+    sport.write('info_simple\n')
+  })
+}
+const timeout = (prom, time) => {
+  let timer
+  return Promise.race([prom, new Promise((_r, rej) => (timer = setTimeout(rej, time)))]).finally(
+    () => clearTimeout(timer)
+  )
+}
+
+export const serialBoards: { value: any[] } = { value: [] }
+const scanForKeyboards = async () => {
+  console.log('checking for connected keyboards')
+  if (connectedKeyboardPort && connectedKeyboardPort.isOpen) connectedKeyboardPort.close()
+  const ports = await serialPort.SerialPort.list()
+  const circuitPythonPorts = ports //.filter(port => {
+  //     return port.manufacturer && ['0xCB'].includes(port.manufacturer)
+  // });
+  let boards = await Promise.allSettled(
+    circuitPythonPorts.map(async (a) => await timeout(getBoardInfo(a), 2000))
+  )
+  boards = boards.filter((a) => a.value !== undefined).map((a) => a.value)
+
+  console.log('boards ready')
+  boards.map((a) => console.log(`${a.name} - ${a.id} | ${a.path}`))
+  mainWindow?.webContents.send('keyboardScan', {
+    keyboards: boards
+  })
+  serialBoards.value = boards
+  return boards
+}
+
+let currentPackage = ''
+let addedChunks = 0
+function crossSum(s) {
+  // Compute the cross sum
+  let total = 0
+  for (let i = 0; i < s.length; i++) {
+    const c = s.charAt(i)
+    total += c.charCodeAt(0)
+  }
+
+  return total
+}
+
+const sendConfigChunk = (port) => {
+  port.write(
+    JSON.stringify({
+      current_chunk: currentChunk,
+      total_chunks,
+      data: pogconfigbuffer.substring(
+        chunksize * currentChunk,
+        chunksize * currentChunk + chunksize
+      )
+    }) + '\n'
+  )
+  console.log('done sending next config chunk waiting for microcontroller')
+}
+const sendKeymapChunk = (port) => {
+  port.write(
+    JSON.stringify({
+      current_chunk: currentChunk,
+      total_chunks,
+      data: keymapbuffer.substring(chunksize * currentChunk, chunksize * currentChunk + chunksize)
+    }) + '\n'
+  )
+  console.log('done sending next keymap chunk waiting for microcontroller')
+}
+export let connectedKeyboardPort: any = null
+
+export const connectSerialKeyboard = async (keyboard) => {
+  connectedKeyboardPort = new serialPort.SerialPort(
+    { path: keyboard.path, baudRate, autoOpen: true },
+    (e) => {}
+  )
+  const parser = connectedKeyboardPort.pipe(new ReadlineParser({ delimiter: '\n' }))
+  // parser.once('data', (data) => {
+  //   sport.close()
+  //   res({ ...port, ...JSON.parse(data) })
+  // })
+  // port.write('info_simple\n');
+  parser.on('data', (data) => {
+    try {
+      const chunk = JSON.parse(data.toString())
+      if (chunk.type === 'pogconfig') {
+        console.log('got chunk', chunk.current_chunk, 'of', chunk.total_chunks)
+        const checksum = crossSum(chunk.data)
+        console.log(
+          'checking cross sum',
+          checksum,
+          chunk.cross_sum,
+          checksum === chunk.cross_sum ? 'valid' : 'invalid'
+        )
+        // if(Math.random() > 0.8){
+        //     console.error('fake invalid')
+        //     port.write('0\n')
+        //     return
+        // }
+        currentPackage += chunk.data
+        addedChunks++
+
+        if (chunk.current_chunk === Math.ceil(chunk.total_chunks)) {
+          const validated = Math.ceil(chunk.total_chunks) === addedChunks
+          console.log('done', addedChunks, chunk.current_chunk, validated)
+          addedChunks = 0
+          connectedKeyboardPort.write('y\n')
+          const pogconfig = JSON.parse(currentPackage)
+          // info was successfully queried push to frontend
+          mainWindow?.webContents.send('serialKeyboardPogConfig', {
+            pogconfig
+          })
+          currentPackage = ''
+          return
+        }
+        connectedKeyboardPort.write('1\n')
+        return
+      } else {
+        console.log('keyboard info', chunk)
+      }
+    } catch (e) {
+      console.log('not a proper json command, moving to simple commands', e, data, data.toString())
+    }
+
+    // pinging for next chunk
+    if (data === '1') {
+      if (sendMode === 'saveConfig') {
+        total_chunks = Math.ceil(pogconfigbuffer.length / chunksize)
+        console.log(
+          'got signal that last chunk came in fine, sending more if we have more',
+          currentChunk,
+          total_chunks,
+          data
+        )
+
+        if (currentChunk > total_chunks) {
+          console.log('done sending')
+          const dif = new Date().getTime() - startTime.getTime()
+          console.log(`took ${dif / 1000}s`)
+          // now saving keymap
+          handleKeymapSave({ pogConfig: JSON.parse(pogconfigbuffer), serial: true })
+        } else {
+          sendConfigChunk(connectedKeyboardPort)
+          currentChunk += 1
+        }
+      } else if (sendMode === 'saveKeymap') {
+        total_chunks = Math.ceil(keymapbuffer.length / chunksize)
+        console.log(
+          'last chunk came in fine, sending more if we have more',
+          currentChunk,
+          total_chunks,
+          data
+        )
+        if (currentChunk <= total_chunks) {
+          sendKeymapChunk(connectedKeyboardPort)
+          currentChunk += 1
+        }
+      }
+    } else if (data === 'y') {
+      console.log('something else', data)
+      // if sendmode = pog config send keymap as well
+      if (sendMode === 'saveConfig') {
+        handleKeymapSave({ pogConfig: JSON.parse(pogconfigbuffer), serial: true })
+        return
+      }
+      // general reset
+      sendMode = ''
+      currentChunk = 0
+    }
+    return
+  })
+}
+export const writePogConfViaSerial = (pogconfig) => {
+  pogconfigbuffer = pogconfig
+  currentChunk = 0
+  sendMode = 'saveConfig'
+  if (!connectedKeyboardPort) {
+    console.log('port not set')
+  } else if (!connectedKeyboardPort.isConnected) {
+    connectedKeyboardPort.open(() => {
+      console.log('port open again')
+      connectedKeyboardPort.write('save\n')
+    })
+  } else {
+    connectedKeyboardPort.write('save\n')
+  }
+}
+export const writeKeymapViaSerial = (pogconfig) => {
+  keymapbuffer = pogconfig
+  currentChunk = 0
+  sendMode = 'saveKeymap'
+  if (!connectedKeyboardPort) {
+    console.log('port not set')
+  } else if (!connectedKeyboardPort.isConnected) {
+    connectedKeyboardPort.open(() => {
+      console.log('port open again')
+      connectedKeyboardPort.write('saveKeymap\n')
+    })
+  } else {
+    connectedKeyboardPort.write('saveKeymap\n')
+  }
+}
+const deselectKeyboard = () => {
+  if (connectedKeyboardPort && connectedKeyboardPort.isConnected) {
+    connectedKeyboardPort.close()
+  }
+}

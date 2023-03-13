@@ -1,11 +1,33 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { keyboardStore, notifications } from './store'
-
+import { keyboardStore, notifications, serialKeyboards } from './store'
+import { useRouter} from "vue-router";
+const router = useRouter()
 const store = computed(() => {
   return keyboardStore
 })
 console.log('store added to debug menu', store)
+
+window.api.keyboardScan((_event: Event, value: { keyboards }) => {
+  console.log('found keyboards via serial', value)
+  serialKeyboards.value = value.keyboards.map(a=>{
+    const b = a
+    b.port = b.path
+    delete(b.path)
+    return b
+  })
+})
+
+window.api.serialKeyboardPogConfig((_event: Event, value: { pogconfig }) => {
+  console.log('loaded pog config', value)
+  keyboardStore.import({
+    path: '',
+    serial: true,
+    folderContents: ['pog.json', 'kmk'],
+    configContents: value.pogconfig
+  })
+  router.push('/configurator')
+})
 </script>
 
 <template>
@@ -26,7 +48,7 @@ console.log('store added to debug menu', store)
           />
         </svg>
         <span>{{ notification.label }}</span>
-        <button class="btn-ghost btn-sm btn" @click="notifications.splice(nindex,1)">
+        <button class="btn-ghost btn-sm btn" @click="notifications.splice(nindex, 1)">
           <i class="mdi mdi-close"></i>
         </button>
       </div>
@@ -50,6 +72,6 @@ body,
   position: absolute;
   top: 0;
   display: flex;
-  @apply flex-col gap-4 p-4 z-20;
+  @apply z-20 flex-col gap-4 p-4;
 }
 </style>
