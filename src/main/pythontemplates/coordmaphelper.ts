@@ -1,4 +1,4 @@
-export const coordmaphelperpy = `# coordmaphelper.py helper script to get your coord map
+export const coordmaphelperpy = `# coordmaphelper.py helper script to get your coord map - v0.9.5
 from kmk.handlers.sequences import simple_key_sequence
 from kmk.keys import KC
 from kb import KMKKeyboard as _KMKKeyboard

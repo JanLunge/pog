@@ -215,7 +215,6 @@ if __name__ == '__main__':
 from kmk.keys import KC
 from kmk.handlers.sequences import send_string, simple_key_sequence
 from kmk.modules.combos import Chord, Sequence
-from kb import combos
 
 import pog
 import customkeys

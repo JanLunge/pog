@@ -1,4 +1,4 @@
-export const codepy = `# Main Keyboard Configuration
+export const codepy = `# Main Keyboard Configuration - v0.9.5
 import board
 import pog
 

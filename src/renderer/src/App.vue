@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { keyboardStore, notifications, serialKeyboards } from './store'
+import {addToHistory, keyboardHistory, keyboardStore, notifications, serialKeyboards} from './store'
 import { useRouter} from "vue-router";
 const router = useRouter()
 const store = computed(() => {
@@ -26,6 +26,9 @@ window.api.serialKeyboardPogConfig((_event: Event, value: { pogconfig }) => {
     folderContents: ['pog.json', 'kmk'],
     configContents: value.pogconfig
   })
+  if (keyboardStore.pogConfigured){
+    addToHistory(keyboardStore)
+  }
   router.push('/configurator')
 })
 </script>

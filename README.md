@@ -22,16 +22,13 @@ then just run it with dev to start
 
 # Tasks
 ## urgent
-- [ ] boot.py generation
+- [ ] guides etc for setup + split workflow
 - [ ] share pog.json files
-- [ ] use injection points from the pog.json for codeblocks
-- [ ] direct pin wiring support
+- [ ] check if the controller you use even has the pin you specified (controller lookup and serial to get pins )
 - [ ] bluetooth workflow
 - [ ] generate layout based on matrix + clear layout button / delete multiple
-- [ ] save a backup of the json in electron
 
 ## features
-- [x] dragging keys on the layout editor
 - [ ] language switcher for german and other layouts changing the labels on the keymap
 - [ ] modtap/tapdance/macros/sequences
 - [ ] encoder support direct pin click
@@ -39,6 +36,11 @@ then just run it with dev to start
 - [ ] wiring preview
 
 ## done
+- [x] boot.py generation
+- [x] versioning for python files
+- [x] direct pin wiring support
+- [x] save a backup of the json in electron
+- [x] dragging keys on the layout editor
 - [x] Layout editor to replace KLE
 - [x] save pog.json (use as main storage for everything)
 - [x] adjust keymap when matrix changes

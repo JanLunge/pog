@@ -1,6 +1,5 @@
-export const pog_serialpy = `# pog_serial module
+export const pog_serialpy = `# pog_serial module - v0.9.5
 from usb_cdc import data
-
 from kmk.modules import Module
 from kmk.utils import Debug
 import pog
@@ -11,6 +10,7 @@ import microcontroller
 import os
 import supervisor
 import math
+import board
 
 debug = Debug(__name__)
 
@@ -158,7 +158,7 @@ class pogSerial(Module):
                 if split[0] == 'info_simple':
                     # print basic keyboard info
                     print('getting basic keyboard info')
-                    data.write((json.dumps({"driveMounted": microcontroller.nvm[0]!=0 ,"name": pog.config['name'], "manufacturer": pog.config['manufacturer'], "id": pog.config['id']})+"\\n").encode())
+                    data.write((json.dumps({"driveMounted": microcontroller.nvm[0]!=0 ,"name": pog.config['name'], "manufacturer": pog.config['manufacturer'], "id": pog.config['id'], "board": dir(board) })+"\\n").encode())
                 if split[0] == 'save':
                     # read chunks
                     file_to_delete = open("received_file.json",'w')

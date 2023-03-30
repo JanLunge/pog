@@ -1,4 +1,4 @@
-export const pogpy =`# pog.py Import the pog config
+export const pogpy =`# pog.py Import the pog config - v0.9.5
 import json
 import board
 from kmk.keys import KC
@@ -97,4 +97,11 @@ directPinScanner = (
         max_events=64
     )"""
 )
+
+splitPinA = None
+splitPinB = None
+if config.get('splitPinA'):
+    splitPinA = eval(renderPin(config['splitPinA']))
+if config.get('splitPinB'):
+    splitPinB = eval(renderPin(config['splitPinB']))
 `

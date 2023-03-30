@@ -18,17 +18,9 @@
       (Note: your controller needs to be running
       <a href="https://circuitpython.org/downloads" target="_blank" class="link">circuit python</a>)
     </div>
-    <div>
-      <p>keyboards connected via serial</p>
-      <div v-for="keyboard in serialKeyboards">
-        {{ keyboard.name }}
-        <button class="btn-primary btn" @click="selectKeyboard(keyboard)">use</button>
-      </div>
-    </div>
-    <div class="">
-      <div class="keyboard-list">
+    <TransitionGroup name="list" tag="ul" class="keyboard-list">
         <div
-          v-for="keyboard in keyboardHistory"
+          v-for="keyboard in keyboards"
           :key="keyboard.id"
           class="keyboard-preview"
           @click="selectKeyboard(keyboard)"
@@ -36,6 +28,7 @@
           <div class="image">
             <div class="h-full w-full overflow-hidden p-2">
               <keyboard-layout
+                v-if="keyboard.keys"
                 :key-layout="keyboard.keys"
                 :keymap="keyboard.keymap"
                 :matrix-width="keyboard.cols"
@@ -66,6 +59,7 @@
               <i class="mdi mdi-close"></i>
             </button>
             <p class="font-bold">{{ keyboard.name }}</p>
+            <p class="text-sm italic">{{ keyboard.manufacturer }}</p>
             <p class="mt-2 mt-2 text-xs italic">{{ keyboard.path }}</p>
             <p class="mt-2">{{ keyboard.description }}</p>
             <div>
@@ -80,8 +74,7 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
+    </TransitionGroup>
   </div>
 </template>
 
@@ -97,7 +90,7 @@ import {
   serialKeyboards
 } from '../store'
 import KeyboardLayout from '../components/KeyboardLayout.vue'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 const router = useRouter()
 
 selectedLayer.value = 0
@@ -138,6 +131,7 @@ const selectKeyboard = async (keyboard) => {
 
 const removeFromHistory = (keyboard) => {
   keyboardHistory.value = keyboardHistory.value.filter((board) => board.id !== keyboard.id)
+  keyboards.value = keyboards.value.filter((board) => board.id !== keyboard.id)
 }
 
 const keyboards = ref<any[]>([])
@@ -152,9 +146,27 @@ keyboardHistory.value.forEach((keyb) => {
   keyboards.value.push(keyboard)
 })
 
+const addSerialKeyboards = () => {
+  serialKeyboards.value.forEach((board) => {
+    if (!keyboards.value.find((a) => a.id === board.id)) {
+      keyboards.value.unshift({
+        id: board.id,
+        port: board.port,
+        name: board.name,
+        description: board.description,
+        manufacturer: board.manufacturer
+      })
+    }
+  })
+}
 
+watch(serialKeyboards, () => {
+  addSerialKeyboards()
+})
 onMounted(() => {
   window.api.rescanKeyboards()
+  // load the serial keyboards into the shown list
+  addSerialKeyboards()
 })
 </script>
 
@@ -174,5 +186,14 @@ onMounted(() => {
     height: 130px;
     border: 1px solid #333;
   }
+}
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+.list-enter-from,
+.list-leave-to {
+  opacity: 0;
+  transform: translateY(-30px);
 }
 </style>

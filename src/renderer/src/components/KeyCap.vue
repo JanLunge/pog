@@ -1,7 +1,7 @@
 <template>
   <div
     v-if="visible"
-    :ref="keyElem"
+    ref="keyElem"
     class="keycap"
     style="user-select: none"
     :data-index="keyIndex"
@@ -69,7 +69,7 @@
         background: keyColor
       }"
     ></div>
-    <div v-if="!isSimple && mode!=='layout'" class="keylabel-action">
+    <div v-if="!isSimple && mode !== 'layout'" class="keylabel-action">
       <div
         v-if="typeof keyData.encoderIndex === 'number' && mode !== 'layout'"
         class="encoder-labels"
@@ -81,7 +81,7 @@
         {{ mainLabel.action }}
       </span>
     </div>
-<!--    <div class="keylabel-action"></div>-->
+    <!--    <div class="keylabel-action"></div>-->
     <div
       class="keylabels"
       :class="{ 'has-args': !isSimple }"
@@ -93,7 +93,11 @@
       <!--        </div>-->
       <!--      </div>-->
       <div v-if="mainLabel" class="keylabel keylabel-center">
-        <span v-if="isSimple||typeof keyData.encoderIndex==='number'" v-html="mainLabel.action"></span>
+        <span
+          v-if="isSimple || typeof keyData.encoderIndex === 'number'"
+          class="keylabel-main"
+          v-html="mainLabel.action"
+        ></span>
         <div v-else class="flex h-full flex-col justify-between p-1">
           <span
             class="keylabel-main"
@@ -118,7 +122,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, VNodeRef, watch } from 'vue'
+import {computed, nextTick, onMounted, ref, VNodeRef, watch} from 'vue'
 import { selectedLayer, selectedKeys, userSettings } from '../store'
 import { renderLabel } from '../helpers'
 import chroma from 'chroma-js'
@@ -318,13 +322,13 @@ const layerName = computed(() => {
 
 const encoderActionA = computed(() => {
   // get encoder index then lookup current keycode
-  if(!props.keyData.getEncoderLabel)return
+  if (!props.keyData.getEncoderLabel) return
   return renderLabel(props.keyData.getEncoderLabel().a).action
 })
 
 const encoderActionB = computed(() => {
   // get encoder index then lookup current keycode
-  if(!props.keyData.getEncoderLabel)return
+  if (!props.keyData.getEncoderLabel) return
   return renderLabel(props.keyData.getEncoderLabel().b).action
 })
 
@@ -335,9 +339,23 @@ const isSimple = computed(() => {
 
 const keyElem = ref<VNodeRef | null>(null)
 const fixLabelWidth = () => {
-  console.log('scaling labels based on their container')
+  const label = keyElem.value.querySelector('.keylabel-main')
+  const labels = keyElem.value.querySelector('.keylabels')
+  if (label) {
+    const labelWidth = label.getBoundingClientRect().width
+    const wrapperWidth = labels.getBoundingClientRect().width
+    const scaling = Math.min(wrapperWidth / labelWidth, 1)
+    label.style.transform = `scale(${scaling})`
+  }
 }
-fixLabelWidth()
+watch(mainLabel,async ()=>{
+  console.log('watching cap layer')
+  await nextTick()
+  fixLabelWidth()
+})
+onMounted(() => {
+  fixLabelWidth()
+})
 </script>
 
 <style lang="scss" scoped>
@@ -396,7 +414,7 @@ fixLabelWidth()
   .encoder & {
     border-radius: 50%;
   }
-  .selected.encoder &{
+  .selected.encoder & {
     border-bottom: 1px solid white;
   }
 }

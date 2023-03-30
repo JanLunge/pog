@@ -1,4 +1,4 @@
-export const bootpy = `# boot.py
+export const bootpy = `# boot.py - v0.9.5
 import usb_cdc
 import supervisor
 import storage

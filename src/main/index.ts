@@ -233,6 +233,8 @@ const timeout = (prom, time) => {
 }
 
 export const serialBoards: { value: any[] } = { value: [] }
+// TODO: resolve callbacks properly
+// https://stackoverflow.com/questions/69608234/get-promise-resolve-from-separate-callback
 const scanForKeyboards = async () => {
   console.log('checking for connected keyboards')
   if (connectedKeyboardPort && connectedKeyboardPort.isOpen) connectedKeyboardPort.close()
@@ -240,18 +242,23 @@ const scanForKeyboards = async () => {
   const circuitPythonPorts = ports //.filter(port => {
   //     return port.manufacturer && ['0xCB'].includes(port.manufacturer)
   // });
-  let boards = await Promise.allSettled(
+  const boards = (await Promise.allSettled(
     circuitPythonPorts.map(async (a) => await timeout(getBoardInfo(a), 2000))
-  )
-  boards = boards.filter((a) => a.value !== undefined).map((a) => a.value)
+  )) as {
+    status: 'fulfilled' | 'rejected'
+    value:  { name: string; id: string; path: string }
+  }[]
+  const filteredBoards: { name: string; id: string; path: string }[] = boards
+    .filter((a) => a.value !== undefined)
+    .map((a) => a.value)
 
   console.log('boards ready')
-  boards.map((a) => console.log(`${a.name} - ${a.id} | ${a.path}`))
+  filteredBoards.map((a) => console.log(`${a.name} - ${a.id} | ${a.path}`))
   mainWindow?.webContents.send('keyboardScan', {
-    keyboards: boards
+    keyboards: filteredBoards
   })
-  serialBoards.value = boards
-  return boards
+  serialBoards.value = filteredBoards
+  return filteredBoards
 }
 
 let currentPackage = ''

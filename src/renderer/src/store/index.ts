@@ -288,6 +288,8 @@ export class Keyboard {
 
   encoders: { pad_a: string; pad_b: string }[] = []
   split = false
+  splitPinA = ""
+  splitPinB = ""
 
   // keymaps
 
@@ -431,6 +433,8 @@ export class Keyboard {
       if (configContents.layers) this.layers = configContents.layers
 
       if (configContents.split) this.split = configContents.split
+      if (configContents.splitPinA) this.splitPinA = configContents.splitPinA
+      if (configContents.splitPinB) this.splitPinB = configContents.splitPinB
 
       // encoders
       if (configContents.encoders) this.encoders = configContents.encoders
@@ -495,6 +499,9 @@ export class Keyboard {
       layers: this.layers,
 
       split: this.split,
+      splitPinA: this.splitPinA,
+      splitPinB: this.splitPinB,
+
       coordMap: this.coordMap,
       pinPrefix: this.pinPrefix,
       coordMapSetup: this.coordMapSetup,

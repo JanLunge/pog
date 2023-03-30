@@ -298,7 +298,6 @@ export const renderLabel = (keycode: string) => {
     HT: { label: 'HT' },
     OS: { label: 'OS' },
 
-
     // Media
     MPLY: { label: 'Play/Pause', icon: 'mdi-play-pause' },
     VOLU: { label: 'Vol up', icon: 'mdi-volume-plus' },
@@ -307,7 +306,7 @@ export const renderLabel = (keycode: string) => {
     MRWD: { label: 'Prev Track', icon: 'mdi-skip-previous' },
     MFFD: { label: 'Next Track', icon: 'mdi-skip-next' },
     send_string: { label: 'String' },
-    RESET: {label: 'Reset'}
+    RESET: { label: 'Reset' }
   }
 
   const keylabel: {
@@ -338,9 +337,10 @@ export const renderLabel = (keycode: string) => {
   } else if (keycode.startsWith('send_string(') && keycode.endsWith(')')) {
     keylabel.action = '<p class="keylabel-small">String</p>'
   } else if (keycode.startsWith('customkeys.')) {
-    keylabel.action = '<p class="keylabel-small">custom</p>'
+    keylabel.action = 'custom'
+    keylabel.simple = false
     const customcode = keycode.substring(11)
-    keylabel.action += `<p style="overflow: hidden">${customcode}</p>`
+    keylabel.main = `${customcode}`
   } else {
     // Check for modifier keys
     // if (keycode.includes('KC.LSHIFT') || keycode.includes('KC.RSHIFT') ||
@@ -380,7 +380,20 @@ export const renderLabel = (keycode: string) => {
               keylabel.simple = false
               keylabel.layerNamePosition = 'lower'
               break
+            case 'OS':
+              keylabel.main = String(params[0].action)
+              keylabel.simple = false
+              break
+            case 'TD':
+              keylabel.main = String(params.map((a) => a.action).join(' '))
+              keylabel.simple = false
+              break
             case 'MT':
+              keylabel.main = String(params[0].action)
+              keylabel.lower = String(params[1].action)
+              keylabel.simple = false
+              break
+            case 'HT':
               keylabel.main = String(params[0].action)
               keylabel.lower = String(params[1].action)
               keylabel.simple = false
@@ -417,4 +430,18 @@ export const renderLabel = (keycode: string) => {
   }
 
   return keylabel
+}
+const controllers = {
+  '0xcb_helios': ['GP29']
+}
+
+export const microcontrollerPinValid = ({
+  controller,
+  pin
+}: {
+  controller: string
+  pin: string
+}) => {
+  // check if the controller has this pin
+  return controllers[controller].includes(pin)
 }

@@ -1,4 +1,4 @@
-export const customkeyspy = `# These are yous custom keycodes do any needed imports at the top
+export const customkeyspy = `# These are yous custom keycodes do any needed imports at the top - v0.9.5
 # then you can reference them in your keymap with for example customkeys.MyKey
 
 from kmk.keys import KC

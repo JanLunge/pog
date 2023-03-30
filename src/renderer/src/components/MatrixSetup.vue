@@ -42,11 +42,24 @@
       ></InputLabel>
     </div>
     <div>
-      <label class="flex items-center gap-2">
-        <input v-model="keyboardStore.split" type="checkbox" class="checkbox"
-        />
-        <span>Split</span>
+      <label class="mb-2 flex items-center gap-2">
+        <input v-model="keyboardStore.split" type="checkbox" class="checkbox" />
+        <span>Split Keyboard</span>
       </label>
+      <div v-if="keyboardStore.split" class="flex flex-col gap-2">
+        <p>
+          Define the serial pins used to connect the two halves, this is using the pin prefix from
+          the `pins` tab
+        </p>
+        <label class="flex items-center gap-2">
+          <span>SplitPin A</span>
+          <input v-model="keyboardStore.splitPinA" type="text" class="input-bordered input" />
+        </label>
+        <label class="flex items-center gap-2">
+          <span>SplitPin B</span>
+          <input v-model="keyboardStore.splitPinB" type="text" class="input-bordered input" />
+        </label>
+      </div>
     </div>
     <div v-if="initialSetup" class="mb-8 flex justify-center">
       <button
