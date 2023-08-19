@@ -251,12 +251,14 @@ export class Key {
 export class Keyboard {
   id = ulid()
   path?: string = undefined
+  port?: string = undefined // only set when serial is available
   usingSerial = false
   name = ''
   manufacturer = ''
   tags: string[] = []
   description = ''
 
+  driveConnected = false
   driveContents: string[] = []
 
   //manage the code.py yourself

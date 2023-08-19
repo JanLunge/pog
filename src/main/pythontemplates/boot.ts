@@ -4,7 +4,8 @@ import supervisor
 import storage
 import microcontroller
 
-supervisor.set_next_stack_limit(4096 + 4096)
+# optional
+# supervisor.set_next_stack_limit(4096 + 4096)
 usb_cdc.enable(console=True, data=True)
 
 # index configs

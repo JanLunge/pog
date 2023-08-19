@@ -7,7 +7,12 @@ import { kbpy } from './pythontemplates/kb'
 import { codepy } from './pythontemplates/code'
 import { bootpy } from './pythontemplates/boot'
 import { pog_serialpy } from './pythontemplates/pog_serial'
-import {connectedKeyboardPort, pogconfigbuffer, writeKeymapViaSerial, writePogConfViaSerial} from './index'
+import {
+  connectedKeyboardPort,
+  pogconfigbuffer,
+  writeKeymapViaSerial,
+  writePogConfViaSerial
+} from './index'
 // save code.py based on pog.json
 
 export const saveConfiguration = (data: string) => {
@@ -23,65 +28,70 @@ export const saveConfiguration = (data: string) => {
       console.log('pog File written successfully\n')
     })
 
-    saveKeyboardConfig(pogConfig) // initialize files if they dont exist
+    saveKeyboardConfig(pogConfig) // initialize files if they don't exist
     handleKeymapSave({ pogConfig, serial: false })
   }
 }
 export const saveKeyboardConfig = (pogConfig) => {
-  const coordmapstring = () => {
-    if (pogConfig.coordMap.length === 0) return ''
-    let str = '    coord_mapping = [\n'
-    pogConfig.coordMap.forEach((row) => {
-      str += '    ' + row.join(',') + ',\n'
-    })
-    str += '    ]'
-    return str.replaceAll(/spc,/gi, '    ')
-  }
+  // TODO: remove at some point from reference
+  // this is now all moved to the pog.json file
+
+  // const coordmapstring = () => {
+  //   if (pogConfig.coordMap.length === 0) return ''
+  //   let str = '    coord_mapping = [\n'
+  //   pogConfig.coordMap.forEach((row) => {
+  //     str += '    ' + row.join(',') + ',\n'
+  //   })
+  //   str += '    ]'
+  //   return str.replaceAll(/spc,/gi, '    ')
+  // }
 
   // write kb.py for basic config
-  let pinSetup = ``
-  const renderPin = (pin) => {
-    if (pogConfig.pinPefix === 'board') return `board.${pin}`
-    if (pogConfig.pinPefix === 'gp') return `board.GP${pin}`
-    if (pogConfig.pinPefix === 'quickpin') return `pins[${pin}]`
-    return pin
-  }
-  if (pogConfig.wiringMethod === 'matrix') {
-    pinSetup = `
-    col_pins = (${pogConfig.colPins.map((a) => renderPin(a)).join(', ')})
-    row_pins = (${pogConfig.rowPins.map((a) => renderPin(a)).join(', ')})
-    diode_orientation = DiodeOrientation.${pogConfig.diodeDirection}
-${coordmapstring()}
-`
-  } else {
-    pinSetup = `
-    def __init__(self):
-        # create and register the scanner
-        self.matrix = KeysScanner(
-            # require argument:
-            pins=[${pogConfig.directPins.map((a) => 'board.GP' + a).join(', ')}],
-            # optional arguments with defaults:
-            value_when_pressed=False,
-            pull=True,
-            interval=0.02,  # Debounce time in floating point seconds
-            max_events=64
-        )
-    `
-  }
-  const quickpinSupport =
-    pogConfig.pinPrefix === 'quickpin'
-      ? `from kmk.quickpin.pro_micro.nice_nano import pinout as pins `
-      : ''
-  const kbConfig = `# KB base config
-import board
-from kmk.kmk_keyboard import KMKKeyboard as _KMKKeyboard
-from kmk.scanners import DiodeOrientation
-from kmk.scanners.keypad import KeysScanner
+  // let pinSetup = ``
+  // const renderPin = (pin) => {
+  //   if (pogConfig.pinPefix === 'board') return `board.${pin}`
+  //   if (pogConfig.pinPefix === 'gp') return `board.GP${pin}`
+  //   if (pogConfig.pinPefix === 'quickpin') return `pins[${pin}]`
+  //   return pin
+  // }
+  //   if (pogConfig.wiringMethod === 'matrix') {
+  //     pinSetup = `
+  //     col_pins = (${pogConfig.colPins.map((a) => renderPin(a)).join(', ')})
+  //     row_pins = (${pogConfig.rowPins.map((a) => renderPin(a)).join(', ')})
+  //     diode_orientation = DiodeOrientation.${pogConfig.diodeDirection}
+  // ${coordmapstring()}
+  // `
+  //   } else {
+  //   pinSetup = `
+  //   def __init__(self):
+  //       # create and register the scanner
+  //       self.matrix = KeysScanner(
+  //           # require argument:
+  //           pins=[${pogConfig.directPins.map((a) => 'board.GP' + a).join(', ')}],
+  //           # optional arguments with defaults:
+  //           value_when_pressed=False,
+  //           pull=True,
+  //           interval=0.02,  # Debounce time in floating point seconds
+  //           max_events=64
+  //       )
+  //   `
+  // }
+  // const quickpinSupport =
+  //   pogConfig.pinPrefix === 'quickpin'
+  //     ? `from kmk.quickpin.pro_micro.nice_nano import pinout as pins `
+  //     : ''
+  //   const kbConfig = `# KB base config
+  // import board
+  // from kmk.kmk_keyboard import KMKKeyboard as _KMKKeyboard
+  // from kmk.scanners import DiodeOrientation
+  // from kmk.scanners.keypad import KeysScanner
+  //
+  // class KMKKeyboard(_KMKKeyboard):
+  //     ${pinSetup}
+  //  `
+  //   console.log(quickpinSupport)
 
-class KMKKeyboard(_KMKKeyboard):
-    ${pinSetup}
- `
-  console.log(quickpinSupport)
+  // add option to overwrite files eg. force flash
   // add pog helper and keyboard setup
 
   if (!fs.existsSync(currentKeyboard.path + '/kb.py')) {
@@ -124,11 +134,12 @@ class KMKKeyboard(_KMKKeyboard):
   }
 }
 
-export const saveCoordMapHelper = () => {
-  fs.writeFile(currentKeyboard.path + '/coordmaphelper.py', coordmaphelperpy, () => {
-    console.log('coord map helper File created successfully')
-  })
-}
+// is now handled with a flag in pog.json
+// export const saveCoordMapHelper = () => {
+//   fs.writeFile(currentKeyboard.path + '/coordmaphelper.py', coordmaphelperpy, () => {
+//     console.log('coord map helper File created successfully')
+//   })
+// }
 
 export const handleKeymapSave = ({ pogConfig, serial }) => {
   // const codeblockraw = fs.readFileSync(`${keyboardPath}/code.py`, {encoding:'utf8', flag:'r'})
@@ -137,30 +148,18 @@ export const handleKeymapSave = ({ pogConfig, serial }) => {
   // console.log(codeblock)
   // create basic keymap file
   // grab old codeblocks
-  let pythonImports = ''
-  let kmkAddons = ''
-  let codeblock = ''
-  //layers
-  if (true) {
-    pythonImports += '\nfrom kmk.modules.layers import Layers\n'
-    kmkAddons += '\nkeyboard.modules.append(Layers())\n'
-  }
 
-  //media keys
-  if (true) {
-    pythonImports += '\nfrom kmk.extensions.media_keys import MediaKeys\n'
-    kmkAddons += '\nkeyboard.extensions.append(MediaKeys())\n'
-  }
   // testing encoder enable
   if (pogConfig.encoders && pogConfig.encoders.length !== 0) {
-    pythonImports +=
-      '\nfrom kmk.modules.layers import Layers\n' +
-      'from kmk.modules.encoder import EncoderHandler\n'
-    kmkAddons +=
-      '\nlayers = Layers()\n' +
-      'encoder_handler = EncoderHandler()\n' +
-      'keyboard.modules = [layers, encoder_handler]\n'
+    // pythonImports +=
+    //   '\nfrom kmk.modules.layers import Layers\n' +
+    //   'from kmk.modules.encoder import EncoderHandler\n'
+    // kmkAddons +=
+    //   '\nlayers = Layers()\n' +
+    //   'encoder_handler = EncoderHandler()\n' +
+    //   'keyboard.modules = [layers, encoder_handler]\n'
 
+    // still keeping the option to save the encoder keymap as raw code instead of the lookup
     let encoderPins = ''
     pogConfig.encoders.forEach((encoder) => {
       encoderPins += `(board.GP${encoder.pad_a}, board.GP${encoder.pad_b}, None,),`
@@ -175,42 +174,44 @@ export const handleKeymapSave = ({ pogConfig, serial }) => {
       })
       encoderKeymap += '),\n'
     })
-
-    codeblock +=
-      '# Encoder\n' +
-      'encoder_handler.pins = (\n' +
-      encoderPins +
-      '\n' +
-      ')\n' +
-      'encoder_handler.map = [ \n' +
-      encoderKeymap + // layers
-      ']\n'
   }
-  const mainConfig = `# Main Keyboard Configuration
-print("Starting ${pogConfig.name || 'Keyboard'}")
 
-import board
-from kb import KMKKeyboard
-from kmk.modules.tapdance import TapDance
-${pythonImports}
+  //   codeblock +=
+  //     '# Encoder\n' +
+  //     'encoder_handler.pins = (\n' +
+  //     encoderPins +
+  //     '\n' +
+  //     ')\n' +
+  //     'encoder_handler.map = [ \n' +
+  //     encoderKeymap + // layers
+  //     ']\n'
+  // }
+  //   const mainConfig = `# Main Keyboard Configuration
+  // print("Starting ${pogConfig.name || 'Keyboard'}")
+  //
+  // import board
+  // from kb import KMKKeyboard
+  // from kmk.modules.tapdance import TapDance
+  // ${pythonImports}
+  //
+  // keyboard = KMKKeyboard()
+  // ${kmkAddons}
+  //
+  // tapdance = TapDance()
+  // tapdance.tap_time = 200
+  // keyboard.modules.append(tapdance)
+  //
+  // # Keymap
+  // from keymap import keymap
+  // keyboard.keymap = keymap
+  //
+  // ${codeblock}
+  //
+  // if __name__ == '__main__':
+  //     keyboard.go()
+  // `
 
-keyboard = KMKKeyboard()
-${kmkAddons}
-
-tapdance = TapDance()
-tapdance.tap_time = 200
-keyboard.modules.append(tapdance)
-
-# Keymap
-from keymap import keymap
-keyboard.keymap = keymap
-
-${codeblock}
-
-if __name__ == '__main__':
-    keyboard.go()
-`
-
+  // we are still writing the keymap file by hand
   const keymap = `# Keymap Autogenerated by Pog do not edit
 from kmk.keys import KC
 from kmk.handlers.sequences import send_string, simple_key_sequence
@@ -230,13 +231,11 @@ for l, layer in enumerate(pog.config['encoderKeymap']):
         layerEncoders.append(tuple(map(eval, encoder)))
     encoderKeymap.append(tuple(layerEncoders))
 `
-  if(serial){
+  if (serial) {
     writeKeymapViaSerial(keymap)
-
-  }else{
+  } else {
     fs.writeFile(currentKeyboard.path + '/keymap.py', keymap, () => {
       console.log('keymap File written successfully')
     })
   }
-
 }

@@ -57,7 +57,6 @@
 <script setup lang="ts">
 import Popper from '@wlard/vue3-popper'
 import { keyboardStore, selectedLayer } from '../store'
-import { computed } from 'vue'
 const props = defineProps(['layer', 'index'])
 if(!keyboardStore.layers[props.index]) keyboardStore.layers[props.index] = {name:'', color:undefined}
 

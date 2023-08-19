@@ -61,7 +61,7 @@ import { isNumber } from '@vueuse/core'
 import { useDebounceFn } from '@vueuse/core'
 const props = defineProps(['keyLayout', 'keymap', 'mode', 'matrixWidth', 'layouts', 'fixedHeight'])
 // mode can be layout or keymap
-const keyboardContainer = ref<VNodeRef>(null)
+const keyboardContainer = ref<VNodeRef|null>(null)
 // find right edge
 const keyboardWidth = computed(() => {
   let maxW = 0
@@ -76,17 +76,17 @@ const keyboardWidth = computed(() => {
 })
 
 // find bottom edge
-// const keyboardHeight = computed(() => {
-//   let maxH = 0
-//   props.keyLayout.forEach((k) => {
-//     const height = k.h || 1
-//     const bottomEdge = k.y + height
-//     if (bottomEdge > maxH) {
-//       maxH = bottomEdge
-//     }
-//   })
-//   return maxH
-// })
+const keyboardKeyHeight = computed(() => {
+  let maxH = 0
+  props.keyLayout.forEach((k) => {
+    const height = k.h || 1
+    const bottomEdge = k.y + height
+    if (bottomEdge > maxH) {
+      maxH = bottomEdge
+    }
+  })
+  return maxH
+})
 
 const keyboardScale = ref(1)
 const keyboardHeight = ref(200)
@@ -102,21 +102,27 @@ const updateHeight = () => {
       lowestKey = height
     }
   })
-   if(props.fixedHeight &&  keyboardHeight.value < lowestKey ){
-     console.log('lowest key ignored', lowestKey,keyboardHeight.value)
-     return
-   }
+   // if(props.fixedHeight &&  keyboardHeight.value < lowestKey ){
+   //   console.log('lowest key ignored', lowestKey,keyboardHeight.value)
+   //   return
+   // }
   keyboardHeight.value = lowestKey
 }
 const updateScale = () => {
   // updateHeight()
-  if(!keyboardContainer.value)return
+  if(!keyboardContainer.value) return
   const wrapper = keyboardContainer.value.$el
   let heightScale = 1
   let widthScale = 1
   if (wrapper) {
-    const wrapperWidth = wrapper.getBoundingClientRect().width
-    widthScale = Math.min(wrapperWidth / (keyboardWidth.value * 58), 1)
+    if (keyboardWidth.value === 0) return
+    if( keyboardWidth.value  / keyboardKeyHeight.value > 2.71){
+      const wrapperWidth = wrapper.getBoundingClientRect().width
+      widthScale = Math.min(wrapperWidth / (keyboardWidth.value * 58), 1)
+    }else{
+      const wrapperHeight = wrapper.getBoundingClientRect().height
+      heightScale = Math.min(wrapperHeight / (keyboardKeyHeight.value * 58), 1)
+    }
     // if (props.fixedHeight) {
     //   const wrapperHeight = wrapper.parentNode.getBoundingClientRect().height
     //   heightScale = Math.min(wrapperHeight / keyboardHeight.value, 1)

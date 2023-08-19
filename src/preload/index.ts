@@ -16,6 +16,7 @@ export const API = {
     ipcRenderer.on('serialKeyboardPogConfig', callback)
   },
   rescanKeyboards: () => ipcRenderer.invoke('rescanKeyboards'),
+  checkForUSBKeyboards: (data) => ipcRenderer.invoke('checkForUSBKeyboards', data),
   deselectKeyboard: () => ipcRenderer.invoke('deselectKeyboard')
 
 }

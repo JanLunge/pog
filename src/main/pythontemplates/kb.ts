@@ -41,7 +41,7 @@ class KMKKeyboard(_KMKKeyboard):
           side = SplitSide.RIGHT if str(getmount('/').label)[-1] == 'R' else SplitSide.LEFT
           if pog.splitPinB:
               self.split = Split(split_side=side, data_pin=pog.splitPinA, data_pin2=pog.splitPinB, use_pio=True)
-            else:
+          else:
               self.split = Split(split_side=side, data_pin=pog.splitPinA, use_pio=True)
           self.modules.append(self.split)
 

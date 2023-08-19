@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import { handleSelectDrive, selectKeyboard } from './selectKeyboard'
+import {checkForUSBKeyboards, handleSelectDrive, selectKeyboard} from './selectKeyboard'
 import { updateFirmware } from './kmkUpdater'
 import { handleKeymapSave, saveConfiguration } from './saveConfig'
 import { autoUpdater } from 'electron-updater'
@@ -168,7 +168,6 @@ app.whenReady().then(async () => {
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
-  scanForKeyboards().then((boards) => console.log(boards))
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common
@@ -192,6 +191,7 @@ ipcMain.handle('deselectKeyboard', () => deselectKeyboard())
 ipcMain.handle('rescanKeyboards', () => scanForKeyboards())
 ipcMain.handle('updateFirmware', () => updateFirmware())
 ipcMain.on('saveConfiguration', (_event, data) => saveConfiguration(data))
+ipcMain.handle('checkForUSBKeyboards', (_event, data) => checkForUSBKeyboards(data))
 ipcMain.handle('selectKeyboard', (_event, data) => selectKeyboard(data))
 
 autoUpdater.on('update-available', () => {
@@ -236,7 +236,7 @@ export const serialBoards: { value: any[] } = { value: [] }
 // TODO: resolve callbacks properly
 // https://stackoverflow.com/questions/69608234/get-promise-resolve-from-separate-callback
 const scanForKeyboards = async () => {
-  console.log('checking for connected keyboards')
+  console.log('checking for connected keyboards via serial')
   if (connectedKeyboardPort && connectedKeyboardPort.isOpen) connectedKeyboardPort.close()
   const ports = await serialPort.SerialPort.list()
   const circuitPythonPorts = ports //.filter(port => {
@@ -252,7 +252,7 @@ const scanForKeyboards = async () => {
     .filter((a) => a.value !== undefined)
     .map((a) => a.value)
 
-  console.log('boards ready')
+  console.log('found the following boards:', filteredBoards)
   filteredBoards.map((a) => console.log(`${a.name} - ${a.id} | ${a.path}`))
   mainWindow?.webContents.send('keyboardScan', {
     keyboards: filteredBoards

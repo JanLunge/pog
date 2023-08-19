@@ -18,62 +18,69 @@
       (Note: your controller needs to be running
       <a href="https://circuitpython.org/downloads" target="_blank" class="link">circuit python</a>)
     </div>
+    <div class="divider"></div>
+    <div class="flex justify-end">
+      <button class="btn btn-sm" @lick="refreshConnectedBoards">Refresh Keyboard List</button>
+    </div>
     <TransitionGroup name="list" tag="ul" class="keyboard-list">
-        <div
-          v-for="keyboard in keyboards"
-          :key="keyboard.id"
-          class="keyboard-preview"
-          @click="selectKeyboard(keyboard)"
-        >
-          <div class="image">
-            <div class="h-full w-full overflow-hidden p-2">
-              <keyboard-layout
-                v-if="keyboard.keys"
-                :key-layout="keyboard.keys"
-                :keymap="keyboard.keymap"
-                :matrix-width="keyboard.cols"
-                :layouts="keyboard.layouts"
-                mode="static"
-                :fixed-height="true"
-              ></keyboard-layout>
-            </div>
+      <div
+        v-for="keyboard in sortedKeyboards"
+        :key="keyboard.id"
+        class="keyboard-preview"
+        :class="{
+          'opacity-50': keyboard.path && !keyboard.driveConnected,
+        }"
+        @click="selectKeyboard(keyboard)"
+      >
+        <div class="image">
+          <div class="h-full w-full overflow-hidden p-2">
+            <keyboard-layout
+              v-if="keyboard.keys"
+              :key-layout="keyboard.keys"
+              :keymap="keyboard.keymap"
+              :matrix-width="keyboard.cols"
+              :layouts="keyboard.layouts"
+              mode="static"
+              :fixed-height="true"
+            ></keyboard-layout>
           </div>
-          <div class="relative flex flex-grow flex-col">
-            <p v-if="serialKeyboards.find((a) => a.id === keyboard.id && !a.driveMounted)">
-              <span class="rounded bg-info p-1 text-xs"> Serial </span>
-            </p>
-            <p v-else-if="keyboard.path">
-              <span
-                v-if="serialKeyboards.find((a) => a.id === keyboard.id)"
-                class="mr-2 rounded bg-gray-600 p-1 text-xs"
-              >
-                Serial available
-              </span>
-              <span class="rounded bg-accent p-1 text-xs">USB Drive</span>
-            </p>
-            <p v-else><span class="rounded bg-error p-1 text-xs">Read Only Serial</span></p>
-            <button
-              class="btn-ghost btn-sm btn absolute top-0 right-0"
-              @click.stop="removeFromHistory(keyboard)"
+        </div>
+        <div class="relative flex flex-grow flex-col">
+          <p v-if="serialKeyboards.find((id, driveMounted) => id === keyboard.id && !driveMounted)">
+            <span class="rounded bg-info p-1 text-xs"> Serial </span>
+          </p>
+          <p v-else-if="keyboard.path">
+            <span
+              v-if="serialKeyboards.find((a) => a.id === keyboard.id)"
+              class="mr-2 rounded bg-gray-600 p-1 text-xs"
             >
-              <i class="mdi mdi-close"></i>
-            </button>
-            <p class="font-bold">{{ keyboard.name }}</p>
-            <p class="text-sm italic">{{ keyboard.manufacturer }}</p>
-            <p class="mt-2 mt-2 text-xs italic">{{ keyboard.path }}</p>
-            <p class="mt-2">{{ keyboard.description }}</p>
-            <div>
-              <div
-                v-for="tag in keyboard.tags"
-                :key="tag"
-                class="badge"
-                :style="{ backgroundColor: '#ea871a' }"
-              >
-                {{ tag }}
-              </div>
+              Serial available
+            </span>
+            <span v-if="keyboard.driveConnected" class="rounded bg-accent p-1 text-xs">USB Drive Mounted</span>
+            <span v-else class="rounded bg-error p-1 text-xs">USB Drive Disconnected</span>
+          </p>
+          <p v-else><span class="rounded bg-error p-1 text-xs">Read Only Serial</span></p>
+          <button
+            class="btn-ghost btn-sm btn absolute top-0 right-0"
+            @click.stop="removeFromHistory(keyboard)"
+          >
+            <i class="mdi mdi-close"></i>
+          </button>
+          <p class="font-bold">{{ keyboard.name }}</p>
+          <p class="text-sm italic">{{ keyboard.manufacturer }}</p>
+          <p class="mt-2 mt-2 text-xs italic">{{ keyboard.path }}</p>
+          <p class="mt-2" style="font-size: 12px">{{ keyboard.description }}</p>
+          <div class="mt-2">
+            <div
+              v-for="tag in keyboard.tags"
+              :key="tag"
+              class="badge badge-outline"
+            >
+              {{ tag }}
             </div>
           </div>
         </div>
+      </div>
     </TransitionGroup>
   </div>
 </template>
@@ -90,7 +97,7 @@ import {
   serialKeyboards
 } from '../store'
 import KeyboardLayout from '../components/KeyboardLayout.vue'
-import { onMounted, ref, watch } from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 const router = useRouter()
 
 selectedLayer.value = 0
@@ -109,8 +116,18 @@ const selectDrive = async () => {
   }
 }
 
+const sortedKeyboards = computed(()=>{
+  return keyboards.value.sort((a, b) => {
+    if (a.driveConnected && !b.driveConnected) return -1
+    if (!a.driveConnected && b.driveConnected) return 1
+    return 0
+  })
+})
+
 const selectKeyboard = async (keyboard) => {
-  const isSerial = serialKeyboards.value.find((a) => a.id === keyboard.id && !a.driveMounted)
+  const isSerial = serialKeyboards.value.find(
+    ({ id, driveMounted }) => id === keyboard.id && !driveMounted
+  )
   if (isSerial || !keyboard.path) {
     console.log('connectiong keyboard via serial')
     window.api.selectKeyboard({ id: keyboard.id })
@@ -156,17 +173,41 @@ const addSerialKeyboards = () => {
         description: board.description,
         manufacturer: board.manufacturer
       })
+    }else{
+      // update the port
+      keyboards.value.find((a) => a.id === board.id).port = board.port
     }
   })
 }
 
+const checkForUSBKeyboards = () => {
+  const keyboardPaths = keyboards.value.map((keyboard) => keyboard.path)
+  console.log('requesting usb keyboards', keyboardPaths)
+  window.api.checkForUSBKeyboards(keyboardPaths).then((keyboardConnections) => {
+    keyboardConnections.forEach((keyboard) => {
+      console.log(keyboard)
+      if (keyboard.connected){
+        // set connected state in the keyboard list
+        keyboards.value.find((a) => a.path === keyboard.path).driveConnected = true
+      }
+    })
+  })
+  console.log('updated kbs',keyboards.value)
+}
 watch(serialKeyboards, () => {
   addSerialKeyboards()
 })
+
+const refreshConnectedBoards = () => {
+  checkForUSBKeyboards()
+  addSerialKeyboards()
+}
+
 onMounted(() => {
   window.api.rescanKeyboards()
   // load the serial keyboards into the shown list
   addSerialKeyboards()
+  checkForUSBKeyboards()
 })
 </script>
 

@@ -22,6 +22,8 @@ then just run it with dev to start
 
 # Tasks
 ## urgent
+- [x] check if a keyboard is connected (usb drive) in the keyboard selector preview
+- [ ] show serial output in the gui
 - [ ] guides etc for setup + split workflow
 - [ ] share pog.json files
 - [ ] check if the controller you use even has the pin you specified (controller lookup and serial to get pins )

@@ -69,6 +69,7 @@
           contenteditable="true"
           spellcheck="false"
           style="line-height: 48px; max-height: 100px"
+          id="navTitle"
         >
           {{ currentRouteName }}
         </h1>
@@ -86,7 +87,7 @@
 <script lang="ts" setup>
 import { addToHistory, keyboardStore } from '../store'
 import { useRoute, useRouter } from 'vue-router'
-import { computed, ref } from 'vue'
+import {computed, onMounted, ref} from 'vue'
 const router = useRouter()
 const route = useRoute()
 
@@ -117,8 +118,20 @@ const currentRouteName = computed(() => route.matched[1].name)
 const menuOpen = ref(true)
 
 const iconClick = () => {
-  menuOpen.value = !menuOpen.value
+  // menuOpen.value = !menuOpen.value
+  reselectKeyboard()
 }
+onMounted(() => {
+  const title = document.getElementById('navTitle')
+  title?.addEventListener('blur', (e) => {
+    if (typeof currentRouteName.value === "string") {
+      title.innerText = currentRouteName.value
+    }
+  })
+    title?.addEventListener('focus', (e) => {
+      title.innerText = ""
+    })
+})
 </script>
 
 <style lang="scss" scoped>

@@ -172,10 +172,14 @@ const setupDone = () => {
   // if (!selectedConfig.value) return
   // if (!selectedConfig.value.layouts) selectedConfig.value.layouts = { keymap: [], labels: [] }
   // selectedConfig.value.layouts.keymap = tmpLayout.value;
+  if (keyboardStore.keymap.length === 0) {
+    // initialize it with one layer
+   keyboardStore.keymap = [[]]
+  }
   // save
   keyboardStore.coordMapSetup = false
   window.api.saveConfiguration(
-    JSON.stringify({ pogConfig: keyboardStore.serialize(), writeFirmware: false })
+    JSON.stringify({ pogConfig: keyboardStore.serialize() }) // here was a writeFirmware: false forgot what that did
   )
   // save config to localstorage
   addToHistory(keyboardStore)
