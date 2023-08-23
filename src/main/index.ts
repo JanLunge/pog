@@ -2,7 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import {checkForUSBKeyboards, handleSelectDrive, selectKeyboard} from './selectKeyboard'
+import { checkForUSBKeyboards, handleSelectDrive, selectKeyboard } from './selectKeyboard'
 import { updateFirmware } from './kmkUpdater'
 import { handleKeymapSave, saveConfiguration } from './saveConfig'
 import { autoUpdater } from 'electron-updater'
@@ -125,7 +125,8 @@ const createWindow = async () => {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      experimentalFeatures: true
     }
   })
 
@@ -178,6 +179,22 @@ app.on('window-all-closed', () => {
     app.quit()
   }
 })
+app.on('before-quit', (event) => {
+  // Prevent the default behavior of this event
+  if (debugPort !== undefined) {
+    event.preventDefault()
+
+    console.log('Preparing to quit...')
+    debugPort.close(() => {
+      console.log('Port closed')
+      debugPort = undefined
+      app.quit()
+    })
+  } else {
+    // Now allow the app to continue quitting
+    app.quit()
+  }
+})
 
 // In this file you can include the rest of your app"s specific main process
 // code. You can also put them in separate files and require them here.
@@ -193,6 +210,10 @@ ipcMain.handle('updateFirmware', () => updateFirmware())
 ipcMain.on('saveConfiguration', (_event, data) => saveConfiguration(data))
 ipcMain.handle('checkForUSBKeyboards', (_event, data) => checkForUSBKeyboards(data))
 ipcMain.handle('selectKeyboard', (_event, data) => selectKeyboard(data))
+ipcMain.handle('serialPorts', (_event, data) => checkSerialDevices())
+ipcMain.on('serialSend', (_event, data) => sendSerial(data))
+ipcMain.handle('serialConnect', (_event, data) => serialConnect(data))
+ipcMain.handle('openExternal', (_event, data) => openExternal(data))
 
 autoUpdater.on('update-available', () => {
   if (mainWindow) mainWindow.webContents.send('update_available')
@@ -246,7 +267,7 @@ const scanForKeyboards = async () => {
     circuitPythonPorts.map(async (a) => await timeout(getBoardInfo(a), 2000))
   )) as {
     status: 'fulfilled' | 'rejected'
-    value:  { name: string; id: string; path: string }
+    value: { name: string; id: string; path: string }
   }[]
   const filteredBoards: { name: string; id: string; path: string }[] = boards
     .filter((a) => a.value !== undefined)
@@ -434,4 +455,74 @@ const deselectKeyboard = () => {
   if (connectedKeyboardPort && connectedKeyboardPort.isConnected) {
     connectedKeyboardPort.close()
   }
+}
+
+const sendSerial = (message) => {
+  console.log('sending serial', message)
+  mainWindow?.webContents.send('serialData', { message: `> sent: ${message}\n` })
+  if (message === 'ctrlc') {
+    message = Buffer.from('\x03\x03', 'utf8')
+  } else if (message === 'ctrld') {
+    message = Buffer.from('\x04', 'utf8')
+  } else {
+    const buffermessage = Buffer.from(message + `\r\n`, 'utf8')
+    message = buffermessage
+  }
+  debugPort.write(message, (err) => {
+    if (err) {
+      console.error('error sending serial', err)
+    }
+  })
+}
+
+const checkSerialDevices = async () => {
+  try {
+    console.log('checking serial devices')
+    const ports = await serialPort.SerialPort.list()
+
+    if (ports.length === 0) {
+      console.log('No serial ports found')
+      return []
+    }
+
+    const returnPorts = ports.map((port) => {
+      return {
+        port: port.path,
+        manufacturer: port.manufacturer,
+        serialNumber: port.serialNumber,
+        // Add more attributes here if needed
+      }
+    })
+    console.log('found serial ports', returnPorts)
+    return returnPorts
+  } catch (error) {
+    console.error('Error fetching the list of serial ports:', error)
+    return []
+  }
+}
+
+let debugPort: any = undefined
+const serialConnect = async (port) => {
+  if (debugPort !== undefined) {
+    debugPort.close(() => {
+      console.log('closed serial port')
+      debugPort = undefined
+    })
+  }
+  console.log('connecting to serial port', port)
+  try {
+    debugPort = new serialPort.SerialPort({ path: port, baudRate, autoOpen: true }, (e) => {})
+    const parser = debugPort.pipe(new ReadlineParser({ delimiter: '\n' }))
+    parser.on('data', (data) => {
+      console.log('got data from serial', data)
+      mainWindow?.webContents.send('serialData', { message: data })
+    })
+    console.log('connected to serial port and listening for messages', port)
+  } catch (e) {
+    console.log('error connecting to serial port', e)
+  }
+}
+
+const openExternal = (url) => {
+  shell.openExternal(url)
 }

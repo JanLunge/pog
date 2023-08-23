@@ -306,7 +306,10 @@ export const renderLabel = (keycode: string) => {
     MRWD: { label: 'Prev Track', icon: 'mdi-skip-previous' },
     MFFD: { label: 'Next Track', icon: 'mdi-skip-next' },
     send_string: { label: 'String' },
-    RESET: { label: 'Reset' }
+    RESET: { label: 'Reset' },
+    RELOAD: { label: 'Reload' },
+        DEBUG: { label: 'Debug' }
+
   }
 
   const keylabel: {

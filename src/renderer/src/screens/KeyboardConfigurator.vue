@@ -60,21 +60,27 @@
       <li>
         <router-link to="/configurator/firmware"><i class="mdi mdi-flash"></i>Firmware</router-link>
       </li>
+      <li>
+        <router-link to="/configurator/debug"><i class="mdi mdi-bug"></i>Debug</router-link>
+      </li>
       <!--      <li><router-link to="/configurator/community">Community</router-link></li>-->
     </ul>
     <div class="flex h-full w-full flex-col overflow-y-auto">
       <div class="z-10 flex items-center justify-between bg-base-100 py-4 shadow-xl">
         <h1
+          id="navTitle"
           class="flex-grow overflow-auto text-center text-4xl font-bold"
           contenteditable="true"
           spellcheck="false"
           style="line-height: 48px; max-height: 100px"
-          id="navTitle"
         >
           {{ currentRouteName }}
         </h1>
+        <div class="btn-ghost btn mr-4" @click="info">
+          <i class="mdi mdi-help-circle-outline text-2xl"></i>
+        </div>
         <div class="btn-primary btn mr-4" @click="saveKeymap">
-          <i class="mdi mdi-content-save text-xl"></i>
+          <i class="mdi mdi-content-save text-2xl"></i>
         </div>
       </div>
       <div class="flex-grow overflow-y-auto bg-base-200 px-4 pt-4">
@@ -87,7 +93,7 @@
 <script lang="ts" setup>
 import { addToHistory, keyboardStore } from '../store'
 import { useRoute, useRouter } from 'vue-router'
-import {computed, onMounted, ref} from 'vue'
+import { computed, onMounted, ref } from 'vue'
 const router = useRouter()
 const route = useRoute()
 
@@ -123,15 +129,20 @@ const iconClick = () => {
 }
 onMounted(() => {
   const title = document.getElementById('navTitle')
-  title?.addEventListener('blur', (e) => {
-    if (typeof currentRouteName.value === "string") {
+  title?.addEventListener('blur', () => {
+    if (typeof currentRouteName.value === 'string') {
       title.innerText = currentRouteName.value
     }
   })
-    title?.addEventListener('focus', (e) => {
-      title.innerText = ""
-    })
+  title?.addEventListener('focus', () => {
+    title.innerText = ''
+  })
 })
+
+const info = () => {
+  // TODO: open a browser window with the help docs for this route
+  window.api.openExternal('https://pog.heaper.de/docs/intro')
+}
 </script>
 
 <style lang="scss" scoped>

@@ -117,7 +117,7 @@ const selectDrive = async () => {
 }
 
 const sortedKeyboards = computed(()=>{
-  return keyboards.value.sort((a, b) => {
+  return [ ...keyboards.value ].sort((a, b) => {
     if (a.driveConnected && !b.driveConnected) return -1
     if (!a.driveConnected && b.driveConnected) return 1
     return 0
@@ -175,7 +175,9 @@ const addSerialKeyboards = () => {
       })
     }else{
       // update the port
-      keyboards.value.find((a) => a.id === board.id).port = board.port
+      console.log('adding port to keyboard', board.id, board.port, board.serialNumber)
+      // keyboards.value.find((a) => a.id === board.id).port = board.port
+      // keyboards.value.find((a) => a.id === board.id).serialNumber = board.serialNumber
     }
   })
 }

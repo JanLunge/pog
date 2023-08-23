@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import {addToHistory, keyboardHistory, keyboardStore, notifications, serialKeyboards} from './store'
+import {addToHistory, keyboardStore, notifications, serialKeyboards} from './store'
 import { useRouter} from "vue-router";
 const router = useRouter()
 const store = computed(() => {

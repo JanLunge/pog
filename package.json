@@ -1,6 +1,6 @@
 {
   "name": "pog",
-  "version": "0.9.5",
+  "version": "1.0.0",
   "description": "A KMK firmware configurator",
   "main": "./out/main/index.js",
   "author": "Jan Lunge",

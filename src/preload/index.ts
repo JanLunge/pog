@@ -17,8 +17,14 @@ export const API = {
   },
   rescanKeyboards: () => ipcRenderer.invoke('rescanKeyboards'),
   checkForUSBKeyboards: (data) => ipcRenderer.invoke('checkForUSBKeyboards', data),
-  deselectKeyboard: () => ipcRenderer.invoke('deselectKeyboard')
-
+  deselectKeyboard: () => ipcRenderer.invoke('deselectKeyboard'),
+  serialData: (callback) =>
+    ipcRenderer.on('serialData', callback),
+  serialPorts: () =>
+    ipcRenderer.invoke('serialPorts'),
+  serialSend: (data) => ipcRenderer.send('serialSend', data),
+  serialConnect: (data) => ipcRenderer.invoke('serialConnect', data),
+  openExternal: (data) => ipcRenderer.invoke('openExternal', data),
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

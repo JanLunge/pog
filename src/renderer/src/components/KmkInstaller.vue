@@ -26,12 +26,16 @@
       </div>
     </div>
     <div class="mt-8 flex justify-center">
-      <button class="btn-primary btn mt-4 block" @click="$emit('next')">
-        {{ keyboardStore.firmwareInstalled ? 'Next' : 'skip' }}
+      <button v-if="keyboardStore.firmwareInstalled" class="btn btn-primary mt-4 block" @click="$emit('next')">
+        Next
+      </button>
+      <button v-else class="btn mt-4 block" @click="$emit('next')">
+              I install it manually
+
       </button>
     </div>
     <div v-if="[''].includes(kmkInstallState)" class="mt-8 flex justify-center items-center flex-col">
-      <button class="btn-primary btn mt-8" @click="updateKMK">install KMK</button>
+      <button class="btn-primary btn mt-8" @click="updateKMK"> {{keyboardStore.firmwareInstalled? 'update': 'install'}} KMK</button>
 
     </div>
     <div class="mt-4 flex flex-col items-center justify-center" v-if="['downloading', 'copying', 'unpacking'].includes(kmkInstallState)" >

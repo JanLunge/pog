@@ -251,12 +251,15 @@ export class Key {
 export class Keyboard {
   id = ulid()
   path?: string = undefined
-  port?: string = undefined // only set when serial is available
-  usingSerial = false
   name = ''
   manufacturer = ''
   tags: string[] = []
   description = ''
+
+  // serial interface
+  port?: string = undefined // only set when serial is available
+  usingSerial = false
+  serialNumber = ''
 
   driveConnected = false
   driveContents: string[] = []
@@ -395,10 +398,10 @@ export class Keyboard {
     serial
   }: {
     path: string
-    codeContents: string
+    codeContents?: string
     configContents: any
     folderContents: string[]
-    serial: boolean
+    serial?: boolean
   }) {
     this.clear()
     this.id = ulid()
@@ -552,4 +555,4 @@ export const userSettings = useStorage('user-settings', {
   autoSelectNextKey: false
 })
 
-export const serialKeyboards = ref([])
+export const serialKeyboards = ref<any[]>([])

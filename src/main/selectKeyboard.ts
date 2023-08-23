@@ -45,15 +45,19 @@ const loadKeyboard = async (path) => {
 }
 export const selectKeyboard = async ({ path, id }: { path: string; id: string }) => {
   console.log(path,id)
+  if(id){
+    // connect serial if available
+    const port = serialBoards.value.find((a) => a.id === id)
+    if(!port) return { error:'not a serial keyboard' }
+    console.log(serialBoards, id)
+    await connectSerialKeyboard(port)
+    connectedKeyboardPort.write('info\n')
+  }
   if (path) {
     console.log('checking keyboard files for', path)
     return await loadKeyboard(path)
   } else if (id) {
     console.log('connecting serial keyboard')
-    const port = serialBoards.value.find((a) => a.id === id)
-    console.log(serialBoards, id)
-    await connectSerialKeyboard(port)
-    connectedKeyboardPort.write('info\n')
     return { success: true }
   }
   return { error: 'not all args provided' }
