@@ -1,19 +1,24 @@
-# pog
-keyboard flashing utility
+![logo](demo/pog-header.png?raw=true)
+<h1 align="center">POG</h1>
+<h4 align="center">
+KMK GUI, Layout Editor, Keymap Editor, Flashing Utility
+</h4>
+<p align="center">
+    <a href="https://github.com/JanLunge/pog/stargazers"><img src="https://img.shields.io/github/stars/JanLunge/pog" alt="Stars Badge"/></a>
+    <a href="https://github.com/JanLunge/pog/network/members"><img src="https://img.shields.io/github/forks/JanLunge/pog" alt="Forks Badge"/></a>
+    <img src="https://badgen.net/badge/version/v1.0.5" alt="">
+</p>
 
-POG stands for Pog Open Gui
+![preview](demo/pog-screenshot.png?raw=true)
 
-![version](https://badgen.net/badge/version/v0.5.0/green )
+# Installation
+pre built binaries for Windows, Mac and Linux are available in the [releases](https://github.com/JanLunge/pog/releases)
 
-![logo](build/icon.png?raw=true)
-
-![preview](resources/pog-thumbnail.png?raw=true)
-
+# Develompment Setup
 ## dependencies
 * node 16
 * yarn
 
-## Setup
 install everything with
 `yarn`
 then just run it with dev to start
@@ -25,13 +30,15 @@ then just run it with dev to start
 - [x] check if a keyboard is connected (usb drive) in the keyboard selector preview
 - [x] show serial output in the gui
 - [ ] automatically get the correct serial device (by serial number)
-- [ ] guides etc for setup + split workflow | help menu + videos
+- [ ] guides etc. for setup + split workflow | help menu + videos
+- [ ] save wiring info in qr code or so
 - [ ] share pog.json files
 - [ ] check if the controller you use even has the pin you specified (controller lookup and serial to get pins )
-- [ ] bluetooth workflow
 - [ ] generate layout based on matrix + clear layout button / delete multiple
+- [ ] features case-insensitive and via gui or pog json
 
-## features
+## features wishlist
+- [ ] bluetooth workflow
 - [ ] language switcher for german and other layouts changing the labels on the keymap
 - [ ] modtap/tapdance/macros/sequences
 - [ ] encoder support direct pin click
@@ -39,6 +46,8 @@ then just run it with dev to start
 - [ ] wiring preview
 
 ## done
+- [x] 1 row / 1col says pin has no len()
+- [x] overwrite on first flash
 - [x] boot.py generation
 - [x] versioning for python files
 - [x] direct pin wiring support
@@ -49,7 +58,7 @@ then just run it with dev to start
 - [x] adjust keymap when matrix changes
 - [x] drag and drop keys
 
-## Project Setup
+## Using Electron
 
 ### Install
 

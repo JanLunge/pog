@@ -21,9 +21,9 @@
       <div class="key" @click="setKey('KC.F11')">F11</div>
       <div class="key" @click="setKey('KC.F12')">F12</div>
       <div class="blocker-half"></div>
-      <div class="key" @click="setKey('KC.PSCREEN')">Print Screen</div>
-      <div class="key" @click="setKey('KC.SCROLLLOCK')">Scroll Lock</div>
-      <div class="key" @click="setKey('KC.PAUSE')">Pause</div>
+      <div class="key sm" @click="setKey('KC.PSCREEN')">Print Screen</div>
+      <div class="key sm" @click="setKey('KC.SCROLLLOCK')">Scroll Lock</div>
+      <div class="key sm" @click="setKey('KC.PAUSE')">Pause</div>
       <div class="blocker-half"></div>
       <div class="blocker-full"></div>
       <div class="blocker-full"></div>
@@ -46,11 +46,11 @@
       <div class="key" @click="setKey('KC.EQL')"><span>+</span><span>=</span></div>
       <div class="key key-2u" @click="setKey('KC.BSPC')">Bksp</div>
       <div class="blocker-half"></div>
-      <div class="key" @click="setKey('KC.INSERT')">Insert</div>
-      <div class="key" @click="setKey('KC.HOME')">Home</div>
-      <div class="key" @click="setKey('KC.PGUP')">Page Up</div>
+      <div class="key sm" @click="setKey('KC.INSERT')">Insert</div>
+      <div class="key sm" @click="setKey('KC.HOME')">Home</div>
+      <div class="key sm" @click="setKey('KC.PGUP')">Page Up</div>
       <div class="blocker-half"></div>
-      <div class="key" @click="setKey('KC.NUMLOCK')">Num Lock</div>
+      <div class="key sm" @click="setKey('KC.NUMLOCK')">Num Lock</div>
       <div class="key" @click="setKey('KC.KP_SLASH')">/</div>
       <div class="key" @click="setKey('KC.KP_ASTERISK')">*</div>
       <div class="key" @click="setKey('KC.KP_MINUS')">-</div>
@@ -73,7 +73,7 @@
       <div class="blocker-half"></div>
       <div class="key" @click="setKey('KC.DEL')">Del</div>
       <div class="key" @click="setKey('KC.END')">End</div>
-      <div class="key" @click="setKey('KC.PGDOWN')">Page Down</div>
+      <div class="key sm" @click="setKey('KC.PGDOWN')">Page Down</div>
       <div class="blocker-half"></div>
       <div class="key" @click="setKey('KC.KP_7')">7</div>
       <div class="key" @click="setKey('KC.KP_8')">8</div>
@@ -127,7 +127,7 @@
       <div class="key" @click="setKey('KC.KP_1')">1</div>
       <div class="key" @click="setKey('KC.KP_2')">2</div>
       <div class="key" @click="setKey('KC.KP_3')">3</div>
-      <div class="key" @click="setKey('KC.KP_ENTER')">Num Enter</div>
+      <div class="key sm" @click="setKey('KC.KP_ENTER')">Num Enter</div>
     </div>
     <div class="row">
       <div class="key key-1-25u" @click="setKey('KC.LCTL')">LCtrl</div>
@@ -148,7 +148,7 @@
       <div class="key" @click="setKey('KC.KP_0')">0</div>
       <div class="key" @click="setKey('KC.KP_0')">0</div>
       <div class="key" @click="setKey('KC.KP_DOT')">.</div>
-      <div class="key" @click="setKey('KC.KP_ENTER')">Num Enter</div>
+      <div class="key sm" @click="setKey('KC.KP_ENTER')">Num Enter</div>
     </div>
 
   </div>
@@ -354,7 +354,9 @@ onMounted(()=>{
     line-height: 16px;
     border: 1px solid #555;
     cursor: pointer;
-
+    &.sm{
+      font-size: 10px;
+    }
     i.mdi{
       font-size: 18px;
     }

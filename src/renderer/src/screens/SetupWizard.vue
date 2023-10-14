@@ -3,8 +3,8 @@
     <div class="flex-grow-0">
       <h1 class="my-4 mt-8 text-center text-5xl font-bold">Initial Keyboard Setup</h1>
       <div class="mb-8 flex items-center justify-center gap-4 text-center">
-        <div class="badge-primary badge-outline badge p-4">Keyboard: {{ keyboardStore.path }}</div>
-        <div class="btn-primary btn-circle btn" @click="$router.push('/')">
+        <div class="badge badge-primary badge-outline p-4">Keyboard: {{ keyboardStore.path }}</div>
+        <div class="btn btn-circle btn-primary" @click="$router.push('/')">
           <i class="mdi mdi-sync text-xl"></i>
         </div>
       </div>

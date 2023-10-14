@@ -16,130 +16,73 @@ import {
 // save code.py based on pog.json
 
 export const saveConfiguration = (data: string) => {
-  const { pogConfig, serial, overwriteFiles } = JSON.parse(data)
+  const { pogConfig, serial, overwriteFiles, writeFirmware } = JSON.parse(data)
   if (serial) {
     // write by serial to current keyboard
     console.log('writing firmware vio usb serial')
     writePogConfViaSerial(JSON.stringify(pogConfig, null, 4))
   } else {
     // write pog.json
-    console.log('writing firmware via usb files')
+    console.log('writing firmware via usb files', 'overwriting Firmware:', writeFirmware)
     fs.writeFile(currentKeyboard.path + '/pog.json', JSON.stringify(pogConfig, null, 4), () => {
       console.log('pog File written successfully\n')
     })
 
-    saveKeyboardConfig(pogConfig) // initialize files if they don't exist
+    saveKeyboardConfig(pogConfig, writeFirmware) // initialize files if they don't exist
     handleKeymapSave({ pogConfig, serial: false })
   }
 }
-export const saveKeyboardConfig = (pogConfig) => {
-  // TODO: remove at some point from reference
-  // this is now all moved to the pog.json file
 
-  // const coordmapstring = () => {
-  //   if (pogConfig.coordMap.length === 0) return ''
-  //   let str = '    coord_mapping = [\n'
-  //   pogConfig.coordMap.forEach((row) => {
-  //     str += '    ' + row.join(',') + ',\n'
-  //   })
-  //   str += '    ]'
-  //   return str.replaceAll(/spc,/gi, '    ')
-  // }
-
-  // write kb.py for basic config
-  // let pinSetup = ``
-  // const renderPin = (pin) => {
-  //   if (pogConfig.pinPefix === 'board') return `board.${pin}`
-  //   if (pogConfig.pinPefix === 'gp') return `board.GP${pin}`
-  //   if (pogConfig.pinPefix === 'quickpin') return `pins[${pin}]`
-  //   return pin
-  // }
-  //   if (pogConfig.wiringMethod === 'matrix') {
-  //     pinSetup = `
-  //     col_pins = (${pogConfig.colPins.map((a) => renderPin(a)).join(', ')})
-  //     row_pins = (${pogConfig.rowPins.map((a) => renderPin(a)).join(', ')})
-  //     diode_orientation = DiodeOrientation.${pogConfig.diodeDirection}
-  // ${coordmapstring()}
-  // `
-  //   } else {
-  //   pinSetup = `
-  //   def __init__(self):
-  //       # create and register the scanner
-  //       self.matrix = KeysScanner(
-  //           # require argument:
-  //           pins=[${pogConfig.directPins.map((a) => 'board.GP' + a).join(', ')}],
-  //           # optional arguments with defaults:
-  //           value_when_pressed=False,
-  //           pull=True,
-  //           interval=0.02,  # Debounce time in floating point seconds
-  //           max_events=64
-  //       )
-  //   `
-  // }
-  // const quickpinSupport =
-  //   pogConfig.pinPrefix === 'quickpin'
-  //     ? `from kmk.quickpin.pro_micro.nice_nano import pinout as pins `
-  //     : ''
-  //   const kbConfig = `# KB base config
-  // import board
-  // from kmk.kmk_keyboard import KMKKeyboard as _KMKKeyboard
-  // from kmk.scanners import DiodeOrientation
-  // from kmk.scanners.keypad import KeysScanner
-  //
-  // class KMKKeyboard(_KMKKeyboard):
-  //     ${pinSetup}
-  //  `
-  //   console.log(quickpinSupport)
-
-  // add option to overwrite files eg. force flash
-  // add pog helper and keyboard setup
-
-  if (!fs.existsSync(currentKeyboard.path + '/kb.py')) {
-    fs.writeFile(currentKeyboard.path + '/kb.py', kbpy, () => {
-      console.log('kb File written successfully')
-    })
-  }
-  // save pog helper
-
-  if (!fs.existsSync(currentKeyboard.path + '/pog.py')) {
-    fs.writeFile(currentKeyboard.path + '/pog.py', pogpy, () => {
-      console.log('pogpy File written successfully')
-    })
-  }
-
-  if (!fs.existsSync(currentKeyboard.path + '/code.py')) {
-    fs.writeFile(currentKeyboard.path + '/code.py', codepy, () => {
-      console.log('Firmware File written successfully')
-    })
-  }
-  if (!fs.existsSync(currentKeyboard.path + '/coordmaphelper.py')) {
-    fs.writeFile(currentKeyboard.path + '/coordmaphelper.py', coordmaphelperpy, () => {
-      console.log('coord map helper File written successfully')
-    })
-  }
-  if (!fs.existsSync(currentKeyboard.path + '/customkeys.py')) {
-    fs.writeFile(currentKeyboard.path + '/customkeys.py', customkeyspy, () => {
-      console.log('customkeys File created successfully')
-    })
-  }
-  if (!fs.existsSync(currentKeyboard.path + '/boot.py')) {
-    fs.writeFile(currentKeyboard.path + '/boot.py', bootpy, () => {
-      console.log('bootpy File created successfully')
-    })
-  }
-  if (!fs.existsSync(currentKeyboard.path + '/pog_serial.py')) {
-    fs.writeFile(currentKeyboard.path + '/pog_serial.py', pog_serialpy, () => {
-      console.log('pog serial File created successfully')
+const flashFileToKB = ({fileName, overwrite, fileContents }) => {
+ if (!fs.existsSync(currentKeyboard.path + '/' + fileName) || overwrite) {
+    fs.writeFile(currentKeyboard.path + '/' + fileName, fileContents, () => {
+      console.log(fileName + 'File written successfully')
     })
   }
 }
 
-// is now handled with a flag in pog.json
-// export const saveCoordMapHelper = () => {
-//   fs.writeFile(currentKeyboard.path + '/coordmaphelper.py', coordmaphelperpy, () => {
-//     console.log('coord map helper File created successfully')
-//   })
-// }
+export const saveKeyboardConfig = (pogConfig, writeFirmware) => {
+  // TODO: add option to overwrite files eg. force flash (writeFirmware)
+
+  // add pog helper and keyboard setup
+  flashFileToKB({
+    fileName: 'kb.py',
+    overwrite: writeFirmware,
+    fileContents: kbpy
+  })
+
+  // save pog helper
+  flashFileToKB({
+    fileName: 'pog.py',
+    overwrite: writeFirmware,
+    fileContents: pogpy
+  })
+  flashFileToKB({
+    fileName: 'code.py',
+    overwrite: writeFirmware,
+    fileContents: codepy
+  })
+  flashFileToKB({
+    fileName: 'coordmaphelper.py',
+    overwrite: writeFirmware,
+    fileContents: coordmaphelperpy
+  })
+  flashFileToKB({
+    fileName: 'customkeys.py',
+    overwrite: writeFirmware,
+    fileContents: customkeyspy
+  })
+  flashFileToKB({
+    fileName: 'boot.py',
+    overwrite: writeFirmware,
+    fileContents: bootpy
+  })
+  flashFileToKB({
+    fileName: 'pog_serial.py',
+    overwrite: writeFirmware,
+    fileContents: pog_serialpy
+  })
+}
 
 export const handleKeymapSave = ({ pogConfig, serial }) => {
   // const codeblockraw = fs.readFileSync(`${keyboardPath}/code.py`, {encoding:'utf8', flag:'r'})

@@ -7,7 +7,7 @@
 
     <div class="mb-4">
       <p class="mb-2 text-sm">Wiring Method</p>
-      <select v-model="keyboardStore.wiringMethod" class="select-bordered select w-full">
+      <select v-model="keyboardStore.wiringMethod" class="select select-bordered w-full">
         <option value="matrix">Matrix</option>
         <option value="direct">Direct Pins</option>
       </select>

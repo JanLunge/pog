@@ -1,27 +1,47 @@
 <template>
+  <dialog id="flash_modal" class="modal">
+    <div class="modal-box">
+      <h3 class="text-lg font-bold">Attention</h3>
+      <p class="py-4">
+        Flashing the pog utilities on to the keyboard will delete the code.py and similar files from
+        the keyboard.
+      </p>
+      <p class="py-4">Be sure to backup your code if you still need any of it.</p>
+      <div class="flex justify-between">
+        <div class="btn">Abort</div>
+        <div class="btn btn-warning" @click="flashCoordMapping({overwrite: true})">Flash POG</div>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button>close</button>
+    </form>
+  </dialog>
   <div>
     <p class="py-4">1. install the debug code on the keyboard</p>
-    <button class="btn-primary btn btn-sm" @click="flashCoordMapping">
+    <button class="btn btn-primary btn-sm" @click="promptFlashing">
       Flash CoordMap Finder to keyboard
     </button>
     <div>
       <p class="py-4">2. Click the text area and follow the guide below</p>
+
+      <p class="mb-4">
+        3. Now press each key starting in the top left corner in the first row and moving to the right
+        when you reached the end press the last key once again to start with the next row
+      </p>
+
+      <p class="py-4">if nothing is happening first replug the board in case it hasnt started and wait 5 seconds. if this did not help check the diode direction or pins.</p>
       <textarea
         id="keycapture"
         v-model="coordmap"
-        class="textarea-bordered textarea w-full font-mono"
+        class="textarea textarea-bordered w-full font-mono"
       ></textarea>
     </div>
     <div class="flex gap-2 py-4">
-      <button class="btn-primary btn" @click="addRow">new Row</button>
-      <button class="btn-primary btn" @click="addSpc">add Space</button>
-      <button class="btn-primary btn" @click="rmLast">remove last</button>
-      <button class="btn-primary btn" @click="clear">clear</button>
+      <button class="btn btn-primary" @click="addRow">new Row</button>
+      <button class="btn btn-primary" @click="addSpc">add Space</button>
+      <button class="btn btn-primary" @click="rmLast">remove last</button>
+      <button class="btn btn-primary" @click="clear">clear</button>
     </div>
-    <p class="mb-4">
-      3. Now press each key starting in the top left corner in the first row and moving to the right
-      when you reached the end press the last key once again to start with the next row
-    </p>
 
     <div>
       <KeyboardLayout
@@ -35,15 +55,18 @@
       <pre class="my-2 rounded bg-base-300 p-4">{{ coordmapstring }}</pre>
     </div>
     <div class="flex gap-2">
-
-    <button class="btn-primary btn mt-2" @click="done">
-      {{ initialSetup ? 'next' : 'save Coord Maping & create keyboard layout' }}
-    </button>
-    <button class="btn-primary btn mt-2" @click="onlySave"  v-if="!initialSetup">
-      only save Coord Maping
-    </button>
+      <button class="btn btn-primary mt-2" @click="done">
+        {{ initialSetup ? 'next' : 'save Coord Maping & create keyboard layout' }}
+      </button>
+      <button class="btn-primary btn mt-2" @click="onlySave"  v-if="!initialSetup">
+        only save Coord Maping
+      </button>
     </div>
-    <p class="my-4">note if your key indexes changed you need to rebuild your layout or adjust the indexes on the layout editor, only saving the coord map is only advisable if you wanted to modify spacings but not the order of the keys</p>
+    <p class="my-4">
+      note if your key indexes changed you need to rebuild your layout or adjust the indexes on the
+      on the layout editor, only saving the coord map is only advisable if you wanted to modify
+      spacings but not the order of the keys
+    </p>
   </div>
 </template>
 
@@ -52,7 +75,7 @@ import { computed, ref } from 'vue'
 import KeyboardLayout from './KeyboardLayout.vue'
 import { Key, keyboardStore, KeyInfo } from '../store'
 const coordmap = ref('')
- defineProps(['initialSetup'])
+const props = defineProps(['initialSetup'])
 const emits = defineEmits(['next'])
 
 console.log('loading coordmap', keyboardStore.coordMap)
@@ -78,10 +101,21 @@ const done = () => {
 const onlySave = () => {
   keyboardStore.coordMap = keys.value
 }
-const flashCoordMapping = async () => {
-  keyboardStore.coordMapSetup = true
+const promptFlashing = () => {
+  if(props.initialSetup){
+    // after valid ok then flash file with overwrite on
+    (document.getElementById("flash_modal") as HTMLDialogElement).showModal()
+  } else {
+    flashCoordMapping({overwrite: false})
+  }
+}
+const flashCoordMapping = async ({ overwrite } : {overwrite: boolean}) => {
+  console.log('flashCoordMapping with overwrite:', overwrite)
+  keyboardStore.coordMapSetup = true;
+  (document.getElementById("flash_modal") as HTMLDialogElement).close()
+  overwrite = Boolean(overwrite)
   await window.api.saveConfiguration(
-    JSON.stringify({ pogConfig: keyboardStore.serialize(), writeFirmware: false, writeCoordMapHelper: true })
+    JSON.stringify({ pogConfig: keyboardStore.serialize(), writeFirmware: overwrite, writeCoordMapHelper: true })
   )
 }
 const keys = computed(() => {

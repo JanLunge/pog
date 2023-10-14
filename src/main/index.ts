@@ -260,9 +260,15 @@ const scanForKeyboards = async () => {
   console.log('checking for connected keyboards via serial')
   if (connectedKeyboardPort && connectedKeyboardPort.isOpen) connectedKeyboardPort.close()
   const ports = await serialPort.SerialPort.list()
-  const circuitPythonPorts = ports //.filter(port => {
-  //     return port.manufacturer && ['0xCB'].includes(port.manufacturer)
-  // });
+  console.log('found the following raw ports:', ports)
+  const circuitPythonPorts = ports.filter(port => {
+    // TODO: make sure the port is used for a pog keyboard
+    // we dont want to send serial data to a REPL that is not a keyboard with pog firmware
+    // maybe whitelist serialnumbers?
+    let manufacturer = port.manufacturer
+    manufacturer = manufacturer ? manufacturer.toLowerCase() : ''
+    return manufacturer.endsWith("-pog") || manufacturer.startsWith("pog-") || manufacturer === 'pog'
+  });
   const boards = (await Promise.allSettled(
     circuitPythonPorts.map(async (a) => await timeout(getBoardInfo(a), 2000))
   )) as {

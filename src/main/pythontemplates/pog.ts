@@ -1,4 +1,4 @@
-export const pogpy =`# pog.py Import the pog config - v0.9.5
+export const pogpy = `# pog.py Import the pog config - v0.9.5
 import json
 import board
 from kmk.keys import KC
@@ -24,26 +24,34 @@ print("starting keyboard %s (%s)" % (config["name"], config["id"]))
 def renderPin(pin):
     if config["pinPrefix"] == "gp":
         return "board.GP" + pin
-    if config["pinPrefix"] == "board":
+    elif config["pinPrefix"] == "board":
         return "board." + pin
-    if config["pinPrefix"] == "quickpin":
+    elif config["pinPrefix"] == "quickpin":
         return "pins[" + pin + "]"
+    else:
+        return pin
 
 
 colPinsArray = []
 for i, item in enumerate(config["colPins"]):
     colPinsArray.append(renderPin(item))
 colPins = ",".join(colPinsArray)
+if len(colPinsArray) == 1:
+    colPins = colPins + ","
 
 rowPinsArray = []
 for i, item in enumerate(config["rowPins"]):
     rowPinsArray.append(renderPin(item))
 rowPins = ",".join(rowPinsArray)
+if len(rowPinsArray) == 1:
+    rowPins = rowPins + ","
 
 pinsArray = []
 for i, item in enumerate(config["directPins"]):
     pinsArray.append(renderPin(item))
 pins = ",".join(pinsArray)
+if len(pinsArray) == 1:
+    pins = pins + ","
 
 matrixWiring = False
 directWiring = False
@@ -104,4 +112,9 @@ if config.get('splitPinA'):
     splitPinA = eval(renderPin(config['splitPinA']))
 if config.get('splitPinB'):
     splitPinB = eval(renderPin(config['splitPinB']))
+
+# led pin without prefix for now
+if config.get('ledPin'):
+  ledPin = eval(config.get('ledPin'))
+  ledLength = int(config.get('ledLength'))
 `

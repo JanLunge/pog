@@ -6,21 +6,9 @@
       </div>
       <p class="pt-6">Effortlessly customize your keyboard with Pog</p>
     </div>
-    <div class="text-2xl font-bold">Your Keyboards</div>
-    <div class="divider"></div>
-    <div class="my-4 flex flex-col items-center justify-center gap-2">
-      <p>select the circuit python drive of your keyboard</p>
-      <button class="btn-primary btn" @click="selectDrive">
-        <i class="mdi mdi-plus mr-1 text-lg"></i><span class="text-xs">add new keyboard</span>
-      </button>
-    </div>
-    <div class="text-center italic opacity-50">
-      (Note: your controller needs to be running
-      <a href="https://circuitpython.org/downloads" target="_blank" class="link">circuit python</a>)
-    </div>
-    <div class="divider"></div>
-    <div class="flex justify-end">
-      <button class="btn btn-sm" @lick="refreshConnectedBoards">Refresh Keyboard List</button>
+    <div v-if="sortedKeyboards.length !== 0" class="divider"></div>
+    <div class="absolute right-2 top-40 flex justify-end">
+      <button class="btn btn-sm" @lick="refreshConnectedBoards"><i class="mdi mdi-refresh"></i></button>
     </div>
     <TransitionGroup name="list" tag="ul" class="keyboard-list">
       <div
@@ -45,7 +33,7 @@
             ></keyboard-layout>
           </div>
         </div>
-        <div class="relative flex flex-grow flex-col">
+        <div class="relative flex flex-grow flex-col pr-14">
           <p v-if="serialKeyboards.find((id, driveMounted) => id === keyboard.id && !driveMounted)">
             <span class="rounded bg-info p-1 text-xs"> Serial </span>
           </p>
@@ -61,7 +49,7 @@
           </p>
           <p v-else><span class="rounded bg-error p-1 text-xs">Read Only Serial</span></p>
           <button
-            class="btn-ghost btn-sm btn absolute top-0 right-0"
+            class="btn btn-xs btn-error absolute right-0 top-0 opacity-50 hover:opacity-100"
             @click.stop="removeFromHistory(keyboard)"
           >
             <i class="mdi mdi-close"></i>
@@ -82,6 +70,17 @@
         </div>
       </div>
     </TransitionGroup>
+    <div class="divider"></div>
+    <div class="my-4 flex flex-col items-center justify-center gap-2">
+      <p>select the circuit python drive of your keyboard</p>
+      <button class="btn-primary btn" @click="selectDrive">
+        <i class="mdi mdi-plus mr-1 text-lg"></i><span class="text-xs">add new keyboard</span>
+      </button>
+    </div>
+    <div class="text-center italic opacity-50">
+      (Note: your controller needs to be running
+      <a href="https://circuitpython.org/downloads" target="_blank" class="link">circuit python</a>)
+    </div>
   </div>
 </template>
 

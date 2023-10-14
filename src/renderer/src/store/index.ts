@@ -308,6 +308,7 @@ export class Keyboard {
   // Keys
   setKeys(keys: KeyInfo[]) {
     this.keys = []
+    if (!keys||keys.length === 0) return
     keys.forEach((key) => {
       const tmpKey = new Key({ ...key, keyboard: this })
       this.keys.push(tmpKey)

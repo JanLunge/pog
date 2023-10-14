@@ -56,6 +56,19 @@ class KMKKeyboard(_KMKKeyboard):
             self.encoder_handler.pins = pog.encoders
             self.modules.append(self.encoder_handler)
 
+        if "rgb" in features:
+            from kmk.extensions.RGB import RGB
+            rgb = RGB(
+                pixel_pin=board.GP3,
+                num_pixels=16,
+                rgb_order=(1, 0, 2),
+                val_limit=40, # Maximum brightness level. Only change if you know what you are doing!
+                hue_default=10,
+                sat_default=255,
+                val_default=20,
+            )
+            self.extensions.append(rgb)
+
 
     # matrix wiring
     if pog.matrixWiring:

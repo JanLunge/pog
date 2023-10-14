@@ -20,17 +20,45 @@ module.exports = {
   },
   plugins: [require('daisyui')],
   daisyui: {
-    darkTheme: 'halloween',
-    themes:[
-      {
-        halloween:{
-          ...require("daisyui/src/colors/themes")["[data-theme=halloween]"],
-          primary: '#ef8f4c',
-          'base-100': '#171717',
-          'base-200': '#252525',
-          'base-300': '#383838',
-        }
-      }
+    // themes: false, // true: all themes | false: only light + dark | array: specific themes like this ["light", "dark", "cupcake"]
+    darkTheme: "worange", // name of one of the included themes for dark mode
+    base: true, // applies background color and foreground color for root element by default
+    styled: true, // include daisyUI colors and design decisions for all components
+    utils: true, // adds responsive and modifier utility classes
+    rtl: false, // rotate style direction from left-to-right to right-to-left. You also need to add dir="rtl" to your html tag and install `tailwindcss-flip` plugin for Tailwind CSS.
+    prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names. Not colors)
+    logs: true, // Shows info about daisyU
+    themes: [
+    {
+        worange: {
+         "color-scheme": "dark",
+          "primary-content": "#131616",
+          "secondary": "#6d3a9c",
+          "accent": "#51a800",
+          "accent-content": "#000000",
+          "neutral": "#2F1B05",
+          "info": "#2563eb",
+          "success": "#16a34a",
+          "warning": "#d97706",
+          "error": "#dc2626",
+         "primary": '#ef8f4c',
+      'base-100': '#171717',
+      'base-200': '#252525',
+      'base-300': '#383838',
+        },
+      },
     ]
+    // darkTheme: 'halloween',
+    // themes:[
+    //   {
+    //     halloween:{
+    //       ...require("daisyui/src/theming/themes")["[data-theme=halloween]"],
+    //       primary: '#ef8f4c',
+    //       'base-100': '#171717',
+    //       'base-200': '#252525',
+    //       'base-300': '#383838',
+    //     }
+    //   }
+    // ]
   }
 }
