@@ -37,13 +37,15 @@ class KMKKeyboard(_KMKKeyboard):
             self.modules.append(self.combos)
 
         if pog.config['split']:
-          from kmk.modules.split import Split, SplitSide, SplitType
-          side = SplitSide.RIGHT if str(getmount('/').label)[-1] == 'R' else SplitSide.LEFT
-          if pog.splitPinB:
-              self.split = Split(split_side=side, data_pin=pog.splitPinA, data_pin2=pog.splitPinB, use_pio=True)
-          else:
-              self.split = Split(split_side=side, data_pin=pog.splitPinA, use_pio=True)
-          self.modules.append(self.split)
+            from kmk.modules.split import Split, SplitSide, SplitType
+            side = SplitSide.RIGHT if str(getmount('/').label)[-1] == 'R' else SplitSide.LEFT
+            if pog.splitPinB:
+              print("split with 2 pins")
+              self.split = Split(data_pin=pog.splitPinA, data_pin2=pog.splitPinB, use_pio=True,)
+            else:
+              print('split with 1 pin')
+              self.split = Split(data_pin=pog.splitPinA, use_pio=True)
+            self.modules.append(self.split)
 
         # Add your own modules and extensions here
         # or sort them into the correct spot to have the correct import order
