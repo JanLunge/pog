@@ -339,6 +339,8 @@ const isSimple = computed(() => {
 
 const keyElem = ref<VNodeRef | null>(null)
 const fixLabelWidth = () => {
+  // key is eventually hidden with a layout variant
+  if(!keyElem.value) return
   const label = keyElem.value.querySelector('.keylabel-main')
   const labels = keyElem.value.querySelector('.keylabels')
   if (label) {

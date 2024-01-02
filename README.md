@@ -26,6 +26,8 @@ then just run it with dev to start
 
 
 # Tasks
+## bugs
+- [ ] maximum call stack error when closing the app
 ## urgent
 - [x] check if a keyboard is connected (usb drive) in the keyboard selector preview
 - [x] show serial output in the gui

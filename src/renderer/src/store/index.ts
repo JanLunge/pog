@@ -288,6 +288,9 @@ export class Keyboard {
   directPins: string[] = []
   coordMapSetup = false
 
+  rgbPin = ""
+  rgbNumLeds = 0
+
   pinPrefix = 'gp'
   // features
 
@@ -302,6 +305,8 @@ export class Keyboard {
   encoderKeymap: EncoderLayer[] = []
   keymap: (string | undefined)[][] = [[]]
   layers: { name: string; color: string | undefined }[] = []
+
+  kbFeatures = ["basic", "serial", "oneshot", "tapdance", "holdtap", "mousekeys", "combos"]
 
   constructor() {}
 
@@ -445,6 +450,13 @@ export class Keyboard {
       // encoders
       if (configContents.encoders) this.encoders = configContents.encoders
       if (configContents.encoderKeymap) this.encoderKeymap = configContents.encoderKeymap
+
+      //RGB
+      if (configContents.rgbPin) this.rgbPin = configContents.rgbPin
+      if (configContents.rgbNumLeds) this.rgbNumLeds = Number(configContents.rgbNumLeds)
+
+      if (configContents.kbFeatures) this.kbFeatures = configContents.kbFeatures
+
     }
   }
 
@@ -474,6 +486,9 @@ export class Keyboard {
     this.split = false
     this.encoders = []
     this.encoderKeymap = []
+    this.rgbPin = ""
+    this.rgbNumLeds = 0
+
   }
 
   serialize() {
@@ -511,6 +526,11 @@ export class Keyboard {
       coordMap: this.coordMap,
       pinPrefix: this.pinPrefix,
       coordMapSetup: this.coordMapSetup,
+
+      rgbPin: this.rgbPin,
+      rgbNumLeds: this.rgbNumLeds,
+
+      kbFeatures: this.kbFeatures,
 
       flashingMode: this.flashingMode,
       lastEdited: dayjs().format('YYYY-MM-DD HH:mm')

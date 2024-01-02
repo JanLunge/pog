@@ -14,6 +14,7 @@ import KeyboardName from '../components/KeyboardName.vue'
 import CoordMap from '../components/CoordMap.vue'
 import Community from "../components/Community.vue";
 import Debug from "../components/debug.vue";
+import RgbSetup from "../components/RgbSetup.vue";
 
 const router = createRouter({
   history: createWebHashHistory(),
@@ -91,6 +92,11 @@ const router = createRouter({
           path: 'community',
           component: Community,
           name: 'Community'
+        },
+         {
+          path: 'rgb',
+          component: RgbSetup,
+          name: 'RGB'
         },
         {
           path: 'debug',

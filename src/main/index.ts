@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Menu, SerialPort } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -14,6 +14,7 @@ export { mainWindow }
 
 const isMac = process.platform === 'darwin'
 
+let triedToQuit = false
 const template: unknown = [
   // { role: 'appMenu' }
   ...(isMac
@@ -181,9 +182,9 @@ app.on('window-all-closed', () => {
 })
 app.on('before-quit', (event) => {
   // Prevent the default behavior of this event
-  if (debugPort !== undefined) {
+  if (debugPort !== undefined && !triedToQuit) {
     event.preventDefault()
-
+    triedToQuit = true
     console.log('Preparing to quit...')
     debugPort.close(() => {
       console.log('Port closed')
@@ -233,19 +234,23 @@ const chunksize = 1200
 
 const getBoardInfo = (port) => {
   return new Promise((res, rej) => {
-    // connect to port and get the response
-    const sport = new serialPort.SerialPort(
-      { path: port.path, baudRate, autoOpen: true },
-      (e) => {}
-    )
+    // connect to port and get the response just once
+    const sport = new serialPort.SerialPort({ path: port.path, baudRate, autoOpen: true }, (e) => {
+      // if the connection fails reject the promise
+      if (e) return rej(e)
+    })
+
     const sparser = sport.pipe(new ReadlineParser({ delimiter: '\n' }))
     sparser.once('data', (data) => {
       sport.close()
-      res({ ...port, ...JSON.parse(data) })
+      return res({ ...port, ...JSON.parse(data) })
     })
+    // request the info
     sport.write('info_simple\n')
   })
 }
+
+// timer helper function
 const timeout = (prom, time) => {
   let timer
   return Promise.race([prom, new Promise((_r, rej) => (timer = setTimeout(rej, time)))]).finally(
@@ -261,14 +266,15 @@ const scanForKeyboards = async () => {
   if (connectedKeyboardPort && connectedKeyboardPort.isOpen) connectedKeyboardPort.close()
   const ports = await serialPort.SerialPort.list()
   console.log('found the following raw ports:', ports)
-  const circuitPythonPorts = ports.filter(port => {
+  const circuitPythonPorts = ports.filter((port) => {
     // TODO: make sure the port is used for a pog keyboard
     // we dont want to send serial data to a REPL that is not a keyboard with pog firmware
-    // maybe whitelist serialnumbers?
-    let manufacturer = port.manufacturer
-    manufacturer = manufacturer ? manufacturer.toLowerCase() : ''
-    return manufacturer.endsWith("-pog") || manufacturer.startsWith("pog-") || manufacturer === 'pog'
-  });
+    const manufacturer = port.manufacturer ? port.manufacturer.toLowerCase() : ''
+    // if the manufactuer is pog or has pog as suffix or prefix with the - we assume its a pog keyboard
+    return (
+      manufacturer.endsWith('-pog') || manufacturer.startsWith('pog-') || manufacturer === 'pog'
+    )
+  })
   const boards = (await Promise.allSettled(
     circuitPythonPorts.map(async (a) => await timeout(getBoardInfo(a), 2000))
   )) as {
@@ -290,7 +296,7 @@ const scanForKeyboards = async () => {
 
 let currentPackage = ''
 let addedChunks = 0
-function crossSum(s) {
+function crossSum(s: string) {
   // Compute the cross sum
   let total = 0
   for (let i = 0; i < s.length; i++) {

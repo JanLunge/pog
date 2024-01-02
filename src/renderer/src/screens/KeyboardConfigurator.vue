@@ -60,9 +60,13 @@
       <li>
         <router-link to="/configurator/firmware"><i class="mdi mdi-flash"></i>Firmware</router-link>
       </li>
+          <li>
+        <router-link to="/configurator/rgb"><i class="mdi mdi-led-on"></i>RGB</router-link>
+      </li>
       <li>
         <router-link to="/configurator/debug"><i class="mdi mdi-bug"></i>Debug</router-link>
       </li>
+
       <!--      <li><router-link to="/configurator/community">Community</router-link></li>-->
     </ul>
     <div class="flex h-full w-full flex-col overflow-y-auto">

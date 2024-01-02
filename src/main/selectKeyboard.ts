@@ -2,14 +2,13 @@ import * as fs from 'fs-extra'
 import { currentKeyboard } from './store'
 import { dialog } from 'electron'
 import { connectedKeyboardPort, connectSerialKeyboard, serialBoards } from './index'
-// select a keyboard
+
+// invoked from frontend to select a drive or folder load the conig from
 export const handleSelectDrive = async () => {
   const { canceled, filePaths } = await dialog.showOpenDialog({
     properties: ['openDirectory']
   })
-  if (canceled) {
-    return
-  }
+  if (canceled) return
   return await loadKeyboard(filePaths[0])
 }
 const loadKeyboard = async (path) => {
@@ -44,11 +43,11 @@ const loadKeyboard = async (path) => {
   }
 }
 export const selectKeyboard = async ({ path, id }: { path: string; id: string }) => {
-  console.log(path,id)
-  if(id){
+  console.log(path, id)
+  if (id) {
     // connect serial if available
     const port = serialBoards.value.find((a) => a.id === id)
-    if(!port) return { error:'not a serial keyboard' }
+    if (!port) return { error: 'not a serial keyboard' }
     console.log(serialBoards, id)
     await connectSerialKeyboard(port)
     connectedKeyboardPort.write('info\n')

@@ -293,10 +293,12 @@ const updateKey = () => {
     if (tmpKey.value.r !== '') props.layout[keyIndex].r = Number(tmpKey.value.r)
     if (tmpKey.value.rx !== '') props.layout[keyIndex].rx = Number(tmpKey.value.rx)
     if (tmpKey.value.ry !== '') props.layout[keyIndex].ry = Number(tmpKey.value.ry)
-    if (tmpKey.value.directPinIndex !== '')
+    if (tmpKey.value.directPinIndex !== '' && !isNaN(tmpKey.value.directPinIndex as any))
       props.layout[keyIndex].directPinIndex = Number(tmpKey.value.directPinIndex)
-    if (tmpKey.value.encoderIndex !== '')
+    else props.layout[keyIndex].directPinIndex = ""
+    if (tmpKey.value.encoderIndex !== '' && !isNaN(Number(tmpKey.value.encoderIndex)))
       props.layout[keyIndex].encoderIndex = Number(tmpKey.value.encoderIndex)
+    else props.layout[keyIndex].encoderIndex = undefined
     // if (
     //   (tmpKey.value.matrix &&
     //     tmpKey.value.matrix.length == 2 &&

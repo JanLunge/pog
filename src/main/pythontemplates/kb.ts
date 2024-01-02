@@ -61,8 +61,8 @@ class KMKKeyboard(_KMKKeyboard):
         if "rgb" in features:
             from kmk.extensions.RGB import RGB
             rgb = RGB(
-                pixel_pin=board.GP3,
-                num_pixels=16,
+                pixel_pin=eval(pog.rgbPin),
+                num_pixels=pog.rgbNumLeds,
                 rgb_order=(1, 0, 2),
                 val_limit=40, # Maximum brightness level. Only change if you know what you are doing!
                 hue_default=10,
