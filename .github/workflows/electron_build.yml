@@ -62,7 +62,7 @@ jobs:
       - name: Build Electron App for Mac
         run: npm run build && npx electron-builder --mac --config
         env:
-          CSC_NAME: "Developer ID Application: Jan Vincent Lunge (BLH4PG2L7J)"
+          CSC_NAME: "Jan Vincent Lunge (BLH4PG2L7J)"
           CSC_KEYCHAIN: build.keychain
 
       - name: Upload Mac Artifact
