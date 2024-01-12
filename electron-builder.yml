@@ -59,4 +59,7 @@ appImage:
 npmRebuild: false
 publish:
   provider: github
+  repo: pog
+  owner: janlunge
+  releaseType: draft
 #  url: https://pog.heaper.de/auto-updates
