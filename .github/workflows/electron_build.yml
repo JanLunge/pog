@@ -46,7 +46,7 @@ jobs:
         run: npm install
 
       - name: Build Electron App for Mac
-        run: npm run build && electron-builder --mac --config
+        run: npm run build && npx electron-builder --mac --config
 
       - name: Upload Mac Artifact
         uses: actions/upload-artifact@v2
