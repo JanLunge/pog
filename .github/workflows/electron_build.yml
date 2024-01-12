@@ -43,11 +43,27 @@ jobs:
         with:
           node-version: '16'
 
+      - name: Import Apple Developer Certificate
+        env:
+          MAC_CERTIFICATE: ${{ secrets.MAC_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$MAC_CERTIFICATE" | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -P "$CERTIFICATE_PASSWORD" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          security find-identity -v
+
       - name: Install dependencies
         run: npm install
 
       - name: Build Electron App for Mac
         run: npm run build && npx electron-builder --mac --config
+        env:
+          CSC_NAME: "Developer ID Application: Jan Vincent Lunge (BLH4PG2L7J)"
+          CSC_KEYCHAIN: build.keychain
 
       - name: Upload Mac Artifact
         uses: actions/upload-artifact@v2
