@@ -7,6 +7,7 @@
           class="input input-bordered input-sm"
           v-model="rgbPin"
           placeholder="board.GP3"
+          @change="savePin"
         />
       </div>
       <div class="flex items-center gap-4">
@@ -16,6 +17,7 @@
           class="input input-bordered input-sm"
           v-model="rgbNumLeds"
           placeholder="14"
+          @change="saveNumLeds"
         />
       </div>
   </div>
@@ -32,6 +34,14 @@ onMounted(() => {
   rgbPin.value = keyboardStore.rgbPin
   rgbNumLeds.value = String(keyboardStore.rgbNumLeds)
 })
+
+const savePin = () => {
+  keyboardStore.rgbPin = rgbPin.value
+}
+
+const saveNumLeds = () => {
+  keyboardStore.rgbNumLeds = Number(rgbNumLeds.value)
+}
 
 </script>
 
