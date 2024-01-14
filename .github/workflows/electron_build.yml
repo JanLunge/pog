@@ -9,28 +9,28 @@ on:
       - 'v*'
 
 jobs:
-#  build-windows:
-#    runs-on: windows-latest
-#    steps:
-#      - name: Check out repository
-#        uses: actions/checkout@v2
-#
-#      - name: Set up Node.js
-#        uses: actions/setup-node@v2
-#        with:
-#          node-version: '14'
-#
-#      - name: Install dependencies
-#        run: npm install
-#
-#      - name: Build Electron App for Windows
-#        run: npm run build -- --win
-#
-#      - name: Upload Windows Artifact
-#        uses: actions/upload-artifact@v2
-#        with:
-#          name: windows-app
-#          path: dist/*.exe
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Electron App for Windows
+        run: npm run build && npx electron-builder --win --config
+
+      - name: Upload Windows Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: windows-app
+          path: dist/*.exe
 
   build-mac:
     runs-on: macos-latest
@@ -74,7 +74,25 @@ jobs:
           name: mac-app
           path: dist/*.dmg
 
-#  build-linux:
-#    runs-on: ubuntu-latest
-#    steps:
-      # Similar steps as above, with `npm run build -- --linux`
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Electron App for Windows
+        run: npm run build && npx electron-builder --linux --config
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-app
+          path: dist/*.AppImage
