@@ -9,6 +9,40 @@ on:
       - 'v*'
 
 jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Draft Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: true
+          prerelease: false
+
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Electron App for Windows
+        run: npm run build && npx electron-builder --linux --config
+
+      - name: Upload Linux Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-app
+          path: dist/*.AppImage
+
   build-windows:
     runs-on: windows-latest
     steps:
@@ -74,25 +108,3 @@ jobs:
           name: mac-app
           path: dist/*.dmg
 
-  build-linux:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Electron App for Windows
-        run: npm run build && npx electron-builder --linux --config
-
-      - name: Upload Linux Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: linux-app
-          path: dist/*.AppImage
