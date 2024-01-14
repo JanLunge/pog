@@ -59,6 +59,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Resign modules
+        run: npm run resign
+
       - name: Build Electron App for Mac
         run: npm run build && npx electron-builder --mac --config
         env:

@@ -1,4 +1,7 @@
 const { notarize } = require('@electron/notarize')
+const path = require('path')
+const fs = require('fs')
+const { execSync } = require('child_process')
 
 module.exports = async (context) => {
   if (process.platform !== 'darwin') return
