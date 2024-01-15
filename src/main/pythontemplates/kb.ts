@@ -38,6 +38,7 @@ class KMKKeyboard(_KMKKeyboard):
 
         if pog.config['split']:
             from kmk.modules.split import Split, SplitSide, SplitType
+            from storage import getmount
             side = SplitSide.RIGHT if str(getmount('/').label)[-1] == 'R' else SplitSide.LEFT
             if pog.splitPinB:
               print("split with 2 pins")
