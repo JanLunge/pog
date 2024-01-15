@@ -9,6 +9,9 @@
       <a class="link" href="https://circuitpython.org/downloads" target="_blank">circuit python</a>
       on your controller
     </p>
+    <p>
+      info: this does not work when the controller is only connected via the serial port (and not as mounted usb drive)
+    </p>
     <p v-if="!keyboardStore.firmwareInstalled">
       You can let kmk automatically install to this keyboard
       <span class="font-mono">{{ keyboardStore.path }}</span>

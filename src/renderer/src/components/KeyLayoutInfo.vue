@@ -88,7 +88,7 @@
       </div>
     </div>
   </div>
-  <template v-if="keyboardStore.wiringMethod === 'matrix'">
+  <template v-if="keyboardStore.wiringMethod === 'matrix' && false ">
     <p class="mt-2 text-sm" :class="{ 'text-error': matrixValid }">Matrix</p>
     <div class="flex gap-2">
       <div class="keydata-input-group">
@@ -114,8 +114,8 @@
     </div>
   </template>
   <div>
-    <p>Direct Pin Index</p>
-    <input v-model="tmpKey.directPinIndex" type="text" class="keyinfo-input" @change="updateKey" />
+    <p>Key Index <span class="text-xs">(from CoordMap)</span></p>
+    <input v-model="tmpKey.coordMapIndex" type="text" class="keyinfo-input" @change="updateKey" />
   </div>
   <div>
     <p>Encoder Index</p>
@@ -178,7 +178,7 @@ const tmpKey = ref<{
   d: boolean | ''
   matrix: (number | '')[]
   variant: (number | '')[]
-  directPinIndex?: number | ''
+  coordMapIndex?: number | ''
   encoderIndex?: number | ''
   r: number | ''
   rx: number | ''
@@ -195,7 +195,7 @@ const tmpKey = ref<{
   d: false,
   matrix: ['', ''],
   variant: ['', ''],
-  directPinIndex: '',
+  coordMapIndex: '',
   encoderIndex: '',
   r: 0,
   rx: 0,
@@ -252,7 +252,7 @@ const updateSelectedKey = () => {
     tmpKey.value = {
       matrix: ['', ''],
       variant: ['', ''],
-      directPinIndex: '',
+      coordMapIndex: '',
       encoderIndex: '',
       x2: '',
       x: '',
@@ -293,9 +293,9 @@ const updateKey = () => {
     if (tmpKey.value.r !== '') props.layout[keyIndex].r = Number(tmpKey.value.r)
     if (tmpKey.value.rx !== '') props.layout[keyIndex].rx = Number(tmpKey.value.rx)
     if (tmpKey.value.ry !== '') props.layout[keyIndex].ry = Number(tmpKey.value.ry)
-    if (tmpKey.value.directPinIndex !== '' && !isNaN(tmpKey.value.directPinIndex as any))
-      props.layout[keyIndex].directPinIndex = Number(tmpKey.value.directPinIndex)
-    else props.layout[keyIndex].directPinIndex = ""
+    if (tmpKey.value.coordMapIndex !== '' && !isNaN(tmpKey.value.coordMapIndex as any))
+      props.layout[keyIndex].coordMapIndex = Number(tmpKey.value.coordMapIndex)
+    else props.layout[keyIndex].coordMapIndex = ""
     if (tmpKey.value.encoderIndex !== '' && !isNaN(Number(tmpKey.value.encoderIndex)))
       props.layout[keyIndex].encoderIndex = Number(tmpKey.value.encoderIndex)
     else props.layout[keyIndex].encoderIndex = undefined

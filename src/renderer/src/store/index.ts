@@ -61,6 +61,8 @@ export type KeyInfo = BaseKeyInfo & {
   matrix?: [number, number]
   variant?: [number, number]
   directPinIndex?: number
+  coordMapIndex?: number
+  idx?: number
   encoderIndex?: number
   keyboard?: any
 }
@@ -79,7 +81,7 @@ export class Key {
   rx = 0
   ry = 0
   matrix?: [number, number] = undefined
-  directPinIndex?: number = undefined
+  coordMapIndex?: number = undefined
   encoderIndex?: number = undefined
   variant?: [number, number] = undefined
   keyboard?: any
@@ -97,7 +99,8 @@ export class Key {
     r,
     rx,
     ry,
-    directPinIndex,
+    directPinIndex, // Todo: will be removed for idx in the future
+    idx,
     encoderIndex,
     keyboard
   }: KeyInfo) {
@@ -109,8 +112,9 @@ export class Key {
     if (variant && variant.length === 2) {
       this.variant = variant
     }
-    if (typeof directPinIndex === 'number') {
-      this.directPinIndex = directPinIndex
+    if (!idx && typeof directPinIndex === 'number') idx = directPinIndex
+    if (typeof idx === 'number') {
+      this.coordMapIndex = idx
     }
     if (h) this.h = h
     if (w) this.w = w
@@ -162,8 +166,8 @@ export class Key {
     if (Array.isArray(this.variant) && this.variant.length === 2) {
       tmpKey.variant = this.variant.map((n) => Number(n)) as [number, number]
     }
-    if (typeof this.directPinIndex === 'number') {
-      tmpKey.directPinIndex = this.directPinIndex
+    if (typeof this.coordMapIndex === 'number') {
+      tmpKey.coordMapIndex = this.coordMapIndex
     }
     if (typeof this.encoderIndex === 'number') {
       tmpKey.encoderIndex = this.encoderIndex
@@ -188,14 +192,14 @@ export class Key {
     }
   }
   getKeymapIndex() {
-    // if (!this.matrix && typeof this.directPinIndex !== 'number') return undefined
+    // if (!this.matrix && typeof this.coordMapIndex !== 'number') return undefined
     // if (this.keyboard.wiringMethod === 'matrix') {
     //   return matrixPositionToIndex({
     //     pos: this.matrix || [0,0],
     //     matrixWidth: keyboardStore.cols
     //   })
     // } else {
-    return this.directPinIndex
+    return this.coordMapIndex
     // }
   }
   setOnKeymap(keyCode) {
@@ -223,7 +227,7 @@ export class Key {
     keyboardStore.keymap[selectedLayer.value][keyIndex] = keyCode
   }
   getMatrixLabel() {
-    if (typeof this.directPinIndex === 'number') return this.directPinIndex
+    if (typeof this.coordMapIndex === 'number') return this.coordMapIndex
     if (this.matrix) {
       if (
         typeof this.matrix[0] === 'number' &&

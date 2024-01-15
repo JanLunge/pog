@@ -31,6 +31,10 @@
       <button class="btn-sm btn" @click="enterRepl">enter REPL</button>
       <button class="btn-sm btn" @click="exitRepl">exit REPL</button>
     </div>
+    <div class="mt-4" v-if="false">
+      <p>we can load some info from the controller to know what features it offers</p>
+      <buttom class="btn">check which pins the controller has</buttom>
+    </div>
   </div>
 </template>
 

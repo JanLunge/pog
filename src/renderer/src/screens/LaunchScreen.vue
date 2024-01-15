@@ -34,8 +34,8 @@
           </div>
         </div>
         <div class="relative flex flex-grow flex-col pr-14">
-          <p v-if="serialKeyboards.find((id, driveMounted) => id === keyboard.id && !driveMounted)">
-            <span class="rounded bg-info p-1 text-xs"> Serial </span>
+          <p v-if="serialKeyboards.find(({id, driveMounted}) => id === keyboard.id && !driveMounted)">
+            <span class="rounded bg-info p-1 text-xs"> Serial <span>BETA</span> </span>
           </p>
           <p v-else-if="keyboard.path">
             <span

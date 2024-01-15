@@ -382,7 +382,7 @@ export const connectSerialKeyboard = async (keyboard) => {
         console.log('keyboard info', chunk)
       }
     } catch (e) {
-      console.log('not a proper json command, moving to simple commands', e, data, data.toString())
+      // console.log('not a proper json command, moving to simple commands', e, data, data.toString())
     }
 
     // pinging for next chunk

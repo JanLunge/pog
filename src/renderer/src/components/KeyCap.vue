@@ -143,7 +143,7 @@ const action = computed(() => {
   if (props.mode === 'layout') return //String(props.keyData.matrix)
   let keyIndex = 0
 
-  keyIndex = props.keyData.directPinIndex
+  keyIndex = props.keyData.coordMapIndex
   if (!props.keymap[selectedLayer.value]) return 'l missing'
   const keyCode = props.keymap[selectedLayer.value][keyIndex]
   // resolve readable character
@@ -344,6 +344,8 @@ const fixLabelWidth = () => {
   const label = keyElem.value.querySelector('.keylabel-main')
   const labels = keyElem.value.querySelector('.keylabels')
   if (label) {
+    console.log("fixing label width")
+    label.style.transform = `scale(1)`
     const labelWidth = label.getBoundingClientRect().width
     const wrapperWidth = labels.getBoundingClientRect().width
     const scaling = Math.min(wrapperWidth / labelWidth, 1)

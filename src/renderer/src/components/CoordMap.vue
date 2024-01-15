@@ -157,7 +157,7 @@ const keyboardlayout = computed(() => {
   keys.value.forEach((row, rowindex) => {
     row.forEach((key, kindex) => {
       if (key === 'spc') return
-      realKeys.push(new Key({ x: kindex, y: rowindex, directPinIndex: globalkeyindex }))
+      realKeys.push(new Key({ x: kindex, y: rowindex, idx: globalkeyindex }))
       globalkeyindex++
     })
   })

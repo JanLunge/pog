@@ -19,8 +19,8 @@ export const saveConfiguration = (data: string) => {
   const { pogConfig, serial, overwriteFiles, writeFirmware } = JSON.parse(data)
   if (serial) {
     // write by serial to current keyboard
-    console.log('writing firmware vio usb serial')
-    writePogConfViaSerial(JSON.stringify(pogConfig, null, 4))
+    console.log('writing firmware via usb serial')
+    writePogConfViaSerial(JSON.stringify(pogConfig, null, 0))
   } else {
     // write pog.json
     console.log('writing firmware via usb files', 'overwriting Firmware:', writeFirmware)

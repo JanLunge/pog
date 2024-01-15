@@ -308,8 +308,18 @@ export const renderLabel = (keycode: string) => {
     send_string: { label: 'String' },
     RESET: { label: 'Reset' },
     RELOAD: { label: 'Reload' },
-        DEBUG: { label: 'Debug' }
-
+    DEBUG: { label: 'Debug' },
+    RGB_TOG: { label: 'Toggle<br/>RGB' },
+    RGB_HUI: { label: 'RGB<br/>Hue +' },
+    RGB_HUD: { label: 'RGB<br/>Hue -' },
+    RGB_SAI: { label: 'RGB<br/>Sat +' },
+    RGB_SAD: { label: 'RGB<br/>Sat -' },
+    RGB_ANI: { label: 'RGB<br/>Animation +' },
+    RGB_AND: { label: 'RGB<br/>Animation -' },
+    RGB_MODE_SWIRL: { label: 'RGB<br/>Swirl' },
+    RGB_MODE_PLAIN: { label: 'RGB<br/>Plain' },
+    RGB_MODE_KNIGHT: { label: 'RGB<br/>Knight' },
+    RGB_MODE_RAINBOW: { label: 'RGB<br/>Rainbow' },
   }
 
   const keylabel: {
