@@ -9,6 +9,7 @@ import { autoUpdater } from 'electron-updater'
 import serialPort from 'serialport'
 import { ReadlineParser } from '@serialport/parser-readline'
 import { log } from 'util'
+
 let mainWindow: BrowserWindow | null = null
 export { mainWindow }
 
@@ -189,11 +190,13 @@ app.on('before-quit', (event) => {
     debugPort.close(() => {
       console.log('Port closed')
       debugPort = undefined
-      app.quit()
+
+      // Instead of app.quit(), directly exit the process
+      process.exit(0)
     })
-  } else {
+  } else if (!triedToQuit) {
     // Now allow the app to continue quitting
-    app.quit()
+    process.exit(0)
   }
 })
 
@@ -296,6 +299,7 @@ const scanForKeyboards = async () => {
 
 let currentPackage = ''
 let addedChunks = 0
+
 function crossSum(s: string) {
   // Compute the cross sum
   let total = 0
@@ -501,7 +505,7 @@ const checkSerialDevices = async () => {
       return {
         port: port.path,
         manufacturer: port.manufacturer,
-        serialNumber: port.serialNumber,
+        serialNumber: port.serialNumber
         // Add more attributes here if needed
       }
     })

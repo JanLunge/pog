@@ -167,7 +167,7 @@ export class Key {
       tmpKey.variant = this.variant.map((n) => Number(n)) as [number, number]
     }
     if (typeof this.coordMapIndex === 'number') {
-      tmpKey.coordMapIndex = this.coordMapIndex
+      tmpKey.idx = this.coordMapIndex
     }
     if (typeof this.encoderIndex === 'number') {
       tmpKey.encoderIndex = this.encoderIndex
