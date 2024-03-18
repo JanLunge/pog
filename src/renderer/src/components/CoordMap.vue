@@ -157,7 +157,12 @@ const keyboardlayout = computed(() => {
   keys.value.forEach((row, rowindex) => {
     row.forEach((key, kindex) => {
       if (key === 'spc') return
-      realKeys.push(new Key({ x: kindex, y: rowindex, idx: globalkeyindex }))
+      const keyToAdd = new Key({
+        x: kindex,
+        y: rowindex,
+        idx: globalkeyindex
+      })
+      realKeys.push(keyToAdd)
       globalkeyindex++
     })
   })
@@ -166,10 +171,10 @@ const keyboardlayout = computed(() => {
 })
 
 const rmLast = () => {
-  coordmap.value = coordmap.value.split(' ').slice(0, -1).join(' ');
+  coordmap.value = coordmap.value.split(' ').slice(0, -1).join(' ')
 }
-const clear = ()=>{
-  coordmap.value=''
+const clear = () => {
+  coordmap.value = ''
 }
 </script>
 
