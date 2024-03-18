@@ -45,7 +45,7 @@
     />
   </div>
   <div class="my-4">
-    <p class="mb-2 text-sm font-bold">Keycode Options for Selected Key(s)</p>
+    <p class="mb-2 text-sm font-bold">Keycode Options for Selected Key(s) <span class="text-warning text-sm">{{coordMapWarning}}</span></p>
     <div class="flex gap-2">
       <select
         v-model="keycodeModeForSelection"
@@ -174,4 +174,15 @@ const settingsOpen = ref(false)
 const toggleSettings = () => {
   settingsOpen.value=!settingsOpen.value
 }
+
+const coordMapWarning = computed(() => {
+ // show if any of the selected keys does not have and idx
+  const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
+  if (keys.length === 0) return ''
+  console.log(keys, keys[0].coordMapIndex)
+  if (keys.some((key) => key.coordMapIndex === '')) {
+    return '⚠️ no coordmap index set in the layout for this key'
+  }
+  return ''
+})
 </script>

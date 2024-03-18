@@ -100,6 +100,7 @@ export class Key {
     rx,
     ry,
     directPinIndex, // Todo: will be removed for idx in the future
+    coordMapIndex, // Todo: will also be removed for idx
     idx,
     encoderIndex,
     keyboard
@@ -112,10 +113,10 @@ export class Key {
     if (variant && variant.length === 2) {
       this.variant = variant
     }
+    // coordmap things
     if (!idx && typeof directPinIndex === 'number') idx = directPinIndex
-    if (typeof idx === 'number') {
-      this.coordMapIndex = idx
-    }
+    if (typeof idx === 'number') this.coordMapIndex = idx
+    if (!idx && typeof coordMapIndex === 'number') this.coordMapIndex = coordMapIndex
     if (h) this.h = h
     if (w) this.w = w
     if (h2) this.h2 = h2
