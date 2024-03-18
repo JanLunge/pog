@@ -180,7 +180,7 @@ const coordMapWarning = computed(() => {
   const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
   if (keys.length === 0) return ''
   console.log(keys, keys[0].coordMapIndex)
-  if (keys.some((key) => key.coordMapIndex === '')) {
+  if (keys.some((key) => typeof key.coordMapIndex !== 'number')) {
     return '⚠️ no coordmap index set in the layout for this key'
   }
   return ''
