@@ -120,7 +120,7 @@ import customkeys
 
 keymap = [
     ${pogConfig.keymap
-      .map((layer) => '[' + layer.map((key) => (key ? key : 'KC.NO')).join(', ') + ']')
+      .map((layer) => '[' + layer.map((key) => (key ? key : 'KC.TRNS')).join(', ') + ']')
       .join(', ')}
 ]
 
