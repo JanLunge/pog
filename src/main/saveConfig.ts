@@ -33,8 +33,8 @@ export const saveConfiguration = (data: string) => {
   }
 }
 
-const flashFileToKB = ({fileName, overwrite, fileContents }) => {
- if (!fs.existsSync(currentKeyboard.path + '/' + fileName) || overwrite) {
+const flashFileToKB = ({ fileName, overwrite, fileContents }) => {
+  if (!fs.existsSync(currentKeyboard.path + '/' + fileName) || overwrite) {
     fs.writeFile(currentKeyboard.path + '/' + fileName, fileContents, () => {
       console.log(fileName + 'File written successfully')
     })
@@ -119,7 +119,9 @@ import pog
 import customkeys
 
 keymap = [
-    ${pogConfig.keymap.map((layer) => '[' + layer.join(', ') + ']').join(', ')}
+    ${pogConfig.keymap
+      .map((layer) => '[' + layer.map((key) => (key ? key : 'KC.NO')).join(', ') + ']')
+      .join(', ')}
 ]
 
 encoderKeymap = []
