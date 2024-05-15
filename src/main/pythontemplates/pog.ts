@@ -92,23 +92,6 @@ def convert_coord_mapping():
 
 coordMapping = convert_coord_mapping()
 
-
-directPinScanner = (
-    """def __init__(self):
-    # create and register the scanner
-    self.matrix = KeysScanner(
-        # require argument:
-        pins=["""
-    + pins
-    + """],
-        # optional arguments with defaults:
-        value_when_pressed=False,
-        pull=True,
-        interval=0.02,  # Debounce time in floating point seconds
-        max_events=64
-    )"""
-)
-
 splitPinA = None
 splitPinB = None
 if config.get('splitPinA'):

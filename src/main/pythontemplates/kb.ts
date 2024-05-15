@@ -71,17 +71,23 @@ class KMKKeyboard(_KMKKeyboard):
                 val_default=20,
             )
             self.extensions.append(rgb)
-
-
+        
+        # direct pin wiring
+        # Must be set during init to override defaulting to matrix wiring
+        if pog.directWiring:
+            self.matrix = KeysScanner(
+                pins=eval(pog.pins),
+                value_when_pressed=False,
+                pull=True,
+                interval=0.02,
+                max_events=64
+            )
+          
     # matrix wiring
     if pog.matrixWiring:
         exec("col_pins = (" + pog.colPins + ")")
         exec("row_pins = (" + pog.rowPins + ")")
         exec("diode_orientation = DiodeOrientation." + pog.config["diodeDirection"])
-
-    # direct pin wiring
-    if pog.directWiring:
-        exec(pog.directPinScanner)
 
     # coord_mapping
     if len(pog.config["coordMap"]) != 0:
