@@ -92,12 +92,24 @@ def convert_coord_mapping():
 
 coordMapping = convert_coord_mapping()
 
+keyboardType = None
+if config.get('keyboardType'):
+    keyboardType = config['keyboardType']
+
+splitSide = None
+if config.get('splitSide'):
+    splitSide = config['splitSide']
+
 splitPinA = None
 splitPinB = None
 if config.get('splitPinA'):
     splitPinA = eval(renderPin(config['splitPinA']))
 if config.get('splitPinB'):
     splitPinB = eval(renderPin(config['splitPinB']))
+
+vbusPin = None
+if config.get('vbusPin'):
+    vbusPin = eval("board." + config['vbusPin'])
 
 # led pin without prefix for now
 if config.get('ledPin'):

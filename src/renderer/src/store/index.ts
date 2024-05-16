@@ -293,16 +293,19 @@ export class Keyboard {
   directPins: string[] = []
   coordMapSetup = false
 
-  rgbPin = ""
+  rgbPin = ''
   rgbNumLeds = 0
 
   pinPrefix = 'gp'
   // features
 
   encoders: { pad_a: string; pad_b: string }[] = []
+  keyboardType: 'normal' | 'splitBLE' | 'splitSerial' | 'splitOnewire' = 'normal'
+  splitSide: 'left' | 'right' | 'vbus' | 'label' = 'left'
   split = false
-  splitPinA = ""
-  splitPinB = ""
+  splitPinA = ''
+  splitPinB = ''
+  vbusPin = 'VBUS_SENSE'
 
   // keymaps
 
@@ -311,14 +314,14 @@ export class Keyboard {
   keymap: (string | undefined)[][] = [[]]
   layers: { name: string; color: string | undefined }[] = []
 
-  kbFeatures = ["basic", "serial", "oneshot", "tapdance", "holdtap", "mousekeys", "combos"]
+  kbFeatures = ['basic', 'serial', 'oneshot', 'tapdance', 'holdtap', 'mousekeys', 'combos']
 
   constructor() {}
 
   // Keys
   setKeys(keys: KeyInfo[]) {
     this.keys = []
-    if (!keys||keys.length === 0) return
+    if (!keys || keys.length === 0) return
     keys.forEach((key) => {
       const tmpKey = new Key({ ...key, keyboard: this })
       this.keys.push(tmpKey)
@@ -430,6 +433,7 @@ export class Keyboard {
       if (configContents.description) this.description = configContents.description
       if (configContents.tags) this.tags = configContents.tags
       if (configContents.manufacturer) this.manufacturer = configContents.manufacturer
+      if (configContents.keyboardType) this.keyboardType = configContents.keyboardType
       this.wiringMethod = configContents.wiringMethod || 'matrix'
       this.flashingMode = configContents.flashingMode || 'automatic'
       this.pinPrefix = configContents.pinPrefix || 'gp'
@@ -451,6 +455,8 @@ export class Keyboard {
       if (configContents.split) this.split = configContents.split
       if (configContents.splitPinA) this.splitPinA = configContents.splitPinA
       if (configContents.splitPinB) this.splitPinB = configContents.splitPinB
+      if (configContents.splitSide) this.splitSide = configContents.splitSide
+      if (configContents.vbusPin) this.vbusPin = configContents.vbusPin
 
       // encoders
       if (configContents.encoders) this.encoders = configContents.encoders
@@ -461,7 +467,6 @@ export class Keyboard {
       if (configContents.rgbNumLeds) this.rgbNumLeds = Number(configContents.rgbNumLeds)
 
       if (configContents.kbFeatures) this.kbFeatures = configContents.kbFeatures
-
     }
   }
 
@@ -474,6 +479,7 @@ export class Keyboard {
     this.description = ''
     this.tags = []
     this.manufacturer = ''
+    this.keyboardType = 'normal'
     this.wiringMethod = 'matrix'
     this.flashingMode = 'automatic'
     this.pinPrefix = 'gp'
@@ -491,9 +497,8 @@ export class Keyboard {
     this.split = false
     this.encoders = []
     this.encoderKeymap = []
-    this.rgbPin = ""
+    this.rgbPin = ''
     this.rgbNumLeds = 0
-
   }
 
   serialize() {
@@ -504,6 +509,7 @@ export class Keyboard {
       description: this.description,
       tags: this.tags,
       controller: this.controller,
+      keyboardType: this.keyboardType,
 
       wiringMethod: this.wiringMethod,
       diodeDirection: this.diodeDirection,
@@ -527,6 +533,8 @@ export class Keyboard {
       split: this.split,
       splitPinA: this.splitPinA,
       splitPinB: this.splitPinB,
+      splitSide: this.splitSide,
+      vbusPin: this.vbusPin,
 
       coordMap: this.coordMap,
       pinPrefix: this.pinPrefix,

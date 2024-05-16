@@ -38,14 +38,42 @@ class KMKKeyboard(_KMKKeyboard):
 
         if pog.config['split']:
             from kmk.modules.split import Split, SplitSide, SplitType
-            from storage import getmount
-            side = SplitSide.RIGHT if str(getmount('/').label)[-1] == 'R' else SplitSide.LEFT
-            if pog.splitPinB:
-              print("split with 2 pins")
-              self.split = Split(data_pin=pog.splitPinA, data_pin2=pog.splitPinB, use_pio=True,)
+            
+            # Split Side Detection
+            if pog.splitSide == "label":
+                from storage import getmount
+                side = SplitSide.RIGHT if str(getmount('/').label)[-1] == 'R' else SplitSide.LEFT
+            if pog.splitSide == "vbus":
+                import digitalio
+
+                vbus = digitalio.DigitalInOut(pog.vbusPin)
+                vbus.direction = digitalio.Direction.INPUT
+                side = SplitSide.RIGHT if vbus.value == False else SplitSide.LEFT
+            if pog.splitSide == "left" or pog.splitSide == "right":
+                side = SplitSide.RIGHT if pog.splitSide == "right" else SplitSide.LEFT
+
+            # Split Type Configuration
+            if pog.keyboardType == "splitBLE":
+                print("split with 2 pins")
+                self.split = Split(
+                    split_type=SplitType.BLE, 
+                    split_side=side)
+            elif pog.keyboardType == "splitSerial":
+                print("split with 2 pins (UART)")
+                self.split = Split(
+                    split_side=side,
+                    split_type=SplitType.UART,
+                    split_flip=False,
+                    data_pin=pog.splitPinA, 
+                    data_pin2=pog.splitPinB, 
+                    use_pio=True)
             else:
-              print('split with 1 pin')
-              self.split = Split(data_pin=pog.splitPinA, use_pio=True)
+                # Nested under pog.split == True => splitOnewire
+                print('split with 1 pin')
+                self.split = Split(
+                    data_pin=pog.splitPinA
+                    )
+              
             self.modules.append(self.split)
 
         # Add your own modules and extensions here
