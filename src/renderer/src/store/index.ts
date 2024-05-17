@@ -302,7 +302,7 @@ export class Keyboard {
   encoders: { pad_a: string; pad_b: string }[] = []
   keyboardType: 'normal' | 'splitBLE' | 'splitSerial' | 'splitOnewire' = 'normal'
   splitSide: 'left' | 'right' | 'vbus' | 'label' = 'left'
-  split = false
+  // split = false
   splitPinA = ''
   splitPinB = ''
   vbusPin = 'VBUS_SENSE'
@@ -356,6 +356,10 @@ export class Keyboard {
     return this.driveContents.includes(filename)
   }
 
+  isSplit() {
+    return this.keyboardType !== 'normal'
+  }
+
   // count keys on the matrix
   physicalKeyCount() {
     let keycount = 0
@@ -364,7 +368,7 @@ export class Keyboard {
     } else {
       keycount = this.pins
     }
-    if (this.split) {
+    if (this.isSplit()) {
       keycount = keycount * 2
     }
     return keycount
@@ -382,7 +386,7 @@ export class Keyboard {
     } else {
       width = this.pins
     }
-    if (this.split) {
+    if (this.isSplit()) {
       width = width * 2
     }
     return width
@@ -452,7 +456,6 @@ export class Keyboard {
       if (configContents.layouts) this.layouts = configContents.layouts
       if (configContents.layers) this.layers = configContents.layers
 
-      if (configContents.split) this.split = configContents.split
       if (configContents.splitPinA) this.splitPinA = configContents.splitPinA
       if (configContents.splitPinB) this.splitPinB = configContents.splitPinB
       if (configContents.splitSide) this.splitSide = configContents.splitSide
@@ -494,7 +497,6 @@ export class Keyboard {
     this.controller = ''
     this.keymap = []
     this.layouts = []
-    this.split = false
     this.encoders = []
     this.encoderKeymap = []
     this.rgbPin = ''
@@ -530,7 +532,7 @@ export class Keyboard {
       encoderKeymap: this.encoderKeymap,
       layers: this.layers,
 
-      split: this.split,
+      split: this.keyboardType !== 'normal',
       splitPinA: this.splitPinA,
       splitPinB: this.splitPinB,
       splitSide: this.splitSide,

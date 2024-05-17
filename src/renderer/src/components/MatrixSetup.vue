@@ -3,7 +3,7 @@
     <div class="mb-8 flex justify-center">
       <div class="w-full max-w-md">
         <p class="mb-2 text-sm">Keyboard Type</p>
-        <select v-model="keyboardStore.keyboardType" class="select select-bordered mb-2 w-1/2">
+        <select v-model="keyboardStore.keyboardType" class="select select-bordered mb-2 w-full">
           <option value="normal">Normal</option>
           <option value="splitBle">Split (Bluetooth)</option>
           <option value="splitSerial">Split (Serial)</option>
@@ -11,7 +11,7 @@
         </select>
 
         <p class="mb-2 text-sm">Wiring Method</p>
-        <select v-model="keyboardStore.wiringMethod" class="select select-bordered mb-2 w-1/2">
+        <select v-model="keyboardStore.wiringMethod" class="select select-bordered mb-2 w-full">
           <option value="matrix">Matrix</option>
           <option value="direct">Direct Pins</option>
         </select>
@@ -28,52 +28,51 @@
   </div>
   <!-- Wiring Method -->
   <div class="mt-5 flex justify-center gap-8">
-    <div v-if="keyboardStore.wiringMethod === 'matrix'" class="flex-grow-0">
-      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-100 p-2 py-8" style="width: 350px">
-        <p class="flex items-center justify-center text-xl font-bold">Matrix Size</p>
-        <div class="grid grid-cols-5 items-center gap-2">
-          <span class="mr-2 text-right">Width</span>
-          <InputLabel
-            v-model="keyboardStore.cols"
-            class="input-bordered col-span-4"
-            placeholder="1"
-            input-type="number"
-            :min="0"
-            @input="checkMatrix"
-          ></InputLabel>
-          <span class="mr-2 text-right">Height</span>
-          <InputLabel
-            v-model="keyboardStore.rows"
-            class="input-bordered col-span-4"
-            placeholder="1"
-            input-type="number"
-            :min="0"
-            @input="checkMatrix"
-          ></InputLabel>
+    <div class="mb-8">
+      <template v-if="keyboardStore.wiringMethod === 'matrix'">
+        <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-100 p-2 py-8">
+          <p class="flex items-center justify-center text-xl font-bold">Matrix Size</p>
+          <div class="grid grid-cols-5 items-center gap-2">
+            <span class="mr-2 text-right">Width</span>
+            <InputLabel
+              v-model="keyboardStore.cols"
+              class="input-bordered col-span-4"
+              placeholder="1"
+              input-type="number"
+              :min="0"
+              @input="checkMatrix"
+            ></InputLabel>
+            <span class="mr-2 text-right">Height</span>
+            <InputLabel
+              v-model="keyboardStore.rows"
+              class="input-bordered col-span-4"
+              placeholder="1"
+              input-type="number"
+              :min="0"
+              @input="checkMatrix"
+            ></InputLabel>
+          </div>
         </div>
-      </div>
-    </div>
-    <div v-if="keyboardStore.wiringMethod === 'direct'" class="mb-8">
-      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-100 p-2 py-8" style="width: 350px">
-        <p class="flex items-center justify-center text-xl font-bold">Pin Count</p>
-        <div class="grid grid-cols-5 items-center gap-2">
-          <span class="mr-2 text-right">Pins</span>
-          <InputLabel
-            v-model="keyboardStore.pins"
-            class="input-bordered col-span-4"
-            placeholder="1"
-            input-type="number"
-            :min="1"
-            @input="checkMatrix"
-          ></InputLabel>
+      </template>
+      <template v-if="keyboardStore.wiringMethod === 'direct'">
+        <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-100 p-2 py-8">
+          <p class="flex items-center justify-center text-xl font-bold">Pin Count</p>
+          <div class="grid grid-cols-5 items-center gap-2">
+            <span class="mr-2 text-right">Pins</span>
+            <InputLabel
+              v-model="keyboardStore.pins"
+              class="input-bordered col-span-4"
+              placeholder="1"
+              input-type="number"
+              :min="1"
+              @input="checkMatrix"
+            ></InputLabel>
+          </div>
         </div>
-      </div>
+      </template>
     </div>
-    <div class="flex w-1/2 flex-col items-center" style="width: 350px">
-      <div
-        v-if="keyboardStore.keyboardType !== 'normal'"
-        class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-100 p-2 py-8"
-      >
+    <div v-if="keyboardStore.keyboardType !== 'normal'" class="flex w-1/2 flex-col items-center">
+      <div class="mb-4 grid grid-cols-1 gap-2 rounded bg-base-100 p-2 py-8">
         <p class="flex items-center justify-center text-xl font-bold">Split Configuration</p>
         <p class="px-2 py-2 text-sm italic">
           Define how each half of the split keyboard is detected.<br />
@@ -125,7 +124,7 @@
       <div v-for="_col in keyboardStore.cols" class="col"></div>
     </div>
   </div>
-  <div v-if="initialSetup" class="mb-8 flex justify-center">
+  <div v-if="initialSetup" class="my-8 flex justify-center">
     <button class="btn btn-primary" :class="{ 'btn-disabled': matrixEmpty }" @click="$emit('next')">
       Next
     </button>
@@ -136,6 +135,7 @@
 import InputLabel from './ui/InputLabel.vue'
 import { keyboardStore } from '../store'
 import { computed, watch } from 'vue'
+
 defineProps(['initialSetup'])
 const matrixEmpty = computed(() => {
   return !(
@@ -149,18 +149,6 @@ const checkMatrix = () => {
   if (keyboardStore.rows < 0) keyboardStore.rows = 0
   if (keyboardStore.pins < 0) keyboardStore.pins = 0
 }
-
-// watch for changes in keyboardType
-watch(
-  () => keyboardStore.keyboardType,
-  () => {
-    if (keyboardStore.keyboardType === 'normal') {
-      keyboardStore.split = false
-    } else {
-      keyboardStore.split = true
-    }
-  }
-)
 </script>
 
 <style lang="scss" scoped>
@@ -171,10 +159,12 @@ watch(
   align-items: center;
   width: 100%;
 }
+
 .row {
   display: flex;
   gap: 4px;
 }
+
 .col {
   width: 40px;
   height: 40px;
