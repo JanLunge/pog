@@ -92,22 +92,13 @@ def convert_coord_mapping():
 
 coordMapping = convert_coord_mapping()
 
+keyboardType = None
+if config.get('keyboardType'):
+    keyboardType = config['keyboardType']
 
-directPinScanner = (
-    """def __init__(self):
-    # create and register the scanner
-    self.matrix = KeysScanner(
-        # require argument:
-        pins=["""
-    + pins
-    + """],
-        # optional arguments with defaults:
-        value_when_pressed=False,
-        pull=True,
-        interval=0.02,  # Debounce time in floating point seconds
-        max_events=64
-    )"""
-)
+splitSide = None
+if config.get('splitSide'):
+    splitSide = config['splitSide']
 
 splitPinA = None
 splitPinB = None
@@ -115,6 +106,10 @@ if config.get('splitPinA'):
     splitPinA = eval(renderPin(config['splitPinA']))
 if config.get('splitPinB'):
     splitPinB = eval(renderPin(config['splitPinB']))
+
+vbusPin = None
+if config.get('vbusPin'):
+    vbusPin = eval("board." + config['vbusPin'])
 
 # led pin without prefix for now
 if config.get('ledPin'):
