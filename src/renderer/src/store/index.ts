@@ -501,6 +501,11 @@ export class Keyboard {
     this.encoderKeymap = []
     this.rgbPin = ''
     this.rgbNumLeds = 0
+    // split pins
+    this.splitPinA = ''
+    this.splitPinB = ''
+    this.splitSide = 'left'
+    this.vbusPin = 'VBUS_SENSE'
   }
 
   serialize() {
