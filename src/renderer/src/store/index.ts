@@ -293,16 +293,19 @@ export class Keyboard {
   directPins: string[] = []
   coordMapSetup = false
 
-  rgbPin = ""
+  rgbPin = ''
   rgbNumLeds = 0
 
   pinPrefix = 'gp'
   // features
 
   encoders: { pad_a: string; pad_b: string }[] = []
-  split = false
-  splitPinA = ""
-  splitPinB = ""
+  keyboardType: 'normal' | 'splitBLE' | 'splitSerial' | 'splitOnewire' = 'normal'
+  splitSide: 'left' | 'right' | 'vbus' | 'label' = 'left'
+  // split = false
+  splitPinA = ''
+  splitPinB = ''
+  vbusPin = 'VBUS_SENSE'
 
   // keymaps
 
@@ -311,14 +314,14 @@ export class Keyboard {
   keymap: (string | undefined)[][] = [[]]
   layers: { name: string; color: string | undefined }[] = []
 
-  kbFeatures = ["basic", "serial", "oneshot", "tapdance", "holdtap", "mousekeys", "combos"]
+  kbFeatures = ['basic', 'serial', 'oneshot', 'tapdance', 'holdtap', 'mousekeys', 'combos']
 
   constructor() {}
 
   // Keys
   setKeys(keys: KeyInfo[]) {
     this.keys = []
-    if (!keys||keys.length === 0) return
+    if (!keys || keys.length === 0) return
     keys.forEach((key) => {
       const tmpKey = new Key({ ...key, keyboard: this })
       this.keys.push(tmpKey)
@@ -353,6 +356,10 @@ export class Keyboard {
     return this.driveContents.includes(filename)
   }
 
+  isSplit() {
+    return this.keyboardType !== 'normal'
+  }
+
   // count keys on the matrix
   physicalKeyCount() {
     let keycount = 0
@@ -361,7 +368,7 @@ export class Keyboard {
     } else {
       keycount = this.pins
     }
-    if (this.split) {
+    if (this.isSplit()) {
       keycount = keycount * 2
     }
     return keycount
@@ -379,7 +386,7 @@ export class Keyboard {
     } else {
       width = this.pins
     }
-    if (this.split) {
+    if (this.isSplit()) {
       width = width * 2
     }
     return width
@@ -430,6 +437,7 @@ export class Keyboard {
       if (configContents.description) this.description = configContents.description
       if (configContents.tags) this.tags = configContents.tags
       if (configContents.manufacturer) this.manufacturer = configContents.manufacturer
+      if (configContents.keyboardType) this.keyboardType = configContents.keyboardType
       this.wiringMethod = configContents.wiringMethod || 'matrix'
       this.flashingMode = configContents.flashingMode || 'automatic'
       this.pinPrefix = configContents.pinPrefix || 'gp'
@@ -448,9 +456,10 @@ export class Keyboard {
       if (configContents.layouts) this.layouts = configContents.layouts
       if (configContents.layers) this.layers = configContents.layers
 
-      if (configContents.split) this.split = configContents.split
       if (configContents.splitPinA) this.splitPinA = configContents.splitPinA
       if (configContents.splitPinB) this.splitPinB = configContents.splitPinB
+      if (configContents.splitSide) this.splitSide = configContents.splitSide
+      if (configContents.vbusPin) this.vbusPin = configContents.vbusPin
 
       // encoders
       if (configContents.encoders) this.encoders = configContents.encoders
@@ -461,7 +470,6 @@ export class Keyboard {
       if (configContents.rgbNumLeds) this.rgbNumLeds = Number(configContents.rgbNumLeds)
 
       if (configContents.kbFeatures) this.kbFeatures = configContents.kbFeatures
-
     }
   }
 
@@ -474,6 +482,7 @@ export class Keyboard {
     this.description = ''
     this.tags = []
     this.manufacturer = ''
+    this.keyboardType = 'normal'
     this.wiringMethod = 'matrix'
     this.flashingMode = 'automatic'
     this.pinPrefix = 'gp'
@@ -488,12 +497,15 @@ export class Keyboard {
     this.controller = ''
     this.keymap = []
     this.layouts = []
-    this.split = false
     this.encoders = []
     this.encoderKeymap = []
-    this.rgbPin = ""
+    this.rgbPin = ''
     this.rgbNumLeds = 0
-
+    // split pins
+    this.splitPinA = ''
+    this.splitPinB = ''
+    this.splitSide = 'left'
+    this.vbusPin = 'VBUS_SENSE'
   }
 
   serialize() {
@@ -504,6 +516,7 @@ export class Keyboard {
       description: this.description,
       tags: this.tags,
       controller: this.controller,
+      keyboardType: this.keyboardType,
 
       wiringMethod: this.wiringMethod,
       diodeDirection: this.diodeDirection,
@@ -524,9 +537,11 @@ export class Keyboard {
       encoderKeymap: this.encoderKeymap,
       layers: this.layers,
 
-      split: this.split,
+      split: this.keyboardType !== 'normal',
       splitPinA: this.splitPinA,
       splitPinB: this.splitPinB,
+      splitSide: this.splitSide,
+      vbusPin: this.vbusPin,
 
       coordMap: this.coordMap,
       pinPrefix: this.pinPrefix,
@@ -559,7 +574,7 @@ export const isNewKeyboardSetup = computed(() => {
 
 export const notifications = ref<{ label: string }[]>([])
 
-export const pinPfrefixHint = computed(() => {
+export const pinPrefixHint = computed(() => {
   switch (keyboardStore.pinPrefix) {
     case 'gp':
       return 'generates `board.GP1` like pins from numbers'
@@ -576,6 +591,43 @@ export const pinPfrefixHint = computed(() => {
       return ''
   }
 })
+
+export const splitSideHint = computed(() => {
+  switch (keyboardStore.splitSide) {
+    case 'label':
+      return 'detects split side by label on the microcontroller'
+      break
+    case 'vbus':
+      return 'detects split side using VBUS pin'
+      break
+    case 'left':
+      return 'detects split side using value in config file (left side)'
+      break
+    case 'right':
+      return 'detects split side using value in config file (right side)'
+      break
+    default:
+      return ''
+  }
+})
+
+export const splitPinHint = computed(() => {
+  switch (keyboardStore.keyboardType) {
+    case 'splitSerial':
+      return 'Defines the serial pins used to connect the two halves.'
+      break
+    case 'splitOnewire':
+      return 'Defines the data pin used to connect the two halves'
+      break
+    default:
+      return ''
+  }
+})
+
+export const vbusPinHint = computed(() => {
+  return `generates 'board.${keyboardStore.vbusPin}'`
+})
+
 export const userSettings = useStorage('user-settings', {
   reduceKeymapColors: false,
   autoSelectNextKey: false

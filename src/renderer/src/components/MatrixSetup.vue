@@ -4,7 +4,15 @@
       define the size of your keyboard matrix here, set it as big as you need. For easier wiring set
       it to the max number of cols/rows on your keyboard
     </p>
-
+    <div class="mb-4">
+      <p class="mb-2 text-sm">Keyboard Type</p>
+      <select v-model="keyboardStore.keyboardType" class="select select-bordered mb-2 w-full">
+        <option value="normal">Normal</option>
+        <option value="splitBle">Split (Bluetooth)</option>
+        <option value="splitSerial">Split (Serial)</option>
+        <option value="splitOnewire">Split (1 Pin)</option>
+      </select>
+    </div>
     <div class="mb-4">
       <p class="mb-2 text-sm">Wiring Method</p>
       <select v-model="keyboardStore.wiringMethod" class="select select-bordered w-full">
@@ -14,59 +22,14 @@
     </div>
 
     <div v-if="keyboardStore.wiringMethod === 'matrix'" class="mb-8 grid grid-cols-2 gap-2">
-      <InputLabel
-        v-model="keyboardStore.cols"
-        placeholder="1"
-        input-type="number"
-        label="Matrix Width"
-        :min="0"
-        @input="checkMatrix"
-      ></InputLabel>
-      <InputLabel
-        v-model="keyboardStore.rows"
-        placeholder="1"
-        input-type="number"
-        label="Matrix Height"
-        :min="0"
-        @input="checkMatrix"
-      ></InputLabel>
+      <InputLabel v-model="keyboardStore.cols" placeholder="1" input-type="number" label="Matrix Width" :min="0" @input="checkMatrix"></InputLabel>
+      <InputLabel v-model="keyboardStore.rows" placeholder="1" input-type="number" label="Matrix Height" :min="0" @input="checkMatrix"></InputLabel>
     </div>
     <div v-if="keyboardStore.wiringMethod === 'direct'" class="mb-8">
-      <InputLabel
-        v-model="keyboardStore.pins"
-        placeholder="1"
-        input-type="number"
-        label="Pin Count"
-        :min="1"
-        @input="checkMatrix"
-      ></InputLabel>
-    </div>
-    <div>
-      <label class="mb-2 flex items-center gap-2">
-        <input v-model="keyboardStore.split" type="checkbox" class="checkbox" />
-        <span>Split Keyboard</span>
-      </label>
-      <div v-if="keyboardStore.split" class="flex flex-col gap-2">
-        <p>
-          Define the serial pins used to connect the two halves, this is using the pin prefix from
-          the `pins` tab
-        </p>
-        <label class="flex items-center gap-2">
-          <span>SplitPin A</span>
-          <input v-model="keyboardStore.splitPinA" type="text" class="input-bordered input" />
-        </label>
-        <label class="flex items-center gap-2">
-          <span>SplitPin B</span>
-          <input v-model="keyboardStore.splitPinB" type="text" class="input-bordered input" />
-        </label>
-      </div>
+      <InputLabel v-model="keyboardStore.pins" placeholder="1" input-type="number" label="Pin Count" :min="1" @input="checkMatrix"></InputLabel>
     </div>
     <div v-if="initialSetup" class="mb-8 flex justify-center">
-      <button
-        class="btn-primary btn"
-        :class="{ 'btn-disabled': matrixEmpty }"
-        @click="$emit('next')"
-      >
+      <button class="btn-primary btn" :class="{ 'btn-disabled': matrixEmpty }" @click="$emit('next')">
         Next
       </button>
     </div>
@@ -105,10 +68,12 @@ const checkMatrix = () => {
   align-items: center;
   width: 100%;
 }
+
 .row {
   display: flex;
   gap: 4px;
 }
+
 .col {
   width: 40px;
   height: 40px;
