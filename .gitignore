@@ -4,3 +4,4 @@ out
 *.log*
 .idea
 .DS_Store
+.pog.code-workspace
