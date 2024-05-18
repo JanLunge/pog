@@ -10,7 +10,7 @@
          <i class="mdi mdi-delete"></i> remove encoder
         </button>
       </div>
-        <p>Prefix: {{keyboardStore.pinPrefix}} - {{pinPfrefixHint}}</p>
+        <p>Prefix: {{keyboardStore.pinPrefix}} - {{pinPrefixHint}}</p>
       <div class="flex items-center gap-4 mb-2">
         <label>Pad A</label>
         <input
@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts" setup>
-import {keyboardStore, pinPfrefixHint} from "../store";
+import {keyboardStore, pinPrefixHint} from "../store";
 import EncoderLayer from "./EncoderLayer.vue";
 
 const cleanEncoders = () => {

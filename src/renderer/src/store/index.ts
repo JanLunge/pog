@@ -569,7 +569,7 @@ export const isNewKeyboardSetup = computed(() => {
 
 export const notifications = ref<{ label: string }[]>([])
 
-export const pinPfrefixHint = computed(() => {
+export const pinPrefixHint = computed(() => {
   switch (keyboardStore.pinPrefix) {
     case 'gp':
       return 'generates `board.GP1` like pins from numbers'
@@ -586,6 +586,43 @@ export const pinPfrefixHint = computed(() => {
       return ''
   }
 })
+
+export const splitSideHint = computed(() => {
+  switch (keyboardStore.splitSide) {
+    case 'label':
+      return 'detects split side by label on the microcontroller'
+      break
+    case 'vbus':
+      return 'detects split side using VBUS pin'
+      break
+    case 'left':
+      return 'detects split side using value in config file (left side)'
+      break
+    case 'right':
+      return 'detects split side using value in config file (right side)'
+      break
+    default:
+      return ''
+  }
+})
+
+export const splitPinHint = computed(() => {
+  switch (keyboardStore.keyboardType) {
+    case 'splitSerial':
+      return 'Defines the serial pins used to connect the two halves.'
+      break
+    case 'splitOnewire':
+      return 'Defines the data pin used to connect the two halves'
+      break
+    default:
+      return ''
+  }
+})
+
+export const vbusPinHint = computed(() => {
+  return `generates 'board.${keyboardStore.vbusPin}'`
+})
+
 export const userSettings = useStorage('user-settings', {
   reduceKeymapColors: false,
   autoSelectNextKey: false
