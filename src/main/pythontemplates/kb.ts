@@ -38,7 +38,7 @@ class KMKKeyboard(_KMKKeyboard):
 
         if pog.config['split']:
             from kmk.modules.split import Split, SplitSide, SplitType
-            
+
             # Split Side Detection
             if pog.splitSide == "label":
                 from storage import getmount
@@ -56,7 +56,7 @@ class KMKKeyboard(_KMKKeyboard):
             if pog.keyboardType == "splitBLE":
                 print("split with 2 pins")
                 self.split = Split(
-                    split_type=SplitType.BLE, 
+                    split_type=SplitType.BLE,
                     split_side=side)
             elif pog.keyboardType == "splitSerial":
                 print("split with 2 pins (UART)")
@@ -64,16 +64,16 @@ class KMKKeyboard(_KMKKeyboard):
                     split_side=side,
                     split_type=SplitType.UART,
                     split_flip=False,
-                    data_pin=pog.splitPinA, 
-                    data_pin2=pog.splitPinB, 
+                    data_pin=pog.splitPinA,
+                    data_pin2=pog.splitPinB,
                     use_pio=True)
             else:
                 # Nested under pog.split == True => splitOnewire
                 print('split with 1 pin')
                 self.split = Split(
-                    data_pin=pog.splitPinA
-                    )
-              
+                    data_pin=pog.splitPinA,
+                    use_pio=True)
+
             self.modules.append(self.split)
 
         # Add your own modules and extensions here
@@ -99,7 +99,7 @@ class KMKKeyboard(_KMKKeyboard):
                 val_default=20,
             )
             self.extensions.append(rgb)
-        
+
         # direct pin wiring
         # Must be set during init to override defaulting to matrix wiring
         if pog.directWiring:
@@ -110,7 +110,7 @@ class KMKKeyboard(_KMKKeyboard):
                 interval=0.02,
                 max_events=64
             )
-          
+
     # matrix wiring
     if pog.matrixWiring:
         exec("col_pins = (" + pog.colPins + ")")
