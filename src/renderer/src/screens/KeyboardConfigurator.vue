@@ -60,7 +60,7 @@
       <li>
         <router-link to="/configurator/firmware"><i class="mdi mdi-flash"></i>Firmware</router-link>
       </li>
-          <li>
+      <li>
         <router-link to="/configurator/rgb"><i class="mdi mdi-led-on"></i>RGB</router-link>
       </li>
       <li>
@@ -80,10 +80,10 @@
         >
           {{ currentRouteName }}
         </h1>
-        <div class="btn-ghost btn mr-4" @click="info">
+        <div class="btn btn-ghost mr-4" @click="info">
           <i class="mdi mdi-help-circle-outline text-2xl"></i>
         </div>
-        <div class="btn-primary btn mr-4" @click="saveKeymap">
+        <div class="btn btn-primary mr-4" @click="saveKeymap">
           <i class="mdi mdi-content-save text-2xl"></i>
         </div>
       </div>

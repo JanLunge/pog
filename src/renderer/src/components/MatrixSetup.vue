@@ -1,7 +1,7 @@
 <template>
   <div>
-    <p class="max-w-md py-4">
-      define the size of your keyboard matrix here, set it as big as you need. For easier wiring set
+    <p class="max-w-xl py-4">
+      Define the size of your keyboard matrix here, set it as big as you need. For easier wiring set
       it to the max number of cols/rows on your keyboard
     </p>
     <div class="mb-4">
@@ -22,14 +22,39 @@
     </div>
 
     <div v-if="keyboardStore.wiringMethod === 'matrix'" class="mb-8 grid grid-cols-2 gap-2">
-      <InputLabel v-model="keyboardStore.cols" placeholder="1" input-type="number" label="Matrix Width" :min="0" @input="checkMatrix"></InputLabel>
-      <InputLabel v-model="keyboardStore.rows" placeholder="1" input-type="number" label="Matrix Height" :min="0" @input="checkMatrix"></InputLabel>
+      <InputLabel
+        v-model="keyboardStore.cols"
+        placeholder="1"
+        input-type="number"
+        label="Matrix Width"
+        :min="0"
+        @input="checkMatrix"
+      ></InputLabel>
+      <InputLabel
+        v-model="keyboardStore.rows"
+        placeholder="1"
+        input-type="number"
+        label="Matrix Height"
+        :min="0"
+        @input="checkMatrix"
+      ></InputLabel>
     </div>
     <div v-if="keyboardStore.wiringMethod === 'direct'" class="mb-8">
-      <InputLabel v-model="keyboardStore.pins" placeholder="1" input-type="number" label="Pin Count" :min="1" @input="checkMatrix"></InputLabel>
+      <InputLabel
+        v-model="keyboardStore.pins"
+        placeholder="1"
+        input-type="number"
+        label="Pin Count"
+        :min="1"
+        @input="checkMatrix"
+      ></InputLabel>
     </div>
     <div v-if="initialSetup" class="mb-8 flex justify-center">
-      <button class="btn-primary btn" :class="{ 'btn-disabled': matrixEmpty }" @click="$emit('next')">
+      <button
+        class="btn btn-primary"
+        :class="{ 'btn-disabled': matrixEmpty }"
+        @click="$emit('next')"
+      >
         Next
       </button>
     </div>
