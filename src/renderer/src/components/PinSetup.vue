@@ -2,7 +2,7 @@
   <div class="flex items-center justify-center">
     <p class="max-w-md py-4">
       Define the mapping for columns and rows to the microcontroller pins. For split keyboards
-      define the method for detecting the spilt side.
+      define the method for detecting the split side.
     </p>
   </div>
   <div v-if="initialSetup" class="my-8 flex w-full justify-center">
@@ -211,12 +211,12 @@
           </li>
         </ul>
         <p class="py-4">
-          feel free to submit other microcontroller pinouts just make sure you have the permission
-          to use the pinout image if it has not been created by you, in the mean time here are links
-          to other pinouts
+          Feel free to submit other microcontroller pinouts. Ensure you have the permission to use
+          the pinout image if it has not been created by you. In the meantime here are links to
+          other pinouts
         </p>
-        <p>currently this tool works with any RP2040 controller.</p>
-        <p class="py-4">just look for a pinout and use any pin that is starting with GP</p>
+        <p>Currently this tool works with any RP2040 controller.</p>
+        <p class="py-4">Just look for a pinout and use any pin that is starting with GP</p>
       </div>
     </div>
   </div>

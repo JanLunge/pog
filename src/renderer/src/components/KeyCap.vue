@@ -122,7 +122,7 @@
 </template>
 
 <script lang="ts" setup>
-import {computed, nextTick, onMounted, ref, VNodeRef, watch} from 'vue'
+import { computed, nextTick, onMounted, ref, VNodeRef, watch } from 'vue'
 import { selectedLayer, selectedKeys, userSettings } from '../store'
 import { renderLabel } from '../helpers'
 import chroma from 'chroma-js'
@@ -144,7 +144,7 @@ const action = computed(() => {
   let keyIndex = 0
 
   keyIndex = props.keyData.coordMapIndex
-  if (!props.keymap[selectedLayer.value]) return 'l missing'
+  if (!props.keymap[selectedLayer.value]) return 'No layer'
   const keyCode = props.keymap[selectedLayer.value][keyIndex]
   // resolve readable character
   if (!keyCode || keyCode === 'KC.TRNS') return '▽'
@@ -340,11 +340,11 @@ const isSimple = computed(() => {
 const keyElem = ref<VNodeRef | null>(null)
 const fixLabelWidth = () => {
   // key is eventually hidden with a layout variant
-  if(!keyElem.value) return
+  if (!keyElem.value) return
   const label = keyElem.value.querySelector('.keylabel-main')
   const labels = keyElem.value.querySelector('.keylabels')
   if (label) {
-    console.log("fixing label width")
+    console.log('fixing label width')
     label.style.transform = `scale(1)`
     const labelWidth = label.getBoundingClientRect().width
     const wrapperWidth = labels.getBoundingClientRect().width
@@ -352,7 +352,7 @@ const fixLabelWidth = () => {
     label.style.transform = `scale(${scaling})`
   }
 }
-watch(mainLabel,async ()=>{
+watch(mainLabel, async () => {
   console.log('watching cap layer')
   await nextTick()
   fixLabelWidth()
