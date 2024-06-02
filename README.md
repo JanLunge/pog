@@ -6,7 +6,7 @@ KMK GUI, Layout Editor, Keymap Editor, Flashing Utility
 <p align="center">
     <a href="https://github.com/JanLunge/pog/stargazers"><img src="https://img.shields.io/github/stars/JanLunge/pog" alt="Stars Badge"/></a>
     <a href="https://github.com/JanLunge/pog/network/members"><img src="https://img.shields.io/github/forks/JanLunge/pog" alt="Forks Badge"/></a>
-    <img src="https://badgen.net/badge/version/v1.0.5" alt="">
+    <img src="https://badgen.net/badge/version/v1.3.2" alt="">
 </p>
 
 ![preview](demo/pog-screenshot.png?raw=true)
