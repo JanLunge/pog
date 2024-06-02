@@ -1,18 +1,12 @@
 <template>
   <div class="relative">
     <!--    <h2 class="mb-2 inline-block absolute top-6" style="transform: rotate(-90deg);  left: -15px">Layers</h2>-->
-    <div class="mb-2  flex gap-2">
-      <button class="btn-sm btn" @click="addLayer">
-        <i class="mdi mdi-plus"></i>add Layer
-      </button>
-      <button
-        class="btn-sm btn"
-        :disabled="keyboardStore.keymap.length === 1"
-        @click="removeLayer"
-      >
+    <div class="mb-2 flex gap-2">
+      <button class="btn btn-sm" @click="addLayer"><i class="mdi mdi-plus"></i>add Layer</button>
+      <button class="btn btn-sm" :disabled="keyboardStore.keymap.length === 1" @click="removeLayer">
         <i class="mdi mdi-trash-can"></i>remove Layer
       </button>
-      <button class="btn-sm btn" @click="duplicateLayer">
+      <button class="btn btn-sm" @click="duplicateLayer">
         <i class="mdi mdi-content-duplicate"></i>Duplicate Layer
       </button>
       <button class="btn btn-sm" @click="toggleSettings">
@@ -22,14 +16,14 @@
     <div class="mb-4 flex gap-2" v-if="settingsOpen">
       <label class="flex items-center gap-2">
         <input v-model="userSettings.reduceKeymapColors" type="checkbox" class="checkbox" />
-        <span>reduce keymap colors</span>
+        <span>Reduce keymap colors</span>
       </label>
       <label class="flex items-center gap-2">
         <input v-model="userSettings.autoSelectNextKey" type="checkbox" class="checkbox" />
-        <span>auto select next key</span>
+        <span>Auto-select next key</span>
       </label>
     </div>
-    <div class="flex items-center mt-4">
+    <div class="mt-4 flex items-center">
       <div class="flex gap-2">
         <KeymapLayer v-for="(layer, index) in keyboardStore.keymap" :layer="layer" :index="index" />
       </div>
@@ -45,35 +39,37 @@
     />
   </div>
   <div class="my-4">
-    <p class="mb-2 text-sm font-bold">Keycode Options for Selected Key(s) <span class="text-warning text-sm">{{coordMapWarning}}</span></p>
+    <p class="mb-2 text-sm font-bold">
+      Keycode Options for Selected Key(s)
+      <span class="text-sm text-warning">{{ coordMapWarning }}</span>
+    </p>
     <div class="flex gap-2">
       <select
         v-model="keycodeModeForSelection"
-        class="select-bordered select select-sm"
+        class="select select-bordered select-sm"
         @change="switchedKeyCodeType"
       >
         <!-- simple will just inline the keycode -->
-        <option value="simple">simple</option>
+        <option value="simple">Simple</option>
         <!-- other options will create a separately linked keycode -->
-        <option value="string">string</option>
-        <option value="sequence">sequence</option>
-        <option value="tapdance">tapdance</option>
-        <option value="custom">custom</option>
+        <option value="string">String</option>
+        <option value="sequence">Sequence</option>
+        <option value="tapdance">Tap Dance</option>
+        <option value="custom">Custom</option>
       </select>
       <div class="flex-grow">
         <input
           v-model="currentKeyCode"
           :disabled="selectedKeys.size === 0"
           type="text"
-          class="input-bordered input input-sm w-full"
+          class="input input-bordered input-sm w-full"
         />
-
       </div>
     </div>
     <div v-if="keycodeModeForSelection === 'custom'" class="p-2 text-sm italic">
       <p>
-        to add your own custom keycodes you edit the file `customkeys.py` to add your own and then
-        use them with cusomkeys.MyKey in your keymap
+        To add your own custom keycodes, edit the file `customkeys.py` to add your own and then use
+        them with `customkeys.MyKey` in your keymap
       </p>
     </div>
   </div>
@@ -81,7 +77,7 @@
 </template>
 
 <script lang="ts" setup>
-import {keyboardStore, selectedKeys, selectedLayer, userSettings} from '../store'
+import { keyboardStore, selectedKeys, selectedLayer, userSettings } from '../store'
 import KeyboardLayout from './KeyboardLayout.vue'
 import KeyPicker from './KeyPicker.vue'
 import { cleanupKeymap, selectNextKey } from '../helpers'
@@ -118,7 +114,6 @@ const addLayer = () => {
   }
 }
 const removeLayer = () => {
-
   if (keyboardStore.keymap.length <= 1) return
 
   // if needed also remove the encoder layer
@@ -138,7 +133,7 @@ const duplicateLayer = () => {
 const currentKeyCode = computed({
   get() {
     const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
-    if (keys.length === 0) return 'no key'
+    if (keys.length === 0) return 'No key selected'
     const actions: string[] = []
     keys.forEach((key) => {
       actions.push(keyboardStore.getActionForKey({ key, layer: selectedLayer.value }))
@@ -172,11 +167,11 @@ const switchedKeyCodeType = () => {
 }
 const settingsOpen = ref(false)
 const toggleSettings = () => {
-  settingsOpen.value=!settingsOpen.value
+  settingsOpen.value = !settingsOpen.value
 }
 
 const coordMapWarning = computed(() => {
- // show if any of the selected keys does not have and idx
+  // show if any of the selected keys does not have and idx
   const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
   if (keys.length === 0) return ''
   console.log(keys, keys[0].coordMapIndex)

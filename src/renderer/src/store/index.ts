@@ -402,7 +402,7 @@ export class Keyboard {
   }
 
   getActionForKey({ key, layer }) {
-    if (!this.keymap[layer]) return 'l missing'
+    if (!this.keymap[layer]) return 'No layer'
     const keyCode = this.keymap[layer][key.getKeymapIndex()]
     // resolve readable character
     if (!keyCode || keyCode === 'KC.TRNS') return '▽'
@@ -577,16 +577,16 @@ export const notifications = ref<{ label: string }[]>([])
 export const pinPrefixHint = computed(() => {
   switch (keyboardStore.pinPrefix) {
     case 'gp':
-      return 'generates `board.GP1` like pins from numbers'
+      return 'Generates `board.GP1` like pins from numbers'
       break
     case 'board':
-      return 'generates `board.yourpin` like pins from text'
+      return 'Generates `board.yourpin` like pins from text'
       break
     case 'none':
-      return 'generates `yourpin` like pins from text'
+      return 'Generates `yourpin` like pins from text'
       break
     case 'quickpin':
-      return 'generates `pins[1]` like pins from numbers'
+      return 'Generates `pins[1]` like pins from numbers'
     default:
       return ''
   }
@@ -595,16 +595,16 @@ export const pinPrefixHint = computed(() => {
 export const splitSideHint = computed(() => {
   switch (keyboardStore.splitSide) {
     case 'label':
-      return 'detects split side by label on the microcontroller'
+      return 'Detects split side by label on the microcontroller'
       break
     case 'vbus':
-      return 'detects split side using VBUS pin'
+      return 'Detects split side using VBUS pin'
       break
     case 'left':
-      return 'detects split side using value in config file (left side)'
+      return 'Detects split side using value in config file (left side)'
       break
     case 'right':
-      return 'detects split side using value in config file (right side)'
+      return 'Detects split side using value in config file (right side)'
       break
     default:
       return ''
@@ -625,7 +625,7 @@ export const splitPinHint = computed(() => {
 })
 
 export const vbusPinHint = computed(() => {
-  return `generates 'board.${keyboardStore.vbusPin}'`
+  return `Generates 'board.${keyboardStore.vbusPin}'`
 })
 
 export const userSettings = useStorage('user-settings', {

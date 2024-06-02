@@ -2,62 +2,71 @@
   <div class="mt-4 p-4 text-left">
     <p>
       <a href="https://kmkfw.io/" target="_blank" class="link">KMK</a> is a capable firmware for
-      keyboards using the rp2040.
+      keyboards using the Rp2040.
     </p>
     <p>
       Before you proceed make sure you installed
-      <a class="link" href="https://circuitpython.org/downloads" target="_blank">circuit python</a>
+      <a class="link" href="https://circuitpython.org/downloads" target="_blank">CircuitPython</a>
       on your controller
     </p>
     <p>
-      info: this does not work when the controller is only connected via the serial port (and not as mounted usb drive)
+      Info: This does not work when the controller is only connected via the serial port (and not as
+      mounted usb drive)
     </p>
+    <br />
     <p v-if="!keyboardStore.firmwareInstalled">
-      You can let kmk automatically install to this keyboard
+      By clicking the button below, you can install KMK automatically to the following drive:
       <span class="font-mono">{{ keyboardStore.path }}</span>
     </p>
-    <div class="flex justify-center">
-      <div v-if="keyboardStore.firmwareInstalled" class="stats mt-8 shadow-xl">
-        <div class="stat text-left">
-          <div class="stat-figure text-primary">
-            <i class="mdi mdi-check text-3xl"></i>
+    <div class="holder">
+      <div class="flex justify-center">
+        <div v-if="keyboardStore.firmwareInstalled" class="stats mt-8 shadow-xl">
+          <div class="stat text-left">
+            <div class="stat-figure text-primary">
+              <i class="mdi mdi-check text-3xl"></i>
+            </div>
+            <div class="stat-title">Firmware Installed</div>
+            <div class="stat-value text-primary">KMK</div>
+            <!--        <div class="stat-desc">modified on</div>-->
           </div>
-          <div class="stat-title">Firmware Installed</div>
-          <div class="stat-value text-primary">KMK</div>
-          <!--        <div class="stat-desc">modified on</div>-->
         </div>
       </div>
-    </div>
-    <div class="mt-8 flex justify-center">
-      <button v-if="keyboardStore.firmwareInstalled" class="btn btn-primary mt-4 block" @click="$emit('next')">
-        Next
-      </button>
-      <button v-else class="btn mt-4 block" @click="$emit('next')">
-              I install it manually
+      <div
+        v-if="[''].includes(kmkInstallState)"
+        class="mt-8 flex flex-col items-center justify-center"
+      >
+        <button class="btn btn-primary mt-8" @click="updateKMK">
+          {{ keyboardStore.firmwareInstalled ? 'update' : 'install' }} KMK
+        </button>
+      </div>
+      <div class="mt-8 flex justify-center">
+        <button
+          v-if="keyboardStore.firmwareInstalled"
+          class="btn btn-primary mt-4 block"
+          @click="$emit('next')"
+        >
+          Next
+        </button>
+        <button v-else class="btn mt-4 block" @click="$emit('next')">
+          I installed KMK manually
+        </button>
+      </div>
 
-      </button>
-    </div>
-    <div v-if="[''].includes(kmkInstallState)" class="mt-8 flex justify-center items-center flex-col">
-      <button class="btn-primary btn mt-8" @click="updateKMK"> {{keyboardStore.firmwareInstalled? 'update': 'install'}} KMK</button>
-
-    </div>
-    <div class="mt-4 flex flex-col items-center justify-center" v-if="['downloading', 'copying', 'unpacking'].includes(kmkInstallState)" >
-      <p class="m-4 mt-8">{{ kmkInstallState || '' }}</p>
-      <progress
-        class="progress progress-primary w-56"
-        :value="progress"
-        max="100"
-      ></progress>
-      <span v-if="progress !== 0">
-      {{ isNaN(progress) ? 'Done' : progress }}%
-      </span>
+      <div
+        class="mt-4 flex flex-col items-center justify-center"
+        v-if="['downloading', 'copying', 'unpacking'].includes(kmkInstallState)"
+      >
+        <p class="m-4 mt-8">{{ kmkInstallState || '' }}</p>
+        <progress class="progress progress-primary w-56" :value="progress" max="100"></progress>
+        <span v-if="progress !== 0"> {{ isNaN(progress) ? 'Done' : progress }}% </span>
+      </div>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue'
 import { keyboardStore } from '../store'
-import dayjs from "dayjs";
+import dayjs from 'dayjs'
 
 const progress = ref(0)
 const kmkInstallState = ref('')
