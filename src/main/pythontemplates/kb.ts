@@ -36,6 +36,12 @@ class KMKKeyboard(_KMKKeyboard):
             self.combos = Combos()
             self.modules.append(self.combos)
 
+        # TODO: not tested yet
+        if "capsword" in features:
+            from kmk.modules.capsword import CapsWord
+            self.capsword = CapsWord()
+            self.modules.append(self.capsword)
+
         if pog.config['split']:
             from kmk.modules.split import Split, SplitSide, SplitType
 
