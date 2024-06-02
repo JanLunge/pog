@@ -9,7 +9,7 @@
       <p class="py-4">Be sure to backup your code if you still need any of it.</p>
       <div class="flex justify-between">
         <div class="btn">Abort</div>
-        <div class="btn btn-warning" @click="flashCoordMapping({overwrite: true})">Flash POG</div>
+        <div class="btn btn-warning" @click="flashCoordMapping({ overwrite: true })">Flash POG</div>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
@@ -17,7 +17,7 @@
     </form>
   </dialog>
   <div>
-    <p class="py-4">1. install the debug code on the keyboard</p>
+    <p class="py-4">1. Install the debug code on the keyboard</p>
     <button class="btn btn-primary btn-sm" @click="promptFlashing">
       Flash CoordMap Finder to keyboard
     </button>
@@ -25,11 +25,14 @@
       <p class="py-4">2. Click the text area and follow the guide below</p>
 
       <p class="mb-4">
-        3. Now press each key starting in the top left corner in the first row and moving to the right
-        when you reached the end press the last key once again to start with the next row
+        3. Now press each key starting in the top left corner in the first row and moving to the
+        right when you reached the end press the last key once again to start with the next row
       </p>
 
-      <p class="py-4">if nothing is happening first replug the board in case it hasnt started and wait 5 seconds. if this did not help check the diode direction or pins.</p>
+      <p class="py-4">
+        If nothing is happening first replug the board in case it hasnt started and wait 5 seconds.
+        If this did not help check the diode direction or pins.
+      </p>
       <textarea
         id="keycapture"
         v-model="coordmap"
@@ -58,7 +61,7 @@
       <button class="btn btn-primary mt-2" @click="done">
         {{ initialSetup ? 'next' : 'save Coord Maping & create keyboard layout' }}
       </button>
-      <button class="btn-primary btn mt-2" @click="onlySave"  v-if="!initialSetup">
+      <button class="btn btn-primary mt-2" @click="onlySave" v-if="!initialSetup">
         only save Coord Maping
       </button>
     </div>
@@ -86,12 +89,12 @@ coordmap.value = keyboardStore.coordMap
   .join(' row ')
 
 const addRow = () => {
-  coordmap.value = coordmap.value + '\n';
-  (document.querySelector('#keycapture') as HTMLInputElement).focus()
+  coordmap.value = coordmap.value + '\n'
+  ;(document.querySelector('#keycapture') as HTMLInputElement).focus()
 }
 const addSpc = () => {
-  coordmap.value += 'spc ';
-  (document.querySelector('#keycapture') as HTMLInputElement).focus()
+  coordmap.value += 'spc '
+  ;(document.querySelector('#keycapture') as HTMLInputElement).focus()
 }
 const done = () => {
   keyboardStore.setKeys(keyboardlayout.value as KeyInfo[])
@@ -102,20 +105,24 @@ const onlySave = () => {
   keyboardStore.coordMap = keys.value
 }
 const promptFlashing = () => {
-  if(props.initialSetup){
+  if (props.initialSetup) {
     // after valid ok then flash file with overwrite on
-    (document.getElementById("flash_modal") as HTMLDialogElement).showModal()
+    ;(document.getElementById('flash_modal') as HTMLDialogElement).showModal()
   } else {
-    flashCoordMapping({overwrite: false})
+    flashCoordMapping({ overwrite: false })
   }
 }
-const flashCoordMapping = async ({ overwrite } : {overwrite: boolean}) => {
+const flashCoordMapping = async ({ overwrite }: { overwrite: boolean }) => {
   console.log('flashCoordMapping with overwrite:', overwrite)
-  keyboardStore.coordMapSetup = true;
-  (document.getElementById("flash_modal") as HTMLDialogElement).close()
+  keyboardStore.coordMapSetup = true
+  ;(document.getElementById('flash_modal') as HTMLDialogElement).close()
   overwrite = Boolean(overwrite)
   await window.api.saveConfiguration(
-    JSON.stringify({ pogConfig: keyboardStore.serialize(), writeFirmware: overwrite, writeCoordMapHelper: true })
+    JSON.stringify({
+      pogConfig: keyboardStore.serialize(),
+      writeFirmware: overwrite,
+      writeCoordMapHelper: true
+    })
   )
 }
 const keys = computed(() => {
@@ -152,7 +159,7 @@ const coordmapstring = computed(() => {
   return str.replaceAll(/spc,/gi, '    ')
 })
 const keyboardlayout = computed(() => {
-  const realKeys :Key[]= []
+  const realKeys: Key[] = []
   let globalkeyindex = 0
   keys.value.forEach((row, rowindex) => {
     row.forEach((key, kindex) => {

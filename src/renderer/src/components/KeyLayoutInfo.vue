@@ -1,6 +1,6 @@
 <template>
-  <p class="font-bold">Key Info for key #{{ [...selectedKeys][0] }}</p>
-  <p>selected {{ selectedKeys.size }} keys</p>
+  <p class="font-bold">Key info for key #{{ [...selectedKeys][0] }}</p>
+  <p>{{ selectedKeys.size }} {{ selectedKeys.size == 1 ? 'key' : 'keys' }} selected:</p>
   <p class="mt-2 text-sm">Basics</p>
   <div class="flex flex-col gap-2">
     <div class="grid grid-cols-4 gap-2 text-right">
@@ -88,7 +88,7 @@
       </div>
     </div>
   </div>
-  <template v-if="keyboardStore.wiringMethod === 'matrix' && false ">
+  <template v-if="keyboardStore.wiringMethod === 'matrix' && false">
     <p class="mt-2 text-sm" :class="{ 'text-error': matrixValid }">Matrix</p>
     <div class="flex gap-2">
       <div class="keydata-input-group">
@@ -123,15 +123,15 @@
   </div>
   <div v-if="keyboardStore.layouts.length !== 0" class="flex gap-1">
     <label>
-      <span>variant</span>
+      <span>Variant</span>
       <input v-model="tmpKey.variant[0]" type="text" class="keyinfo-input" @change="updateKey" />
     </label>
     <label>
-      <span>variant option</span>
+      <span>Variant option</span>
       <input v-model="tmpKey.variant[1]" type="text" class="keyinfo-input" @change="updateKey" />
     </label>
   </div>
-  <span>rotation</span>
+  <span>Rotation</span>
   <div class="flex gap-1">
     <input
       v-model="tmpKey.r"
@@ -208,22 +208,9 @@ const isAttrSame = (keys, attr) => {
 const getSameKeyAttrs = (keys) => {
   console.log(keys)
   const sameAttrs = new Map()
-  ;[
-    'y',
-    'y2',
-    'x',
-    'x2',
-    'w',
-    'w2',
-    'h',
-    'h2',
-    'r',
-    'ry',
-    'rx',
-    'encoderIndex'
-  ].forEach((attr) => {
+  ;['y', 'y2', 'x', 'x2', 'w', 'w2', 'h', 'h2', 'r', 'ry', 'rx', 'encoderIndex'].forEach((attr) => {
     if (isAttrSame(keys, attr) && keys[0][attr] !== undefined) {
-      console.log('attr is same',attr)
+      console.log('attr is same', attr)
       sameAttrs.set(attr, keys[0][attr])
     }
   })
@@ -295,7 +282,7 @@ const updateKey = () => {
     if (tmpKey.value.ry !== '') props.layout[keyIndex].ry = Number(tmpKey.value.ry)
     if (tmpKey.value.coordMapIndex !== '' && !isNaN(tmpKey.value.coordMapIndex as any))
       props.layout[keyIndex].coordMapIndex = Number(tmpKey.value.coordMapIndex)
-    else props.layout[keyIndex].coordMapIndex = ""
+    else props.layout[keyIndex].coordMapIndex = ''
     if (tmpKey.value.encoderIndex !== '' && !isNaN(Number(tmpKey.value.encoderIndex)))
       props.layout[keyIndex].encoderIndex = Number(tmpKey.value.encoderIndex)
     else props.layout[keyIndex].encoderIndex = undefined
@@ -342,7 +329,7 @@ const matrixValid = computed(() => {
 
 <style lang="scss" scoped>
 .keyinfo-input {
-  @apply input-bordered input input-sm w-full flex-shrink;
+  @apply input input-bordered input-sm w-full flex-shrink;
   padding-left: 3px;
   padding-right: 3px;
 }
