@@ -20,7 +20,11 @@ except OSError as e:
 print("starting keyboard %s (%s)" % (config["name"], config["id"]))
 
 def pinValid(pin):
-    return pin in [f'board.{alias}' for alias in dir(board)]
+    if pin in [f'board.{alias}' for alias in dir(board)]:
+        return True
+    else:
+        print(f'INVALID PIN FOUND {pin}')
+        return False
 
 # Pin setup
 def renderPin(pin):
@@ -35,6 +39,7 @@ def renderPin(pin):
         pinLabel = pin
     if pinValid(pinLabel):
         return pinLabel
+    
 
 
 colPinsArray = []
