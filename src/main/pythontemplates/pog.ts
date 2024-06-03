@@ -1,6 +1,7 @@
 export const pogpy = `# pog.py Import the pog config - v0.9.5
 import json
 import board
+import microcontroller
 from kmk.keys import KC
 
 config = {}
@@ -19,22 +20,30 @@ except OSError as e:
 
 print("starting keyboard %s (%s)" % (config["name"], config["id"]))
 
+def pinValid(pin):
+    return pin in [f'board.{alias}' for alias in dir(board)]
 
 # Pin setup
 def renderPin(pin):
+    pinLabel = ''
     if config["pinPrefix"] == "gp":
-        return "board.GP" + pin
+        pinLabel = "board.GP" + pin
     elif config["pinPrefix"] == "board":
-        return "board." + pin
+        pinLabel = "board." + pin
     elif config["pinPrefix"] == "quickpin":
-        return "pins[" + pin + "]"
+        pinLabel = "pins[" + pin + "]"
     else:
-        return pin
+        pinLabel = pin
+    if pinValid(pinLabel):
+        return pinLabel
 
 
 colPinsArray = []
 for i, item in enumerate(config["colPins"]):
     colPinsArray.append(renderPin(item))
+# Check validity of all the pins.
+# If a pin isn't valid it is omitted from the string
+colPinsArray = [pin for pin in colPinsArray if pin is not None]
 colPins = ",".join(colPinsArray)
 if len(colPinsArray) == 1:
     colPins = colPins + ","
@@ -42,6 +51,9 @@ if len(colPinsArray) == 1:
 rowPinsArray = []
 for i, item in enumerate(config["rowPins"]):
     rowPinsArray.append(renderPin(item))
+# Check validity of all the pins.
+# If a pin isn't valid it is omitted from the string
+rowPinsArray = [pin for pin in rowPinsArray if pin is not None]
 rowPins = ",".join(rowPinsArray)
 if len(rowPinsArray) == 1:
     rowPins = rowPins + ","
@@ -49,11 +61,14 @@ if len(rowPinsArray) == 1:
 pinsArray = []
 for i, item in enumerate(config["directPins"]):
     pinsArray.append(renderPin(item))
+# Check validity of all the pins.
+# If a pin isn't valid it is omitted from the string
+pinsArray = [pin for pin in pinsArray if pin is not None]
 pins = ",".join(pinsArray)
 if len(pinsArray) == 1:
     pins = pins + ","
 
-rgbPin = config["rgbPin"]
+rgbPin = config["rgbPin"] if pinValid(config["rgbPin"]) else None
 rgbNumLeds = config["rgbNumLeds"]
 
 matrixWiring = False
@@ -108,7 +123,7 @@ if config.get('splitPinB'):
     splitPinB = eval(renderPin(config['splitPinB']))
 
 vbusPin = None
-if config.get('vbusPin'):
+if config.get('vbusPin') and config.get('splitSide') == 'vbus' and pinValid("board." + config['vbusPin']):
     vbusPin = eval("board." + config['vbusPin'])
 
 # led pin without prefix for now
