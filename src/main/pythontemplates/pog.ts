@@ -1,7 +1,6 @@
 export const pogpy = `# pog.py Import the pog config - v0.9.5
 import json
 import board
-import microcontroller
 from kmk.keys import KC
 
 config = {}
@@ -41,8 +40,7 @@ def renderPin(pin):
 colPinsArray = []
 for i, item in enumerate(config["colPins"]):
     colPinsArray.append(renderPin(item))
-# Check validity of all the pins.
-# If a pin isn't valid it is omitted from the string
+# Remove the 'None's from the list of pins
 colPinsArray = [pin for pin in colPinsArray if pin is not None]
 colPins = ",".join(colPinsArray)
 if len(colPinsArray) == 1:
@@ -51,8 +49,7 @@ if len(colPinsArray) == 1:
 rowPinsArray = []
 for i, item in enumerate(config["rowPins"]):
     rowPinsArray.append(renderPin(item))
-# Check validity of all the pins.
-# If a pin isn't valid it is omitted from the string
+# Remove the 'None's from the list of pins
 rowPinsArray = [pin for pin in rowPinsArray if pin is not None]
 rowPins = ",".join(rowPinsArray)
 if len(rowPinsArray) == 1:
@@ -61,8 +58,7 @@ if len(rowPinsArray) == 1:
 pinsArray = []
 for i, item in enumerate(config["directPins"]):
     pinsArray.append(renderPin(item))
-# Check validity of all the pins.
-# If a pin isn't valid it is omitted from the string
+# Remove the 'None's from the list of pins
 pinsArray = [pin for pin in pinsArray if pin is not None]
 pins = ",".join(pinsArray)
 if len(pinsArray) == 1:
