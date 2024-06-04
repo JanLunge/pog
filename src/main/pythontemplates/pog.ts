@@ -19,22 +19,38 @@ except OSError as e:
 
 print("starting keyboard %s (%s)" % (config["name"], config["id"]))
 
+def pinValid(pin):
+    if pin == "":
+        return False
+    if config["pinPrefix"] == "quickpin":
+        pin = f'{eval(pin)}'
+    if pin in [f'board.{alias}' for alias in dir(board)]:
+        return True
+    else:
+        print(f'INVALID PIN FOUND {pin}')
+        return False
 
 # Pin setup
 def renderPin(pin):
+    pinLabel = ''
     if config["pinPrefix"] == "gp":
-        return "board.GP" + pin
+        pinLabel = "board.GP" + pin
     elif config["pinPrefix"] == "board":
-        return "board." + pin
+        pinLabel = "board." + pin
     elif config["pinPrefix"] == "quickpin":
-        return "pins[" + pin + "]"
+        pinLabel = "pins[" + pin + "]"
     else:
-        return pin
+        pinLabel = pin
+    if pinValid(pinLabel):
+        return pinLabel
+    
 
 
 colPinsArray = []
 for i, item in enumerate(config["colPins"]):
     colPinsArray.append(renderPin(item))
+# Remove the 'None's from the list of pins
+colPinsArray = [pin for pin in colPinsArray if pin is not None]
 colPins = ",".join(colPinsArray)
 if len(colPinsArray) == 1:
     colPins = colPins + ","
@@ -42,6 +58,8 @@ if len(colPinsArray) == 1:
 rowPinsArray = []
 for i, item in enumerate(config["rowPins"]):
     rowPinsArray.append(renderPin(item))
+# Remove the 'None's from the list of pins
+rowPinsArray = [pin for pin in rowPinsArray if pin is not None]
 rowPins = ",".join(rowPinsArray)
 if len(rowPinsArray) == 1:
     rowPins = rowPins + ","
@@ -49,11 +67,13 @@ if len(rowPinsArray) == 1:
 pinsArray = []
 for i, item in enumerate(config["directPins"]):
     pinsArray.append(renderPin(item))
+# Remove the 'None's from the list of pins
+pinsArray = [pin for pin in pinsArray if pin is not None]
 pins = ",".join(pinsArray)
 if len(pinsArray) == 1:
     pins = pins + ","
 
-rgbPin = config["rgbPin"]
+rgbPin = config["rgbPin"] if pinValid(config["rgbPin"]) else None
 rgbNumLeds = config["rgbNumLeds"]
 
 matrixWiring = False
@@ -108,7 +128,7 @@ if config.get('splitPinB'):
     splitPinB = eval(renderPin(config['splitPinB']))
 
 vbusPin = None
-if config.get('vbusPin'):
+if config.get('vbusPin') and config.get('splitSide') == 'vbus' and pinValid("board." + config['vbusPin']):
     vbusPin = eval("board." + config['vbusPin'])
 
 # led pin without prefix for now
