@@ -519,14 +519,14 @@ export class Keyboard {
       keyboardType: this.keyboardType,
 
       wiringMethod: this.wiringMethod,
-      diodeDirection: this.diodeDirection,
-      rows: this.rows,
-      cols: this.cols,
-      pins: this.pins,
+      diodeDirection: this.wiringMethod == 'matrix' ? this.diodeDirection : "",
+      rows: this.wiringMethod == 'matrix' ? this.rows : 0,
+      cols: this.wiringMethod == 'matrix' ? this.cols : 0,
+      pins: this.wiringMethod == 'direct' ? this.pins : 0,
 
-      rowPins: this.rowPins,
-      colPins: this.colPins,
-      directPins: this.directPins,
+      rowPins: this.wiringMethod == 'matrix' ? this.rowPins : [],
+      colPins: this.wiringMethod == 'matrix' ? this.colPins : [],
+      directPins: this.wiringMethod == 'direct' ? this.directPins : [],
 
       encoders: this.encoders,
 
