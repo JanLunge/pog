@@ -43,7 +43,7 @@ def renderPin(pin):
         pinLabel = pin
     if pinValid(pinLabel):
         return pinLabel
-    
+
 
 
 colPinsArray = []
@@ -135,4 +135,6 @@ if config.get('vbusPin') and config.get('splitSide') == 'vbus' and pinValid("boa
 if config.get('ledPin'):
   ledPin = eval(config.get('ledPin'))
   ledLength = int(config.get('ledLength'))
+
+kbFeatures = config.get('features')
 `
