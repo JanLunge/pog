@@ -13,7 +13,8 @@ else:
 
 # set the required features for you keyboard and keymap
 # add custom ones in the kb.py
-keyboard = KMKKeyboard(features=['basic', 'serial', 'oneshot', 'tapdance', 'holdtap', 'mousekeys', 'combos'])
+
+keyboard = KMKKeyboard(features=pog.kbFeatures)
 
 # manage settings for our modules and extensions here
 keyboard.tapdance.tap_time = 200
