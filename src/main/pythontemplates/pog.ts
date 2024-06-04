@@ -20,6 +20,10 @@ except OSError as e:
 print("starting keyboard %s (%s)" % (config["name"], config["id"]))
 
 def pinValid(pin):
+    if pin == "":
+        return False
+    if config["pinPrefix"] == "quickpin":
+        pin = f'{eval(pin)}'
     if pin in [f'board.{alias}' for alias in dir(board)]:
         return True
     else:
