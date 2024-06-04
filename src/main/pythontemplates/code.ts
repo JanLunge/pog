@@ -7,6 +7,7 @@ if pog.coordMappingAssistant:
     from coordmaphelper import KMKKeyboard
     if __name__ == '__main__':
         KMKKeyboard().go()
+        exit()
 else:
     from kb import KMKKeyboard
 
