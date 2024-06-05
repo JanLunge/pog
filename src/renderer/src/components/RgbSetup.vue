@@ -6,10 +6,11 @@
     </label>
     <p class="my-4 rounded bg-base-300 p-4">
       Info: To enable RGB you also will need a neopixel.mpy file in the lib folder on your
-      CircuitPython drive. You can download that here:
+      CircuitPython drive eg. adafruit-circuitpython-neopixel-py-6.3.11.zip as neopixel.py . You can download that here:
       <a
         href="https://github.com/adafruit/Adafruit_CircuitPython_NeoPixel/releases"
         class="underline"
+        target="_blank"
         >Adafruit GitHub</a
       >
     </p>
