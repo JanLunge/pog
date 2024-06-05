@@ -148,9 +148,14 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateScale)
 })
 watch(
-  () => props.keyLayout,
-  () => updateScale()
+  props.keyLayout,
+  () => {
+    console.log('keylayout changed')
+    updateScale()
+    updateHeight()
+  }
 )
+
 const rotationOriginX = computed(() => {
   if (!selectedKeys.value.size) return 0
   const firstSelectedKeyIndex = [...selectedKeys.value][0]
