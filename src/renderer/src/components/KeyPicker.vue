@@ -152,19 +152,14 @@
   </div>
   <div class="secondary mb-4">
     <div class="tabs tabs-boxed mt-4">
-      <a class="tab" :class="{ 'tab-active': category === 'basic' }" @click="category = 'basic'"
-        >Basic</a
-      >
-      <a class="tab" :class="{ 'tab-active': category === 'layers' }" @click="category = 'layers'"
-        >Layers</a
-      >
+      <a class="tab" :class="{ 'tab-active': category === 'basic' }" @click="category = 'basic'">Basic</a>
+      <a class="tab" :class="{ 'tab-active': category === 'layers' }" @click="category = 'layers'">Layers</a>
       <a class="tab" :class="{ 'tab-active': category === 'kmk' }" @click="category = 'kmk'">KMK</a>
-      <a class="tab" :class="{ 'tab-active': category === 'app' }" @click="category = 'app'"
-        >App/Media/Mouse</a
-      >
+      <a class="tab" :class="{ 'tab-active': category === 'app' }" @click="category = 'app'">App/Media/Mouse</a>
+      <a class="tab" :class="{ 'tab-active': category === 'rgb' }" @click="category = 'rgb'">RGB</a>
     </div>
     <div class="key-chooser">
-      <div class="bonus" v-if="category === 'basic'">
+      <div v-if="category === 'basic'" class="bonus">
         <div class="key" @click="setKey('KC.NO')">Empty</div>
         <div class="key" @click="setKey('KC.TRNS')">▽</div>
 
@@ -272,6 +267,13 @@
         <div class="key" @click="setKey('KC.BRID')">bright down</div>
 
         <div class="key" @click="setKey('KC.EJCT')">eject (OSX)</div>
+      </div>
+    </div>
+    <div v-if="category === 'rgb'" class="key-chooser flex">
+      <div class="bonus">
+        <div class="key" @click="setKey('KC.RGB_TOG')">RGB Toggle</div>
+        <div class="key" @click="setKey('KC.RGB_HUI')">RGB Hue increase</div>
+        <div class="key" @click="setKey('KC.RGB_HUD')">RGB Hue decrease</div>
       </div>
     </div>
   </div>
