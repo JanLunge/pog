@@ -136,5 +136,5 @@ if config.get('ledPin'):
   ledPin = eval(config.get('ledPin'))
   ledLength = int(config.get('ledLength'))
 
-kbFeatures = config.get('features')
+kbFeatures = config.get('kbFeatures')
 `
