@@ -58,26 +58,26 @@ export const downloadFile = (file_url, targetPath) => {
             state: 'copying',
             progress: 0
           })
+          try {
+            console.log('moving kmk into keyboard')
+            fs.cp(
+              `${appDir}kmk/kmk_firmware-master/kmk`,
+              `${currentKeyboard.path}/kmk`,
+              { recursive: true },
+              (e) => {
+                console.log('Copying of KMK done', e)
+                mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
+                  state: 'done',
+                  progress: 0
+                })
+              }
+            )
+          } catch (err) {
+            console.error(err)
+          }
         })
         .catch((error) => {
           console.log(error)
         })
-      try {
-        console.log('moving kmk into keyboard')
-        fs.cp(
-          `${appDir}kmk/kmk_firmware-master/kmk`,
-          `${currentKeyboard.path}/kmk`,
-          { recursive: true },
-          (e) => {
-            console.log('Copying of KMK done', e)
-            mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
-              state: 'done',
-              progress: 0
-            })
-          }
-        )
-      } catch (err) {
-        console.error(err)
-      }
     })
 }
