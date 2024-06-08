@@ -76,7 +76,9 @@ class KMKKeyboard(_KMKKeyboard):
             else:
                 # Nested under pog.split == True => splitOnewire
                 print('split with 1 pin')
+                side = SplitSide.RIGHT if pog.splitSide == "right" else SplitSide.LEFT
                 self.split = Split(
+                    split_side=side,
                     data_pin=pog.splitPinA,
                     use_pio=True)
 
