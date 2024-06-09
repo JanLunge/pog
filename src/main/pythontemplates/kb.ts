@@ -9,7 +9,12 @@ from kmk.scanners.keypad import KeysScanner
 class KMKKeyboard(_KMKKeyboard):
     def __init__(self, features=['basic']):
         if "basic" in features:
-            from kmk.modules.layers import Layers; self.modules.append(Layers())
+            from kmk.modules.layers import Layers;
+            combo_layers = {
+            # combolayers can be added here
+            # (1, 2): 3,
+            }
+            self.modules.append(Layers(combo_layers))
             from kmk.extensions.media_keys import MediaKeys; self.extensions.append(MediaKeys())
 
         if "serial" in features:
