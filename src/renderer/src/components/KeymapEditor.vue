@@ -53,7 +53,7 @@
         <option value="simple">Simple</option>
         <!-- other options will create a separately linked keycode -->
         <option value="string">String</option>
-        <option value="sequence">Sequence</option>
+        <option value="macro">Macro</option>
         <option value="tapdance">Tap Dance</option>
         <option value="custom">Custom</option>
       </select>
@@ -87,7 +87,7 @@ import KeymapLayer from './KeymapLayer.vue'
 selectedKeys.value.clear()
 
 const keycodeModeForSelection = ref<
-  'simple' | 'combo' | 'sequence' | 'custom' | 'tapdance' | 'string'
+  'simple' | 'combo' | 'macro' | 'custom' | 'tapdance' | 'string'
 >('simple')
 const setKey = (keyCode: string) => {
   selectedKeys.value.forEach((index) => {
@@ -154,8 +154,8 @@ const switchedKeyCodeType = () => {
   console.log(keycodeModeForSelection.value)
   const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
   keys.forEach((key) => {
-    if (keycodeModeForSelection.value === 'sequence') {
-      key.setOnKeymap('simple_key_sequence((KC.A, KC.B))')
+    if (keycodeModeForSelection.value === 'macro') {
+      key.setOnKeymap('KC.MACRO((KC.A, KC.B))')
     } else if (keycodeModeForSelection.value === 'string') {
       key.setOnKeymap('send_string("")')
     } else if (keycodeModeForSelection.value === 'tapdance') {
