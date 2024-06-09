@@ -1,5 +1,4 @@
-export const coordmaphelperpy = `
-# coordmaphelper.py helper script to get your coord map - v1.0.0
+export const coordmaphelperpy = `# coordmaphelper.py helper script to get your coord map - v1.0.0
 from kmk.keys import KC
 from kb import KMKKeyboard as _KMKKeyboard
 from kmk.modules.macros import Press, Release, Tap, Macros
@@ -29,5 +28,4 @@ class KMKKeyboard(_KMKKeyboard):
                         Tap(KC.SPC),
                 )
             )
-        self.keymap = [layer]
-        `
+        self.keymap = [layer]`
