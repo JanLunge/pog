@@ -8,7 +8,7 @@ import dayjs from 'dayjs'
 const router = useRouter()
 // @ts-ignore will be used later
 type KeyActions = {
-  type: 'chord' | 'tap' | 'short_hold' | 'hold' | 'sequence'
+  type: 'chord' | 'tap' | 'short_hold' | 'hold' | 'macro'
   keycodes: string[]
   actions: KeyActions[]
 }[]
