@@ -8,7 +8,7 @@ import { mainWindow } from './index'
 export const updateFirmware = () => {
   console.log(appDir)
   downloadFile(
-    'https://github.com/KMKfw/kmk_firmware/archive/refs/heads/master.zip',
+    'https://github.com/KMKfw/kmk_firmware/archive/refs/heads/main.zip',
     appDir + 'kmk.zip'
   )
 }
@@ -74,7 +74,7 @@ export const downloadFile = async (file_url, targetPath) => {
   try {
     console.log('moving kmk into keyboard')
     fs.cp(
-      `${appDir}kmk/kmk_firmware-master/kmk`,
+      `${appDir}kmk/kmk_firmware-main/kmk`,
       `${currentKeyboard.path}/kmk`,
       { recursive: true },
       (e) => {
