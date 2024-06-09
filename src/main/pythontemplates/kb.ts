@@ -36,6 +36,11 @@ class KMKKeyboard(_KMKKeyboard):
             self.combos = Combos()
             self.modules.append(self.combos)
 
+        if "macros" in features:
+            from kmk.modules.macros import Macros
+            self.macros = Macros()
+            self.modules.append(self.macros)
+
         # TODO: not tested yet
         if "capsword" in features:
             from kmk.modules.capsword import CapsWord
