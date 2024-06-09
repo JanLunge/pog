@@ -314,7 +314,16 @@ export class Keyboard {
   keymap: (string | undefined)[][] = [[]]
   layers: { name: string; color: string | undefined }[] = []
 
-  kbFeatures = ['basic', 'serial', 'oneshot', 'tapdance', 'holdtap', 'mousekeys', 'combos']
+  kbFeatures = [
+    'basic',
+    'serial',
+    'oneshot',
+    'tapdance',
+    'holdtap',
+    'mousekeys',
+    'combos',
+    'macros'
+  ]
 
   constructor() {}
 
