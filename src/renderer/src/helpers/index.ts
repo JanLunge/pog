@@ -341,9 +341,9 @@ export const renderLabel = (keycode: string) => {
   }
 
   // Check if the keycode is a sequence
-  if (keycode.startsWith('simple_key_sequence(') && keycode.endsWith(')')) {
+  if (keycode.startsWith('macro(') && keycode.endsWith(')')) {
     // Remove the sequence function wrapper and split the keys
-    const keys = keycode.slice(19, -1).split(',')
+    const keys = keycode.slice(5, -1).split(',')
 
     // Get the label for each key and join them with a "+"
     keylabel.action = keys.map((k) => renderLabel(k.trim())).join(' + ')
