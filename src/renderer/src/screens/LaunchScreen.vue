@@ -8,7 +8,7 @@
     </div>
     <div v-if="sortedKeyboards.length !== 0" class="divider"></div>
     <div class="absolute right-2 top-40 flex justify-end">
-      <button class="btn btn-sm" @lick="refreshConnectedBoards">
+      <button class="btn btn-sm" @click="refreshConnectedBoards">
         <i class="mdi mdi-refresh"></i>
       </button>
     </div>
