@@ -1,33 +1,31 @@
-export const codepy = `# Main Keyboard Configuration - v0.9.5
+export const codepy = `# Main Keyboard Configuration - v1.0.0
 import board
 import pog
-
 # check if we just want to run the coord_mappping Assistant
 if pog.coordMappingAssistant:
-    from coordmaphelper import KMKKeyboard
+    from coordmaphelper import CoordMapKeyboard
     if __name__ == '__main__':
-        KMKKeyboard().go()
-        exit()
+        CoordMapKeyboard().go()
+    print("Exiting Coord Mapping Assistant Because of an error")
 else:
-    from kb import KMKKeyboard
+    from kb import POGKeyboard
+    # set the required features for you keyboard and keymap
+    # add custom ones in the kb.py
 
-# set the required features for you keyboard and keymap
-# add custom ones in the kb.py
+    keyboard = POGKeyboard(features=pog.kbFeatures)
 
-keyboard = KMKKeyboard(features=pog.kbFeatures)
+    # manage settings for our modules and extensions here
+    keyboard.tapdance.tap_time = 200
 
-# manage settings for our modules and extensions here
-keyboard.tapdance.tap_time = 200
+    # Keymap
+    import keymap
+    keyboard.keymap = keymap.keymap
 
-# Keymap
-import keymap
-keyboard.keymap = keymap.keymap
+    # Encoder Keymap if available
+    if pog.hasEncoders:
+        keyboard.encoder_handler.map = keymap.encoderKeymap
 
-# Encoder Keymap if available
-if pog.hasEncoders:
-    keyboard.encoder_handler.map = keymap.encoderKeymap
-
-# Execute the keyboard loop
-if __name__ == '__main__':
-    keyboard.go()
+    # Execute the keyboard loop
+    if __name__ == '__main__':
+        keyboard.go()
 `
