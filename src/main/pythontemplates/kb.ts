@@ -2,11 +2,11 @@ export const kbpy = `# kb.py KB base config - v0.9.5
 import board
 import pog
 
-from kmk.kmk_keyboard import KMKKeyboard as _KMKKeyboard
+from kmk.kmk_keyboard import KMKKeyboard
 from kmk.scanners import DiodeOrientation
 from kmk.scanners.keypad import KeysScanner
 
-class KMKKeyboard(_KMKKeyboard):
+class POGKeyboard(KMKKeyboard):
     def __init__(self, features=['basic']):
         if "basic" in features:
             from kmk.modules.layers import Layers;
