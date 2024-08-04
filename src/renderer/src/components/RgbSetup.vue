@@ -24,7 +24,7 @@
         @change="savePin"
       />
     </div>
-    <div class="flex items-center gap-4">
+    <div class="mb-2 flex items-center gap-4">
       <label>RGB Number of LEDS</label>
       <input
         type="text"
@@ -34,29 +34,57 @@
         @change="saveNumLeds"
       />
     </div>
+    <div class="mb-2 flex items-center gap-4">
+      <label>Animation Mode</label>
+      <select v-model="rgbAnimationMode" @change="saveMode" class="select select-bordered">
+        <option value="0">Off</option>
+        <option value="1">Static</option>
+        <option value="2">Static Standby</option>
+        <option value="3">Breathing</option>
+        <option value="4">Rainbow</option>
+        <option value="5">Breathing Rainbow</option>
+        <option value="6">Knight</option>
+        <option value="7">Swirl</option>
+        <option value="8">Custom</option>
+      </select>
+    </div>
+    
+    <HsvColorPicker v-model="rgbColor" @change="saveColor" />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { keyboardStore } from '../store'
 import { onMounted, ref } from 'vue'
+import HsvColorPicker from './HsvColorPicker.vue'
 
 const rgbPin = ref('')
 const rgbNumLeds = ref('')
+const rgbAnimationMode = ref(0)
 const rgbEnabled = ref(false)
+const rgbColor = ref('')
 
 onMounted(() => {
-  rgbPin.value = keyboardStore.rgbPin
-  rgbNumLeds.value = String(keyboardStore.rgbNumLeds)
+  rgbPin.value = keyboardStore.rgb.pin
+  rgbNumLeds.value = String(keyboardStore.rgb.numLeds)
+  rgbAnimationMode.value = keyboardStore.rgb.animationMode
   rgbEnabled.value = keyboardStore.kbFeatures.some((feature) => feature.toLowerCase() === 'rgb')
 })
 
 const savePin = () => {
-  keyboardStore.rgbPin = rgbPin.value
+  keyboardStore.rgb.pin = rgbPin.value
 }
 
 const saveNumLeds = () => {
-  keyboardStore.rgbNumLeds = Number(rgbNumLeds.value)
+  keyboardStore.rgb.numLeds = Number(rgbNumLeds.value)
+}
+const saveMode = () => {
+  keyboardStore.rgb.animationMode = Number(rgbAnimationMode.value)
+}
+
+const saveColor = () => {
+  console.log(rgbColor.value);
+  
 }
 
 const toggleRgbEnabled = () => {
