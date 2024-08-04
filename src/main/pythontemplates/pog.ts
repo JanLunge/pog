@@ -73,8 +73,7 @@ pins = ",".join(pinsArray)
 if len(pinsArray) == 1:
     pins = pins + ","
 
-rgbPin = config["rgbPin"] if pinValid(config["rgbPin"]) else None
-rgbNumLeds = config["rgbNumLeds"]
+rgb = config["rgb"]
 
 matrixWiring = False
 directWiring = False
