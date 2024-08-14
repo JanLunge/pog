@@ -1,7 +1,7 @@
 <template>
   <div>
     <label class="flex gap-4">
-      <input class="checkbox" type="checkbox" v-model="rgbEnabled" @change="toggleRgbEnabled" />
+      <input v-model="rgbEnabled" class="checkbox" type="checkbox" @change="toggleRgbEnabled" />
       <p>Enable RGB</p>
     </label>
     <p class="my-4 rounded bg-base-300 p-4">
@@ -36,7 +36,7 @@
     </div>
     <div class="mb-2 flex items-center gap-4">
       <label>Animation Mode</label>
-      <select v-model="rgbAnimationMode" @change="saveMode" class="select select-bordered">
+      <select v-model="rgbAnimationMode" class="select select-bordered" @change="saveMode">
         <option value="0">Off</option>
         <option value="1">Static</option>
         <option value="2">Static Standby</option>
@@ -48,8 +48,8 @@
         <option value="8">Custom</option>
       </select>
     </div>
-    
-    <HsvColorPicker v-model="rgbColor" @change="saveColor" />
+
+    <HsvColorPicker @change="saveColor" />
   </div>
 </template>
 
@@ -62,7 +62,6 @@ const rgbPin = ref('')
 const rgbNumLeds = ref('')
 const rgbAnimationMode = ref(0)
 const rgbEnabled = ref(false)
-const rgbColor = ref('')
 
 onMounted(() => {
   rgbPin.value = keyboardStore.rgb.pin
@@ -82,9 +81,10 @@ const saveMode = () => {
   keyboardStore.rgb.animationMode = Number(rgbAnimationMode.value)
 }
 
-const saveColor = () => {
-  console.log(rgbColor.value);
-  
+const saveColor = (hsvColor) => {
+  keyboardStore.rgb.hueDefault = hsvColor.hue
+  keyboardStore.rgb.satDefault = hsvColor.sat
+  keyboardStore.rgb.valDefault = hsvColor.val
 }
 
 const toggleRgbEnabled = () => {
