@@ -1,16 +1,46 @@
 <template>
   <div class="mb-2 flex items-center gap-4">
-    <label>Colour</label>
-    <h1>Hue {{ hsvColor.hue }}</h1>
-    <h1>sat {{ hsvColor.sat }}</h1>
-    <h1>val {{ hsvColor.val }}</h1>
-    <input
-      v-model="rgbColor"
-      type="color"
-      class="input input-bordered input-sm"
-      placeholder="14"
-      @change="saveColor"
-    />
+    <div class="flex flex-col gap-2">
+      <h2 class="font-bold">Colour</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-2">
+          <label>Hue:</label>
+          <input
+            v-model="hsvColor.hue"
+            class="input input-bordered input-sm"
+            type="number"
+            max="255"
+            min="0"
+            @input="onInput"
+          />
+          <label>Sat:</label>
+          <input
+            v-model="hsvColor.sat"
+            class="input input-bordered input-sm"
+            type="number"
+            max="255"
+            min="0"
+            @input="onInput"
+          />
+          <label>Val:</label>
+          <input
+            v-model="hsvColor.val"
+            class="input input-bordered input-sm"
+            type="number"
+            max="255"
+            min="0"
+            @input="onInput"
+          />
+        </div>
+        <input
+          v-model="rgbColor"
+          type="color"
+          class="input input-sm row-span-1 h-full w-full"
+          placeholder="14"
+          @change="onColorPicker"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -31,10 +61,15 @@ onMounted(() => {
   hsvColor.value.sat = keyboardStore.rgbOptions.satDefault
   hsvColor.value.val = keyboardStore.rgbOptions.valDefault
 
-  rgbColor.value = hslToHex(hsvColor.value.hue, hsvColor.value.sat, hsvColor.value.val )
+  rgbColor.value = hslToHex(hsvColor.value.hue, hsvColor.value.sat, hsvColor.value.val)
 })
 
-const saveColor = () => {
+const onInput = () => {
+  rgbColor.value = hslToHex(hsvColor.value.hue, hsvColor.value.sat, hsvColor.value.val)
+  emit('change', hsvColor.value)
+}
+
+const onColorPicker = () => {
   hsvColor.value = hexToHSL(rgbColor.value)
   emit('change', hsvColor.value)
 }
