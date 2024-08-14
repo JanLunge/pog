@@ -253,9 +253,7 @@ export class Key {
   }
 }
 
-export type Rgb = {
-  pin: string
-  numLeds: number
+export type RgbOptions = {
   animationMode: number
   hueDefault: number
   satDefault: number
@@ -305,9 +303,9 @@ export class Keyboard {
   directPins: string[] = []
   coordMapSetup = false
 
-  rgb: Rgb = {
-    pin: '',
-    numLeds: 0,
+  rgbPin = ''
+  rgbNumLeds = 0
+  rgbOptions: RgbOptions = {
     animationMode: 0,
     hueDefault: 0,
     satDefault: 255,
@@ -496,7 +494,9 @@ export class Keyboard {
       if (configContents.encoderKeymap) this.encoderKeymap = configContents.encoderKeymap
 
       //RGB
-      if (configContents.rgb) this.rgb = configContents.rgb
+      if (configContents.rgbPin) this.rgbPin = configContents.rgbPin
+      if (configContents.rgbNumLeds) this.rgbNumLeds = Number(configContents.rgbNumLeds)
+      if (configContents.rgbOptions) this.rgbOptions = configContents.rgbOptions
 
       if (configContents.kbFeatures) this.kbFeatures = configContents.kbFeatures
     }
@@ -528,9 +528,9 @@ export class Keyboard {
     this.layouts = []
     this.encoders = []
     this.encoderKeymap = []
-    this.rgb = {
-      pin: '',
-      numLeds: 0,
+    this.rgbPin = ''
+    this.rgbNumLeds = 0
+    this.rgbOptions = {
       animationMode: 0,
       hueDefault: 0,
       satDefault: 255,
@@ -585,7 +585,7 @@ export class Keyboard {
       pinPrefix: this.pinPrefix,
       coordMapSetup: this.coordMapSetup,
 
-      rgb: this.rgb,
+      rgbOptions: this.rgbOptions,
 
       kbFeatures: this.kbFeatures,
 

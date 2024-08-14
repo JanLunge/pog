@@ -107,15 +107,15 @@ class POGKeyboard(KMKKeyboard):
         if "rgb" in features:
             from kmk.extensions.RGB import RGB
             rgb = RGB(
-                pixel_pin=eval(pog.rgb["pin"]),
-                num_pixels=pog.rgb["numLeds"],
+                pixel_pin=eval(pog.rgbPin),
+                num_pixels=pog.rgbNumLeds,
                 rgb_order=(1, 0, 2),
                 val_limit=40, # Maximum brightness level. Only change if you know what you are doing!
-                hue_default=pog.rgb["hueDefault"],
-                sat_default=pog.rgb["satDefault"],
-                val_default=pog.rgb["valDefault"],
-                animation_speed=pog.rgb["animationSpeed"],
-                animation_mode=pog.rgb["animationMode"],
+                hue_default=pog.rgbOptions["hueDefault"],
+                sat_default=pog.rgbOptions["satDefault"],
+                val_default=pog.rgbOptions["valDefault"],
+                animation_speed=pog.rgbOptions["animationSpeed"],
+                animation_mode=pog.rgbOptions["animationMode"],
             )
             self.extensions.append(rgb)
 
