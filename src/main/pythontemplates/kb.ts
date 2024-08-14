@@ -116,6 +116,7 @@ class POGKeyboard(KMKKeyboard):
                 val_default=pog.rgbOptions["valDefault"],
                 animation_speed=pog.rgbOptions["animationSpeed"],
                 animation_mode=pog.rgbOptions["animationMode"],
+                breathe_center=pog.rgbOptions["breatheCenter"],
                 knight_effect_length=pog.rgbOptions["knightEffectLength"],
             )
             self.extensions.append(rgb)
