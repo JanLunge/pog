@@ -64,21 +64,21 @@ const rgbAnimationMode = ref(0)
 const rgbEnabled = ref(false)
 
 onMounted(() => {
-  rgbPin.value = keyboardStore.rgb.pin
-  rgbNumLeds.value = String(keyboardStore.rgb.numLeds)
-  rgbAnimationMode.value = keyboardStore.rgb.animationMode
+  rgbPin.value = keyboardStore.rgbPin
+  rgbNumLeds.value = String(keyboardStore.rgbNumLeds)
+  rgbAnimationMode.value = keyboardStore.rgbOptions.animationMode
   rgbEnabled.value = keyboardStore.kbFeatures.some((feature) => feature.toLowerCase() === 'rgb')
 })
 
 const savePin = () => {
-  keyboardStore.rgb.pin = rgbPin.value
+  keyboardStore.rgbPin = rgbPin.value
 }
 
 const saveNumLeds = () => {
-  keyboardStore.rgb.numLeds = Number(rgbNumLeds.value)
+  keyboardStore.rgbNumLeds = Number(rgbNumLeds.value)
 }
 const saveMode = () => {
-  keyboardStore.rgb.animationMode = Number(rgbAnimationMode.value)
+  keyboardStore.rgbOptions.animationMode = Number(rgbAnimationMode.value)
 }
 
 const saveColor = (hsvColor) => {
