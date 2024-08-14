@@ -1,7 +1,7 @@
 <template>
   <div class="mb-2 flex items-center gap-4">
     <div class="flex flex-col gap-2">
-      <h2 class="font-bold">Colour</h2>
+      <h2 class="font-bold">Color & Brightness</h2>
       <div class="grid grid-cols-2 gap-4">
         <div class="grid grid-cols-2 gap-2">
           <label>Hue:</label>
@@ -13,7 +13,7 @@
             min="0"
             @input="onInput"
           />
-          <label>Sat:</label>
+          <label>Saturation:</label>
           <input
             v-model="hsvColor.sat"
             class="input input-bordered input-sm"
@@ -22,7 +22,7 @@
             min="0"
             @input="onInput"
           />
-          <label>Val:</label>
+          <label>Brightness:</label>
           <input
             v-model="hsvColor.val"
             class="input input-bordered input-sm"

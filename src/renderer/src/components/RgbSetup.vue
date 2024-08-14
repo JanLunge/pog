@@ -16,7 +16,7 @@
       >
     </p>
 
-    <div class="flex mb-4">
+    <div class="mb-4 flex">
       <div class="grid grid-cols-2 gap-2">
         <label>RGB Pin</label>
         <input
@@ -37,7 +37,7 @@
         <label>Animation Mode</label>
         <select
           v-model="rgbAnimationMode"
-          class="mb-4 select select-bordered input-sm"
+          class="select select-bordered input-sm mb-4"
           @change="saveMode"
         >
           <option value="0">Off</option>
@@ -94,16 +94,7 @@
         </div>
       </div>
     </div>
-    <HsvColorPicker
-      v-if="
-        rgbAnimationMode == 1 ||
-        rgbAnimationMode == 2 ||
-        rgbAnimationMode == 3 ||
-        rgbAnimationMode == 6 ||
-        rgbAnimationMode == 8
-      "
-      @change="saveColor"
-    />
+    <HsvColorPicker @change="saveColor" />
   </div>
 </template>
 
