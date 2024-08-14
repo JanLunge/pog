@@ -585,6 +585,8 @@ export class Keyboard {
       pinPrefix: this.pinPrefix,
       coordMapSetup: this.coordMapSetup,
 
+      rgbPin: this.rgbPin,
+      rgbNumLeds: this.rgbNumLeds,
       rgbOptions: this.rgbOptions,
 
       kbFeatures: this.kbFeatures,
