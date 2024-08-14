@@ -25,9 +25,11 @@ const rgbColor = ref('')
 const hsvColor: Ref<{ hue: number; sat: number; val: number }> = ref({ hue: 0, sat: 0, val: 0 })
 
 onMounted(() => {
-  hsvColor.value.hue = keyboardStore.rgb.hueDefault
-  hsvColor.value.sat = keyboardStore.rgb.satDefault
-  hsvColor.value.val = keyboardStore.rgb.valDefault
+  if (!keyboardStore.rgbOptions) return
+
+  hsvColor.value.hue = keyboardStore.rgbOptions.hueDefault
+  hsvColor.value.sat = keyboardStore.rgbOptions.satDefault
+  hsvColor.value.val = keyboardStore.rgbOptions.valDefault
 
   rgbColor.value = hslToHex(hsvColor.value.hue, hsvColor.value.sat, hsvColor.value.val )
 })
