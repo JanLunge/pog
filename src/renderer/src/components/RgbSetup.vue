@@ -64,6 +64,9 @@ const rgbAnimationMode = ref(0)
 const rgbEnabled = ref(false)
 
 onMounted(() => {
+  console.log(keyboardStore);
+  
+
   rgbPin.value = keyboardStore.rgbPin
   rgbNumLeds.value = String(keyboardStore.rgbNumLeds)
   rgbAnimationMode.value = keyboardStore.rgbOptions.animationMode
@@ -82,9 +85,9 @@ const saveMode = () => {
 }
 
 const saveColor = (hsvColor) => {
-  keyboardStore.rgb.hueDefault = hsvColor.hue
-  keyboardStore.rgb.satDefault = hsvColor.sat
-  keyboardStore.rgb.valDefault = hsvColor.val
+  keyboardStore.rgbOptions.hueDefault = hsvColor.hue
+  keyboardStore.rgbOptions.satDefault = hsvColor.sat
+  keyboardStore.rgbOptions.valDefault = hsvColor.val
 }
 
 const toggleRgbEnabled = () => {
