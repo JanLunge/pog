@@ -9,7 +9,7 @@
       <p class="py-4">Be sure to backup your code if you still need any of it.</p>
       <div class="flex justify-between">
         <div class="btn" @click="closeModal">Abort</div>
-        <div class="btn btn-warning" @click="updatePOG">Update POG files</div>
+        <div class="btn btn-error" @click="updatePOG">Update POG files</div>
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
