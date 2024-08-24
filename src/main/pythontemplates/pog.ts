@@ -73,9 +73,14 @@ pins = ",".join(pinsArray)
 if len(pinsArray) == 1:
     pins = pins + ","
 
+kbFeatures = config.get('kbFeatures')
+
 rgbPin = config["rgbPin"] if pinValid(config["rgbPin"]) else None
 rgbNumLeds = config["rgbNumLeds"]
 rgbOptions = config["rgbOptions"]
+if not config["rgbOptions"] and "rgb" in kbFeatures:
+    print("rgbOptions not set when rgb is needed")
+
 
 matrixWiring = False
 directWiring = False
@@ -137,5 +142,4 @@ if config.get('ledPin'):
   ledPin = eval(config.get('ledPin'))
   ledLength = int(config.get('ledLength'))
 
-kbFeatures = config.get('kbFeatures')
 `
