@@ -111,9 +111,13 @@ class POGKeyboard(KMKKeyboard):
                 num_pixels=pog.rgbNumLeds,
                 rgb_order=(1, 0, 2),
                 val_limit=40, # Maximum brightness level. Only change if you know what you are doing!
-                hue_default=10,
-                sat_default=255,
-                val_default=20,
+                hue_default=pog.rgbOptions["hueDefault"],
+                sat_default=pog.rgbOptions["satDefault"],
+                val_default=pog.rgbOptions["valDefault"],
+                animation_speed=pog.rgbOptions["animationSpeed"],
+                animation_mode=pog.rgbOptions["animationMode"],
+                breathe_center=pog.rgbOptions["breatheCenter"],
+                knight_effect_length=pog.rgbOptions["knightEffectLength"],
             )
             self.extensions.append(rgb)
 

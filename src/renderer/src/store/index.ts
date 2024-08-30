@@ -253,6 +253,16 @@ export class Key {
   }
 }
 
+export type RgbOptions = {
+  animationMode: number
+  hueDefault: number
+  satDefault: number
+  valDefault: number
+  animationSpeed: number
+  breatheCenter: number
+  knightEffectLength: number
+}
+
 export class Keyboard {
   id = ulid()
   path?: string = undefined
@@ -295,6 +305,15 @@ export class Keyboard {
 
   rgbPin = ''
   rgbNumLeds = 0
+  rgbOptions: RgbOptions = {
+    animationMode: 0,
+    hueDefault: 0,
+    satDefault: 255,
+    valDefault: 255,
+    animationSpeed: 1,
+    breatheCenter: 1,
+    knightEffectLength: 3,
+  }
 
   pinPrefix = 'gp'
   // features
@@ -477,6 +496,7 @@ export class Keyboard {
       //RGB
       if (configContents.rgbPin) this.rgbPin = configContents.rgbPin
       if (configContents.rgbNumLeds) this.rgbNumLeds = Number(configContents.rgbNumLeds)
+      if (configContents.rgbOptions) this.rgbOptions = configContents.rgbOptions
 
       if (configContents.kbFeatures) this.kbFeatures = configContents.kbFeatures
     }
@@ -510,6 +530,15 @@ export class Keyboard {
     this.encoderKeymap = []
     this.rgbPin = ''
     this.rgbNumLeds = 0
+    this.rgbOptions = {
+      animationMode: 0,
+      hueDefault: 0,
+      satDefault: 255,
+      valDefault: 255,
+      animationSpeed: 1,
+      breatheCenter: 1,
+      knightEffectLength: 3,
+    }
     // split pins
     this.splitPinA = ''
     this.splitPinB = ''
@@ -558,6 +587,7 @@ export class Keyboard {
 
       rgbPin: this.rgbPin,
       rgbNumLeds: this.rgbNumLeds,
+      rgbOptions: this.rgbOptions,
 
       kbFeatures: this.kbFeatures,
 
