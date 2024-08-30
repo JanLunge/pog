@@ -61,7 +61,7 @@
       <button class="btn btn-primary mt-2" @click="done">
         {{ initialSetup ? 'next' : 'save Coord Maping & create keyboard layout' }}
       </button>
-      <button class="btn btn-primary mt-2" @click="onlySave" v-if="!initialSetup">
+      <button v-if="!initialSetup" class="btn btn-primary mt-2" @click="onlySave">
         only save Coord Maping
       </button>
     </div>

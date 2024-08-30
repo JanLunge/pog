@@ -47,7 +47,7 @@
 <script lang="ts" setup>
 import { onMounted, Ref, ref } from 'vue'
 import { keyboardStore } from '../store'
-import { hexToHSL, hslToHex } from '@renderer/helpers/colors'
+import { hexToHSL, hslToHex } from '../helpers/colors'
 
 const emit = defineEmits(['change'])
 

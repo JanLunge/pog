@@ -1,6 +1,6 @@
-export const hexToHSL = (hex) => {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-
+export const hexToHSL = (hex): {hue: number, sat: number, val: number} => {
+  const result: RegExpExecArray | null = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  if (!result || result.length != 3) return { hue: 0, sat: 0, val: 0 }
   let r = parseInt(result[1], 16)
   let g = parseInt(result[2], 16)
   let b = parseInt(result[3], 16)
@@ -8,9 +8,9 @@ export const hexToHSL = (hex) => {
   ;(r /= 255), (g /= 255), (b /= 255)
   const max = Math.max(r, g, b),
     min = Math.min(r, g, b)
-  let h,
-    s,
-    l = (max + min) / 2
+  let h = 0
+  let s = 0
+  const l = (max + min) / 2
 
   if (max == min) {
     h = s = 0 // achromatic
@@ -39,16 +39,16 @@ export const hexToHSL = (hex) => {
   }
 }
 
-export function hslToHex(h, s, l) {
+export function hslToHex(h, s, l): string {
   s /= 255
   l /= 255
 
-  let c = (1 - Math.abs(2 * l - 1)) * s,
-    x = c * (1 - Math.abs(((h / 60) % 2) - 1)),
-    m = l - c / 2,
-    r = 0,
-    g = 0,
-    b = 0
+  const c = (1 - Math.abs(2 * l - 1)) * s
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1))
+  const m = l - c / 2
+  let r = 0
+  let g = 0
+  let b = 0
 
   if (0 <= h && h < 60) {
     r = c
@@ -76,14 +76,14 @@ export function hslToHex(h, s, l) {
     b = x
   }
   // Having obtained RGB, convert channels to hex
-  r = Math.round((r + m) * 255).toString(16)
-  g = Math.round((g + m) * 255).toString(16)
-  b = Math.round((b + m) * 255).toString(16)
+  let r_str = Math.round((r + m) * 255).toString(16)
+  let g_str = Math.round((g + m) * 255).toString(16)
+  let b_str = Math.round((b + m) * 255).toString(16)
 
   // Prepend 0s, if necessary
-  if (r.length == 1) r = '0' + r
-  if (g.length == 1) g = '0' + g
-  if (b.length == 1) b = '0' + b
+  if (r_str.length == 1) r_str = '0' + r
+  if (g_str.length == 1) g_str = '0' + g
+  if (b_str.length == 1) b_str = '0' + b
 
-  return '#' + r + g + b
+  return '#' + r_str + g_str + b_str
 }

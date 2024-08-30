@@ -2,18 +2,18 @@
   <div class="mt-8">
     <div class="mb-4">
       <p class="mb-2 text-sm">Name</p>
-      <input v-model="keyboardStore.name" type="text" class="input-bordered input w-full" />
+      <input v-model="keyboardStore.name" type="text" class="input input-bordered w-full" />
     </div>
     <div class="mb-4">
       <p class="mb-2 text-sm">Manufacturer (optional)</p>
-      <input v-model="keyboardStore.manufacturer" type="text" class="input-bordered input w-full" />
+      <input v-model="keyboardStore.manufacturer" type="text" class="input input-bordered w-full" />
     </div>
     <div class="mb-4">
       <p class="mb-2 text-sm">Description (optional)</p>
       <textarea
         v-model="keyboardStore.description"
         type="text"
-        class="textarea-bordered textarea w-full"
+        class="textarea textarea-bordered w-full"
       />
     </div>
     <div class="mb-4">
@@ -23,13 +23,13 @@
         :options="keyboardTags"
         :multiple="true"
         :taggable="true"
-        @tag="addTag"
         class="w-full"
+        @tag="addTag"
       >
       </VueMultiselect>
     </div>
     <div class="mt-8 flex justify-center">
-      <button v-if="initialSetup" class="btn-primary btn" @click="$emit('next')">next</button>
+      <button v-if="initialSetup" class="btn btn-primary" @click="$emit('next')">next</button>
     </div>
   </div>
 </template>
@@ -48,10 +48,10 @@ const addTag = (tag) => {
 
 <style lang="scss">
 @import 'vue-multiselect/dist/vue-multiselect.css';
-.multiselect__tags{
+.multiselect__tags {
   width: 100%;
   background: transparent;
-  border:none;
+  border: none;
 }
 .multiselect__placeholder {
   background: transparent;

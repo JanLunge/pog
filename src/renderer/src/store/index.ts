@@ -312,7 +312,7 @@ export class Keyboard {
     valDefault: 255,
     animationSpeed: 1,
     breatheCenter: 1,
-    knightEffectLength: 3,
+    knightEffectLength: 3
   }
 
   pinPrefix = 'gp'
@@ -537,7 +537,7 @@ export class Keyboard {
       valDefault: 255,
       animationSpeed: 1,
       breatheCenter: 1,
-      knightEffectLength: 3,
+      knightEffectLength: 3
     }
     // split pins
     this.splitPinA = ''
@@ -557,7 +557,7 @@ export class Keyboard {
       keyboardType: this.keyboardType,
 
       wiringMethod: this.wiringMethod,
-      diodeDirection: this.wiringMethod == 'matrix' ? this.diodeDirection : "",
+      diodeDirection: this.wiringMethod == 'matrix' ? this.diodeDirection : '',
       rows: this.wiringMethod == 'matrix' ? this.rows : 0,
       cols: this.wiringMethod == 'matrix' ? this.cols : 0,
       pins: this.wiringMethod == 'direct' ? this.pins : 0,

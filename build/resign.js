@@ -1,6 +1,6 @@
-const fs = require("fs")
-const path = require("path")
-const execSync = require("child_process").execSync
+const fs = require('fs')
+const path = require('path')
+const execSync = require('child_process').execSync
 
 function findNativeModules(dir, fileList = []) {
   const files = fs.readdirSync(dir)
