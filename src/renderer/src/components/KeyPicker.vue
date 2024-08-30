@@ -152,10 +152,16 @@
   </div>
   <div class="secondary mb-4">
     <div class="tabs tabs-boxed mt-4">
-      <a class="tab" :class="{ 'tab-active': category === 'basic' }" @click="category = 'basic'">Basic</a>
-      <a class="tab" :class="{ 'tab-active': category === 'layers' }" @click="category = 'layers'">Layers</a>
+      <a class="tab" :class="{ 'tab-active': category === 'basic' }" @click="category = 'basic'"
+        >Basic</a
+      >
+      <a class="tab" :class="{ 'tab-active': category === 'layers' }" @click="category = 'layers'"
+        >Layers</a
+      >
       <a class="tab" :class="{ 'tab-active': category === 'kmk' }" @click="category = 'kmk'">KMK</a>
-      <a class="tab" :class="{ 'tab-active': category === 'app' }" @click="category = 'app'">App/Media/Mouse</a>
+      <a class="tab" :class="{ 'tab-active': category === 'app' }" @click="category = 'app'"
+        >App/Media/Mouse</a
+      >
       <a class="tab" :class="{ 'tab-active': category === 'rgb' }" @click="category = 'rgb'">RGB</a>
     </div>
     <div class="key-chooser">

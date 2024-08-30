@@ -1,12 +1,12 @@
 <template>
   <div class="flex gap-2">
-    <div class="btn-sm btn mb-4 p-2" @click="showConverter">
+    <div class="btn btn-sm mb-4 p-2" @click="showConverter">
       <i class="mdi mdi-import"></i>Import from KLE
     </div>
-    <div class="btn-sm btn mb-4 p-2" @click="showQmkConverter">
+    <div class="btn btn-sm mb-4 p-2" @click="showQmkConverter">
       <i class="mdi mdi-import"></i>Import from Qmk info json
     </div>
-    <div class="btn-sm btn mb-4 p-2" @click="showRawPogOutput">
+    <div class="btn btn-sm mb-4 p-2" @click="showRawPogOutput">
       <i class="mdi mdi-export"></i>export from pog
     </div>
   </div>
@@ -32,34 +32,34 @@
     <div class="mt-4 flex gap-2">
       <textarea
         v-model="kleInput"
-        class="textarea-bordered textarea w-full"
+        class="textarea textarea-bordered w-full"
         style="line-height: 1rem"
         rows="8"
       ></textarea>
     </div>
     <div class="mt-2 flex flex-col gap-2">
       <span class="text-warning">this will overwrite your existing layout</span>
-      <button class="btn-primary btn-sm btn my-4" @click="convert">convert to pog.json</button>
+      <button class="btn btn-primary btn-sm my-4" @click="convert">convert to pog.json</button>
     </div>
     <hr />
   </div>
   <div v-if="qmkConverterVisible">
     <div>
-      <textarea v-model="qmkJson" class="textarea-bordered textarea w-full"></textarea>
+      <textarea v-model="qmkJson" class="textarea textarea-bordered w-full"></textarea>
       <button class="btn" @click="convertqmk">convert</button>
     </div>
   </div>
   <div v-if="showRawPogLayout">
-    <textarea v-model="pogOutput" class="textarea-bordered textarea w-full"></textarea>
+    <textarea v-model="pogOutput" class="textarea textarea-bordered w-full"></textarea>
   </div>
   <div>
     <div class="flex justify-between">
       <div class="flex gap-1">
-        <button class="btn-primary btn-sm btn" @click="addKey">
+        <button class="btn btn-primary btn-sm" @click="addKey">
           <i class="mdi mdi-plus"></i>add key
         </button>
         <button
-          class="btn-primary btn-sm btn"
+          class="btn btn-primary btn-sm"
           :disabled="selectedKeys.size === 0"
           @click="removeKey"
         >
@@ -84,7 +84,7 @@
         <key-layout-info :layout="keyboardStore.keys"></key-layout-info>
       </div>
     </div>
-    <div v-if="initialSetup" class="btn-primary btn" @click="setupDone">Finish Setup</div>
+    <div v-if="initialSetup" class="btn btn-primary" @click="setupDone">Finish Setup</div>
   </div>
 </template>
 
@@ -174,7 +174,7 @@ const setupDone = () => {
   // selectedConfig.value.layouts.keymap = tmpLayout.value;
   if (keyboardStore.keymap.length === 0) {
     // initialize it with one layer
-   keyboardStore.keymap = [[]]
+    keyboardStore.keymap = [[]]
   }
   // save
   keyboardStore.coordMapSetup = false

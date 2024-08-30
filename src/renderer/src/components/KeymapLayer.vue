@@ -14,7 +14,7 @@
       <template #content>
         <div class="popover text-left">
           <span>Name</span>
-          <input v-model="keyboardStore.layers[index].name" class="input-bordered input input-sm" />
+          <input v-model="keyboardStore.layers[index].name" class="input input-bordered input-sm" />
           <span>Color</span>
           <label class="relative">
             <div
@@ -41,7 +41,7 @@
             <div
               class="colorswatch"
               style="background: #259eb9"
-              @click="keyboardStore.layers[index].color= '#259eb9'"
+              @click="keyboardStore.layers[index].color = '#259eb9'"
             ></div>
             <div
               class="colorswatch"
@@ -58,8 +58,8 @@
 import Popper from '@wlard/vue3-popper'
 import { keyboardStore, selectedLayer } from '../store'
 const props = defineProps(['layer', 'index'])
-if(!keyboardStore.layers[props.index]) keyboardStore.layers[props.index] = {name:'', color:undefined}
-
+if (!keyboardStore.layers[props.index])
+  keyboardStore.layers[props.index] = { name: '', color: undefined }
 </script>
 <style lang="scss" scoped>
 .tab {

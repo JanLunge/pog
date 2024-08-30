@@ -1,7 +1,7 @@
 <template>
   <div class="flex items-center pr-4">
     <div class="mr-2">
-      <button class="btn-primary btn-xs btn" @click="removeOption">
+      <button class="btn btn-primary btn-xs" @click="removeOption">
         <i class="mdi mdi-close"></i>
       </button>
     </div>
@@ -9,10 +9,10 @@
       v-if="layout.variants && layout.variants.length > 0"
       class="flex h-12 w-full items-center gap-2"
     >
-      <input v-model="variantName" type="text" class="input-bordered input input-sm" />
+      <input v-model="variantName" type="text" class="input input-bordered input-sm" />
       <select
         v-model="selectedOption"
-        class="select-bordered select select-sm mr-4"
+        class="select select-bordered select-sm mr-4"
         @change="selectMultiVariant"
       >
         <option
@@ -24,7 +24,7 @@
       </select>
     </div>
     <div v-else class="flex h-12 w-full items-center gap-2">
-      <input v-model="variantName" class="input-bordered input input-sm w-full" />
+      <input v-model="variantName" class="input input-bordered input-sm w-full" />
       <input v-model="selectedBool" type="checkbox" class="checkbox" @input="selectBool" />
     </div>
   </div>

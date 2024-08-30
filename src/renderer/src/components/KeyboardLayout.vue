@@ -61,7 +61,7 @@ import { isNumber } from '@vueuse/core'
 import { useDebounceFn } from '@vueuse/core'
 const props = defineProps(['keyLayout', 'keymap', 'mode', 'matrixWidth', 'layouts', 'fixedHeight'])
 // mode can be layout or keymap
-const keyboardContainer = ref<VNodeRef|null>(null)
+const keyboardContainer = ref<VNodeRef | null>(null)
 // find right edge
 const keyboardWidth = computed(() => {
   let maxW = 0
@@ -102,24 +102,24 @@ const updateHeight = () => {
       lowestKey = height
     }
   })
-   // if(props.fixedHeight &&  keyboardHeight.value < lowestKey ){
-   //   console.log('lowest key ignored', lowestKey,keyboardHeight.value)
-   //   return
-   // }
+  // if(props.fixedHeight &&  keyboardHeight.value < lowestKey ){
+  //   console.log('lowest key ignored', lowestKey,keyboardHeight.value)
+  //   return
+  // }
   keyboardHeight.value = lowestKey
 }
 const updateScale = () => {
   // updateHeight()
-  if(!keyboardContainer.value) return
+  if (!keyboardContainer.value) return
   const wrapper = keyboardContainer.value.$el
   let heightScale = 1
   let widthScale = 1
   if (wrapper) {
     if (keyboardWidth.value === 0) return
-    if( keyboardWidth.value  / keyboardKeyHeight.value > 2.71){
+    if (keyboardWidth.value / keyboardKeyHeight.value > 2.71) {
       const wrapperWidth = wrapper.getBoundingClientRect().width
       widthScale = Math.min(wrapperWidth / (keyboardWidth.value * 58), 1)
-    }else{
+    } else {
       const wrapperHeight = wrapper.getBoundingClientRect().height
       heightScale = Math.min(wrapperHeight / (keyboardKeyHeight.value * 58), 1)
     }
@@ -147,14 +147,11 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener('resize', updateScale)
 })
-watch(
-  props.keyLayout,
-  () => {
-    console.log('keylayout changed')
-    updateScale()
-    updateHeight()
-  }
-)
+watch(props.keyLayout, () => {
+  console.log('keylayout changed')
+  updateScale()
+  updateHeight()
+})
 
 const rotationOriginX = computed(() => {
   if (!selectedKeys.value.size) return 0

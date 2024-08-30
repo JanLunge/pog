@@ -13,7 +13,7 @@
         <i class="mdi mdi-cog"></i>
       </button>
     </div>
-    <div class="mb-4 flex gap-2" v-if="settingsOpen">
+    <div v-if="settingsOpen" class="mb-4 flex gap-2">
       <label class="flex items-center gap-2">
         <input v-model="userSettings.reduceKeymapColors" type="checkbox" class="checkbox" />
         <span>Reduce keymap colors</span>
