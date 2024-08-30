@@ -1,13 +1,16 @@
 export const hexToHSL = (hex): {hue: number, sat: number, val: number} => {
   const result: RegExpExecArray | null = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  if (!result || result.length != 3) return { hue: 0, sat: 0, val: 0 }
+  if (!result) return { hue: 0, sat: 0, val: 0 }
   let r = parseInt(result[1], 16)
   let g = parseInt(result[2], 16)
   let b = parseInt(result[3], 16)
 
-  ;(r /= 255), (g /= 255), (b /= 255)
-  const max = Math.max(r, g, b),
-    min = Math.min(r, g, b)
+  r /= 255
+  g /= 255
+  b /= 255
+
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
   let h = 0
   let s = 0
   const l = (max + min) / 2
@@ -28,7 +31,6 @@ export const hexToHSL = (hex): {hue: number, sat: number, val: number} => {
         h = (r - g) / d + 4
         break
     }
-
     h /= 6
   }
 
