@@ -53,7 +53,7 @@
         </label>
       </div>
     </div>
-    <div class="mt-4" v-if="false">
+    <div v-if="false" class="mt-4">
       <p>we can load some info from the controller to know what features it offers</p>
       <buttom class="btn">check which pins the controller has</buttom>
     </div>

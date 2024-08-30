@@ -65,7 +65,7 @@ export const selectKeyboard = async ({ path, id }: { path: string; id: string })
 export const checkForUSBKeyboards = async (keyboardPaths: string[]) => {
   console.log('checking for usb keyboards', keyboardPaths)
   // check for each path in the filesystem if it exists
-  const connectedKeyboards : {path:string,connected:boolean}[] = []
+  const connectedKeyboards: { path: string; connected: boolean }[] = []
   for (const path of keyboardPaths) {
     if (fs.existsSync(path)) {
       connectedKeyboards.push({

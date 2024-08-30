@@ -319,7 +319,7 @@ export const renderLabel = (keycode: string) => {
     RGB_MODE_SWIRL: { label: 'RGB<br/>Swirl' },
     RGB_MODE_PLAIN: { label: 'RGB<br/>Plain' },
     RGB_MODE_KNIGHT: { label: 'RGB<br/>Knight' },
-    RGB_MODE_RAINBOW: { label: 'RGB<br/>Rainbow' },
+    RGB_MODE_RAINBOW: { label: 'RGB<br/>Rainbow' }
   }
 
   const keylabel: {

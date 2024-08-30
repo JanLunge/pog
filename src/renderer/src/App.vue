@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import {addToHistory, keyboardStore, notifications, serialKeyboards} from './store'
-import { useRouter} from "vue-router";
+import { addToHistory, keyboardStore, notifications, serialKeyboards } from './store'
+import { useRouter } from 'vue-router'
 const router = useRouter()
 const store = computed(() => {
   return keyboardStore
@@ -10,10 +10,10 @@ console.log('store added to debug menu', store)
 
 window.api.keyboardScan((_event: Event, value: { keyboards }) => {
   console.log('found keyboards via serial', value)
-  serialKeyboards.value = value.keyboards.map(a=>{
+  serialKeyboards.value = value.keyboards.map((a) => {
     const b = a
     b.port = b.path
-    delete(b.path)
+    delete b.path
     return b
   })
 })
@@ -26,7 +26,7 @@ window.api.serialKeyboardPogConfig((_event: Event, value: { pogconfig }) => {
     folderContents: ['pog.json', 'kmk'],
     configContents: value.pogconfig
   })
-  if (keyboardStore.pogConfigured){
+  if (keyboardStore.pogConfigured) {
     addToHistory(keyboardStore)
   }
   router.push('/configurator')
@@ -51,7 +51,7 @@ window.api.serialKeyboardPogConfig((_event: Event, value: { pogconfig }) => {
           />
         </svg>
         <span>{{ notification.label }}</span>
-        <button class="btn-ghost btn-sm btn" @click="notifications.splice(nindex, 1)">
+        <button class="btn btn-ghost btn-sm" @click="notifications.splice(nindex, 1)">
           <i class="mdi mdi-close"></i>
         </button>
       </div>
