@@ -21,7 +21,9 @@
           {{ port.manufacturer }} - {{ port.port }} - {{ port.serialNumber }}
         </option>
       </select>
+
       <button class="btn" :disabled="!selectedPort" @click="connect">connect</button>
+
     </div>
     <textarea
       v-model="output"
@@ -36,6 +38,7 @@
     <div class="flex">
       <button class="btn btn-sm" @click="enterRepl">enter REPL</button>
       <button class="btn btn-sm" @click="exitRepl">exit REPL</button>
+      <div v-if="statusMessage" class="text-sm text-gray-500 pt-1 pl-1">{{ statusMessage }}</div>
     </div>
     <div class="mt-4" v-if="false">
       <p>we can load some info from the controller to know what features it offers</p>
@@ -52,6 +55,7 @@ const output = ref('')
 const inputData = ref('')
 const ports = ref<any[]>([])
 const selectedPort = ref('')
+const statusMessage = ref('')
 const sortedPorts = computed(() => {
   return [...ports.value]
     .sort((a, b) => {
@@ -91,8 +95,15 @@ const sendData = () => {
   window.api.serialSend(inputData.value)
   inputData.value = ''
 }
-const connect = () => {
-  window.api.serialConnect(selectedPort.value)
+const connect = async () => {
+  try {
+    await window.api.serialConnect(selectedPort.value)
+    statusMessage.value = 'Connected!'
+  } catch (error) {
+    statusMessage.value = 'Failed to connect.'
+    console.error('Failed to connect to the port:', error)
+    alert('Failed to connect to the selected port.')
+  }
 }
 const enterRepl = () => {
   window.api.serialSend('ctrlc')
