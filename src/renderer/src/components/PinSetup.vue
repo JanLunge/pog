@@ -69,8 +69,8 @@
         <p class="flex items-center justify-center pb-4 text-xl font-bold">
           Direct Pins
           <span class="badge badge-primary ml-2 font-bold">{{
-            keyboardStore.directPins.length
-          }}</span>
+              keyboardStore.directPins.length
+            }}</span>
         </p>
         <div
           v-for="(_pin, index) in keyboardStore.directPins"
@@ -143,7 +143,7 @@
       </div>
     </div>
     <!-- RIGHT COLUMN -->
-    <div class="flex w-1/2 flex-col items-center" style="width: 400px">
+    <div class="flex w-1/3 flex-col items-center" style="width: 400px">
       <div class="mb-4 w-full">
         <p class="mb-2 text-sm">Pin Prefix</p>
         <select v-model="keyboardStore.pinPrefix" class="select select-bordered mb-2 w-full">
@@ -178,9 +178,13 @@
         <p class="mb-2 text-sm">Microcontroller</p>
         <select v-model="keyboardStore.controller" class="select select-bordered w-full">
           <option value="0xcb-helios">0xCB Helios</option>
+          <option value="pi-pico">Pi Pico</option>
           <option value="">other</option>
         </select>
       </div>
+
+    </div>
+    <div class="flex w-1/3 flex-col items-center">
       <div v-if="keyboardStore.controller === '0xcb-helios'">
         <p class="py-4">
           The
@@ -188,37 +192,44 @@
             class="link-primary link"
             target="_blank"
             href="https://keeb.supply/products/0xcb-helios"
-            >0xCB Helios</a
+          >0xCB Helios</a
           >
           is an Elite-C compatible MicroController that is based on the RP2040.
         </p>
         <img
           src="@renderer/assets/microcontrollers/0xcb-helios.png"
           alt=""
-          width="400"
-          height="300"
+          class="board-image"
+        />
+      </div>
+      <div v-if="keyboardStore.controller === 'pi-pico'">
+        <p class="py-4">
+          The
+          <a
+            class="link-primary link"
+            target="_blank"
+            href="https://www.raspberrypi.com/products/raspberry-pi-pico/"
+          >Raspberry Pi Pico</a
+          >
+          is a low-cost, high-performance microcontroller board based on the RP2040 chip, designed for embedded projects and IoT applications.
+        </p>
+        <img
+          src="@renderer/assets/microcontrollers/pi-pico.png"
+          alt=""
+          class="board-image"
         />
       </div>
       <div v-if="!keyboardStore.controller">
-        <ul class="py-4">
-          <li>
-            <a
-              class="link-primary link"
-              target="_blank"
-              href="https://datasheets.raspberrypi.com/pico/Pico-R3-A4-Pinout.pdf"
-              >Pi Pico</a
-            >
-          </li>
-        </ul>
         <p class="py-4">
           Feel free to submit other microcontroller pinouts. Ensure you have the permission to use
           the pinout image if it has not been created by you. In the meantime here are links to
           other pinouts
         </p>
         <p>Currently this tool works with any RP2040 controller.</p>
-        <p class="py-4">Just look for a pinout and use any pin that is starting with GP</p>
+        <p class="py-4">Just look for a pinout and use any pin that is starting with GP.</p>
       </div>
     </div>
+
   </div>
 </template>
 
@@ -276,6 +287,10 @@ const numberOfSplitPins = computed(() => {
 })
 </script>
 <style lang="scss" scoped>
+.board-image{
+  width: 200px;
+  height:auto;
+}
 .controller-labels {
   @apply absolute grid;
   width: 130px;
