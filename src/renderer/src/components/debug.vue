@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, nextTick } from 'vue'
 import { keyboardStore } from '../store'
 
 const output = ref('')
@@ -65,6 +65,16 @@ const sortedPorts = computed(() => {
     })
     .filter((a) => a.serialNumber !== undefined)
 })
+
+const scrollTextarea = () => {
+  nextTick(() => {
+    const textarea = document.querySelector('textarea')
+    if (textarea) {
+      textarea.scrollTop = textarea.scrollHeight
+    }
+  })
+}
+
 onMounted(async () => {
   ports.value = await window.api.serialPorts()
   // select default port for the one with the current serial number
@@ -72,6 +82,7 @@ onMounted(async () => {
   window.api.serialData((event, data) => {
     console.log(event, data)
     output.value += data.message
+    scrollTextarea()
   })
   console.log(keyboardStore)
 })
