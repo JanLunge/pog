@@ -21,7 +21,7 @@
           {{ port.manufacturer }} - {{ port.port }} - {{ port.serialNumber }}
         </option>
       </select>
-      <button class="btn" @click="connect">connect</button>
+      <button class="btn" :disabled="!selectedPort" @click="connect">connect</button>
     </div>
     <textarea
       v-model="output"
