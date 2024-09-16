@@ -1,0 +1,14 @@
+[
+    {
+        "id": "0xcb-helios",
+        "name": "0xCB Helios",
+        "information": "The <a class=\"link-primary link\" target=\"_blank\" href=\"https://keeb.supply/products/0xcb-helios\">0xCB Helios</a> is an Elite-C compatible MicroController that is based on the RP2040.",
+        "image": true
+    },
+    {
+        "id": "pi-pico",
+        "name": "Raspberry Pi Pico",
+        "information": "The <a class=\"link-primary link\" target=\"_blank\" href=\"https://www.raspberrypi.com/products/raspberry-pi-pico/\">Raspberry Pi Pico</a> is a low-cost, high-performance microcontroller board based on the RP2040 chip, designed for embedded projects and IoT applications.",
+        "image": true
+    }
+]
