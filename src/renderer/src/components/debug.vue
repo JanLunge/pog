@@ -23,11 +23,11 @@
       </select>
 
       <button class="btn" :disabled="!selectedPort" @click="connect">connect</button>
-
     </div>
     <textarea
       v-model="output"
       class="textarea w-full p-2"
+      id="repl-output"
       style="min-height: 200px"
       readonly
     ></textarea>
@@ -38,7 +38,18 @@
     <div class="flex">
       <button class="btn btn-sm" @click="enterRepl">enter REPL</button>
       <button class="btn btn-sm" @click="exitRepl">exit REPL</button>
-      <div v-if="statusMessage" class="text-sm text-gray-500 pt-1 pl-1">{{ statusMessage }}</div>
+      <div v-if="statusMessage" class="pl-1 pt-1 text-sm text-gray-500">{{ statusMessage }}</div>
+      <div class="form-control absolute right-4">
+        <label class="label cursor-pointer">
+          <input
+            type="checkbox"
+            id="repl-output-autoscroll"
+            checked="checked"
+            class="checkbox checkbox-sm"
+          />
+          <span class="label-text pl-1">autoscroll</span>
+        </label>
+      </div>
     </div>
     <div class="mt-4" v-if="false">
       <p>we can load some info from the controller to know what features it offers</p>
@@ -48,7 +59,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref, nextTick } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { keyboardStore } from '../store'
 
 const output = ref('')
@@ -72,9 +83,10 @@ const sortedPorts = computed(() => {
 
 const scrollTextarea = () => {
   nextTick(() => {
-    const textarea = document.querySelector('textarea')
-    if (textarea) {
-      textarea.scrollTop = textarea.scrollHeight
+    const replOutput = document.getElementById('repl-output')
+    const autoscroll = document.getElementById('repl-output-autoscroll')
+    if (replOutput && autoscroll.checked) {
+      replOutput.scrollTop = replOutput.scrollHeight
     }
   })
 }
