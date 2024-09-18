@@ -57,7 +57,7 @@
           </p>
           <p v-else><span class="rounded bg-error p-1 text-xs">Read Only Serial</span></p>
           <button
-            class="btn btn-error btn-xs absolute right-0 top-0 opacity-50 hover:opacity-100"
+            class="btn btn-error btn-xs absolute right-5 top-0 opacity-50 hover:opacity-100"
             @click.stop="removeFromHistory(keyboard)"
           >
             <i class="mdi mdi-close"></i>
