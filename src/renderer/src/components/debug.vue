@@ -21,11 +21,13 @@
           {{ port.manufacturer }} - {{ port.port }} - {{ port.serialNumber }}
         </option>
       </select>
-      <button class="btn" @click="connect">connect</button>
+
+      <button class="btn" :disabled="!selectedPort" @click="connect">connect</button>
     </div>
     <textarea
       v-model="output"
       class="textarea w-full p-2"
+      id="repl-output"
       style="min-height: 200px"
       readonly
     ></textarea>
@@ -36,6 +38,20 @@
     <div class="flex">
       <button class="btn btn-sm" @click="enterRepl">enter REPL</button>
       <button class="btn btn-sm" @click="exitRepl">exit REPL</button>
+      <div v-if="statusMessage" class="pl-1 pt-2 text-sm text-gray-500">
+        <div class="badge badge-outline">{{ statusMessage }}</div>
+      </div>
+      <div class="form-control absolute right-4">
+        <label class="label cursor-pointer">
+          <input
+            type="checkbox"
+            id="repl-output-autoscroll"
+            checked="checked"
+            class="checkbox checkbox-sm"
+          />
+          <span class="label-text pl-1">autoscroll</span>
+        </label>
+      </div>
     </div>
     <div class="mt-4" v-if="false">
       <p>we can load some info from the controller to know what features it offers</p>
@@ -45,13 +61,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import { keyboardStore } from '../store'
 
 const output = ref('')
 const inputData = ref('')
 const ports = ref<any[]>([])
 const selectedPort = ref('')
+const statusMessage = ref('')
 const sortedPorts = computed(() => {
   return [...ports.value]
     .sort((a, b) => {
@@ -65,6 +82,17 @@ const sortedPorts = computed(() => {
     })
     .filter((a) => a.serialNumber !== undefined)
 })
+
+const scrollTextarea = () => {
+  nextTick(() => {
+    const replOutput = document.getElementById('repl-output')
+    const autoscroll = document.getElementById('repl-output-autoscroll')
+    if (replOutput && autoscroll.checked) {
+      replOutput.scrollTop = replOutput.scrollHeight
+    }
+  })
+}
+
 onMounted(async () => {
   ports.value = await window.api.serialPorts()
   // select default port for the one with the current serial number
@@ -72,6 +100,7 @@ onMounted(async () => {
   window.api.serialData((event, data) => {
     console.log(event, data)
     output.value += data.message
+    scrollTextarea()
   })
   console.log(keyboardStore)
 })
@@ -80,8 +109,15 @@ const sendData = () => {
   window.api.serialSend(inputData.value)
   inputData.value = ''
 }
-const connect = () => {
-  window.api.serialConnect(selectedPort.value)
+const connect = async () => {
+  try {
+    await window.api.serialConnect(selectedPort.value)
+    statusMessage.value = 'Connected!'
+  } catch (error) {
+    statusMessage.value = 'Failed to connect.'
+    console.error('Failed to connect to the port:', error)
+    alert('Failed to connect to the selected port.')
+  }
 }
 const enterRepl = () => {
   window.api.serialSend('ctrlc')
