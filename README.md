@@ -17,7 +17,7 @@ the documentation is available [here](https://github.com/JanLunge/pog-docs) feel
 # Installation
 Download the pre built binaries for Windows, Mac and Linux are available in the [releases](https://github.com/JanLunge/pog/releases)
 
-# Develompment Setup
+# Development Setup
 ## dependencies
 * node 16
 * yarn
