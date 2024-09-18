@@ -38,7 +38,9 @@
     <div class="flex">
       <button class="btn btn-sm" @click="enterRepl">enter REPL</button>
       <button class="btn btn-sm" @click="exitRepl">exit REPL</button>
-      <div v-if="statusMessage" class="pl-1 pt-1 text-sm text-gray-500">{{ statusMessage }}</div>
+      <div v-if="statusMessage" class="pl-1 pt-2 text-sm text-gray-500">
+        <div class="badge badge-outline">{{ statusMessage }}</div>
+      </div>
       <div class="form-control absolute right-4">
         <label class="label cursor-pointer">
           <input
