@@ -176,16 +176,21 @@
 
       <div class="mt-4 w-full">
         <p class="mb-2 text-sm">Microcontroller</p>
-        <select v-model="keyboardStore.controller" class="select select-bordered w-full">
-          <option value="0xcb-helios">0xCB Helios</option>
-          <option value="pi-pico">Pi Pico</option>
+        <select v-model="keyboardStore.controller" class="select select-bordered w-full">          
+          <option
+            v-for="microcontroller of microcontrollers"
+            :key="microcontroller.id"
+            :value="microcontroller.id"
+          >
+            {{ microcontroller.name }}
+          </option>
           <option value="">other</option>
         </select>
       </div>
 
     </div>
     <div class="flex w-1/3 flex-col items-center">
-      <div v-if="keyboardStore.controller === '0xcb-helios'">
+      <!--div v-if="keyboardStore.controller === '0xcb-helios'">
         <p class="py-4">
           The
           <a
@@ -201,7 +206,8 @@
           alt=""
           class="board-image"
         />
-      </div>
+      </div-->
+
       <div v-if="keyboardStore.controller === 'pi-pico'">
         <p class="py-4">
           The
@@ -219,6 +225,9 @@
           class="board-image"
         />
       </div>
+
+
+
       <div v-if="!keyboardStore.controller">
         <p class="py-4">
           Feel free to submit other microcontroller pinouts. Ensure you have the permission to use
@@ -234,10 +243,12 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed } from 'vue';
 // import { useRouter } from 'vue-router'
-import { keyboardStore, pinPrefixHint, splitSideHint, vbusPinHint, splitPinHint } from '../store'
+import { keyboardStore, pinPrefixHint, splitPinHint, splitSideHint, vbusPinHint } from '../store';
 // const router = useRouter()
+import microcontrollers from "@renderer/assets/microcontrollers/microcontrollers.json"; // Adjust the path as per your project structure
+
 
 defineProps(['initialSetup'])
 
