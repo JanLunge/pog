@@ -44,9 +44,8 @@
       <div class="form-control absolute right-4">
         <label class="label cursor-pointer">
           <input
+            v-model="autoscroll"
             type="checkbox"
-            id="repl-output-autoscroll"
-            checked="checked"
             class="checkbox checkbox-sm"
           />
           <span class="label-text pl-1">autoscroll</span>
@@ -69,6 +68,7 @@ const inputData = ref('')
 const ports = ref<any[]>([])
 const selectedPort = ref('')
 const statusMessage = ref('')
+const autoscroll = ref(true)
 const sortedPorts = computed(() => {
   return [...ports.value]
     .sort((a, b) => {
@@ -86,8 +86,7 @@ const sortedPorts = computed(() => {
 const scrollTextarea = () => {
   nextTick(() => {
     const replOutput = document.getElementById('repl-output')
-    const autoscroll = document.getElementById('repl-output-autoscroll')
-    if (replOutput && autoscroll.checked) {
+    if (replOutput && autoscroll.value) {
       replOutput.scrollTop = replOutput.scrollHeight
     }
   })
