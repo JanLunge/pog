@@ -36,10 +36,11 @@ jobs:
         run: npm run build && npx electron-builder --linux --config
 
       - name: Upload Linux Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: linux-app
           path: dist/*.AppImage
+          compression-level: 0
 
   build-windows:
     runs-on: windows-latest
@@ -59,10 +60,11 @@ jobs:
         run: npm run build && npx electron-builder --win --config
 
       - name: Upload Windows Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: windows-app
           path: dist/*.exe
+          compression-level: 0
 
   build-mac:
     runs-on: macos-latest
@@ -101,8 +103,9 @@ jobs:
           CSC_KEYCHAIN: build.keychain
 
       - name: Upload Mac Artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: mac-app
           path: dist/*.dmg
+          compression-level: 0
 
