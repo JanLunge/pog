@@ -59,6 +59,7 @@ import { SelectionArea } from '@viselect/vue'
 import type { SelectionEvent } from '@viselect/vue'
 import { isNumber } from '@vueuse/core'
 import { useDebounceFn } from '@vueuse/core'
+
 const props = defineProps(['keyLayout', 'keymap', 'mode', 'matrixWidth', 'layouts', 'fixedHeight'])
 // mode can be layout or keymap
 const keyboardContainer = ref<VNodeRef | null>(null)
@@ -137,10 +138,13 @@ const updateScale = () => {
 }
 onMounted(async () => {
   // adjust keyboard size to fit
+  // TODO: figure out why i need to apply it 3 times to work
   updateScale()
   await nextTick()
   updateScale()
-  // updateHeight()
+  setTimeout(async () => {
+    updateHeight()
+  }, 100)
   window.addEventListener('resize', updateScale)
 })
 
@@ -279,6 +283,7 @@ defineExpose({ keyboardContainer })
   width: 100%;
   @apply flex items-center justify-center p-4;
 }
+
 .keyboard-layout {
 }
 </style>
@@ -288,6 +293,7 @@ defineExpose({ keyboardContainer })
   border: 2px solid rgb(242, 140, 24);
   border-radius: 0.1em;
   z-index: 100;
+
   &.hidden {
     opacity: 0;
   }
