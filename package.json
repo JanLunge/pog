@@ -1,6 +1,6 @@
 {
   "name": "pog",
-  "version": "1.5.3",
+  "version": "1.5.4",
   "license": "MIT",
   "description": "A KMK firmware configurator",
   "main": "./out/main/index.js",
