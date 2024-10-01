@@ -176,7 +176,11 @@
 
       <div class="mt-4 w-full">
         <p class="mb-2 text-sm">Microcontroller</p>
-        <select v-model="keyboardStore.controller" class="select select-bordered w-full">          
+        <select
+          v-model="keyboardStore.controller"
+          class="select select-bordered w-full"
+          @change="showKeyboardstoreController()"
+        >
           <option
             v-for="microcontroller of microcontrollers"
             :key="microcontroller.id"
@@ -190,44 +194,25 @@
 
     </div>
     <div class="flex w-1/3 flex-col items-center">
-      <!--div v-if="keyboardStore.controller === '0xcb-helios'">
-        <p class="py-4">
-          The
-          <a
-            class="link-primary link"
-            target="_blank"
-            href="https://keeb.supply/products/0xcb-helios"
-          >0xCB Helios</a
-          >
-          is an Elite-C compatible MicroController that is based on the RP2040.
-        </p>
-        <img
-          src="@renderer/assets/microcontrollers/0xcb-helios.png"
-          alt=""
+      <div
+        v-for="microcontroller of microcontrollers"
+        :key="microcontroller.id"
+        :value="microcontroller.id"
+      >
+      <div v-if="keyboardStore.controller === microcontroller.id">
+        <p class="py-4" v-html="microcontroller.information"></p>
+        <img 
+        v-if="microcontroller.image"
+          :src="`/src/assets/microcontrollers/${microcontroller.id}.png`"
+          :alt="`Pinout Image of ${microcontroller.name}`"
           class="board-image"
         />
-      </div-->
-
-      <div v-if="keyboardStore.controller === 'pi-pico'">
-        <p class="py-4">
-          The
-          <a
-            class="link-primary link"
-            target="_blank"
-            href="https://www.raspberrypi.com/products/raspberry-pi-pico/"
-          >Raspberry Pi Pico</a
-          >
-          is a low-cost, high-performance microcontroller board based on the RP2040 chip, designed for embedded projects and IoT applications.
-        </p>
-        <img
-          src="@renderer/assets/microcontrollers/pi-pico.png"
-          alt=""
-          class="board-image"
-        />
+        <small class="license-link base-300">
+          Image License: <a v-bind:href="microcontroller.licenseUrl" target="_blank" class="link-primary pr-1">{{microcontroller.license}}</a>|<a v-bind:href="microcontroller.imageUrl" target="_blank" class="link-primary pl-1">source</a>
+        </small>
       </div>
-
-
-
+    </div>
+      
       <div v-if="!keyboardStore.controller">
         <p class="py-4">
           Feel free to submit other microcontroller pinouts. Ensure you have the permission to use
@@ -243,14 +228,24 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue'
 // import { useRouter } from 'vue-router'
-import { keyboardStore, pinPrefixHint, splitPinHint, splitSideHint, vbusPinHint } from '../store';
+import { keyboardStore, pinPrefixHint, splitPinHint, splitSideHint, vbusPinHint } from '../store'
 // const router = useRouter()
-import microcontrollers from "@renderer/assets/microcontrollers/microcontrollers.json"; // Adjust the path as per your project structure
-
+import microcontrollers from '@renderer/assets/microcontrollers/microcontrollers.json'
 
 defineProps(['initialSetup'])
+console.log('here1')
+
+onMounted(() => {
+  microcontrollers.forEach((m) =>
+    m.id === keyboardStore.controller
+      ? (keyboardStore.controllerJson = m)
+      : (keyboardStore.controllerJson = {})
+  )
+
+  console.log(keyboardStore.controllerJson)
+})
 
 // validate pin count
 if (keyboardStore.wiringMethod === 'matrix') {
@@ -296,11 +291,24 @@ const numberOfSplitPins = computed(() => {
   if (keyboardStore.keyboardType === 'splitOnewire') return pins + 1
   return pins
 })
+
+function showKeyboardstoreController(){
+  console.log('here')
+  console.log(keyboardStore.controller)
+}
+
+ 
+
 </script>
 <style lang="scss" scoped>
+.license-link{
+  font-size: 0.55em;
+}
 .board-image{
-  width: 200px;
+  width: 180px;
+  max-width: 180px;
   height:auto;
+  font-size: 0.7em;
 }
 .controller-labels {
   @apply absolute grid;
