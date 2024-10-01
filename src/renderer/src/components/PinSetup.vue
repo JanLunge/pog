@@ -232,10 +232,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue'
-// import { useRouter } from 'vue-router'
-import { keyboardStore, pinPrefixHint, splitPinHint, splitSideHint, vbusPinHint } from '../store'
-// const router = useRouter()
+import { computed, onMounted } from 'vue' // import { useRouter } from 'vue-router'
+import { keyboardStore } from '../store' // const router = useRouter()
 import microcontrollers from '@renderer/assets/microcontrollers/microcontrollers.json'
 
 defineProps(['initialSetup'])
