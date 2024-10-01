@@ -201,7 +201,7 @@
       >
       <div v-if="keyboardStore.controller === microcontroller.id">
         <p class="py-4" v-html="microcontroller.information"></p>
-        <img 
+        <img
         v-if="microcontroller.image"
           :src="`/src/assets/microcontrollers/${microcontroller.id}.png`"
           :alt="`Pinout Image of ${microcontroller.name}`"
@@ -212,7 +212,7 @@
         </small>
       </div>
     </div>
-      
+
       <div v-if="!keyboardStore.controller">
         <p class="py-4">
           Feel free to submit other microcontroller pinouts. Ensure you have the permission to use
@@ -297,7 +297,7 @@ function showKeyboardstoreController(){
   console.log(keyboardStore.controller)
 }
 
- 
+
 
 </script>
 <style lang="scss" scoped>
@@ -307,7 +307,7 @@ function showKeyboardstoreController(){
 .board-image{
   width: 180px;
   max-width: 180px;
-  height:auto;
+  height: auto;
   font-size: 0.7em;
 }
 .controller-labels {
@@ -316,7 +316,7 @@ function showKeyboardstoreController(){
   padding-top: 15px;
   font-size: 14px;
   line-height: 21.4px;
-  font-family: Monospaced 'Lucida Console';
+  font-family: 'Lucida Console', monospace;
   z-index: 2;
   &-right {
     @apply right-0 text-left;
