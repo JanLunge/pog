@@ -179,7 +179,6 @@
         <select
           v-model="keyboardStore.controller"
           class="select select-bordered w-full"
-          @change="showKeyboardstoreController()"
         >
           <option
             v-for="microcontroller of microcontrollers"
@@ -237,16 +236,14 @@ import { keyboardStore } from '../store' // const router = useRouter()
 import microcontrollers from '@renderer/assets/microcontrollers/microcontrollers.json'
 
 defineProps(['initialSetup'])
-console.log('here1')
 
 onMounted(() => {
+  // Getting correct Microcontroller from JSON
   microcontrollers.forEach((m) =>
     m.id === keyboardStore.controller
       ? (keyboardStore.controllerJson = m)
       : (keyboardStore.controllerJson = {})
   )
-
-  console.log(keyboardStore.controllerJson)
 })
 
 // validate pin count
@@ -294,10 +291,6 @@ const numberOfSplitPins = computed(() => {
   return pins
 })
 
-function showKeyboardstoreController() {
-  console.log('here')
-  console.log(keyboardStore.controller)
-}
 </script>
 <style lang="scss" scoped>
 .license-link {
