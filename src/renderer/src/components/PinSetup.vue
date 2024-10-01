@@ -176,10 +176,7 @@
 
       <div class="mt-4 w-full">
         <p class="mb-2 text-sm">Microcontroller</p>
-        <select
-          v-model="keyboardStore.controller"
-          class="select select-bordered w-full"
-        >
+        <select v-model="keyboardStore.controller" class="select select-bordered w-full">
           <option
             v-for="microcontroller of microcontrollers"
             :key="microcontroller.id"
@@ -290,7 +287,6 @@ const numberOfSplitPins = computed(() => {
   if (keyboardStore.keyboardType === 'splitOnewire') return pins + 1
   return pins
 })
-
 </script>
 <style lang="scss" scoped>
 .license-link {
