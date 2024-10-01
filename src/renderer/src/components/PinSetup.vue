@@ -69,8 +69,8 @@
         <p class="flex items-center justify-center pb-4 text-xl font-bold">
           Direct Pins
           <span class="badge badge-primary ml-2 font-bold">{{
-              keyboardStore.directPins.length
-            }}</span>
+            keyboardStore.directPins.length
+          }}</span>
         </p>
         <div
           v-for="(_pin, index) in keyboardStore.directPins"
@@ -191,7 +191,6 @@
           <option value="">other</option>
         </select>
       </div>
-
     </div>
     <div class="flex w-1/3 flex-col items-center">
       <div
@@ -199,19 +198,25 @@
         :key="microcontroller.id"
         :value="microcontroller.id"
       >
-      <div v-if="keyboardStore.controller === microcontroller.id">
-        <p class="py-4" v-html="microcontroller.information"></p>
-        <img
-        v-if="microcontroller.image"
-          :src="`/src/assets/microcontrollers/${microcontroller.id}.png`"
-          :alt="`Pinout Image of ${microcontroller.name}`"
-          class="board-image"
-        />
-        <small class="license-link base-300">
-          Image License: <a v-bind:href="microcontroller.licenseUrl" target="_blank" class="link-primary pr-1">{{microcontroller.license}}</a>|<a v-bind:href="microcontroller.imageUrl" target="_blank" class="link-primary pl-1">source</a>
-        </small>
+        <div v-if="keyboardStore.controller === microcontroller.id">
+          <p class="py-4" v-html="microcontroller.information"></p>
+          <img
+            v-if="microcontroller.image"
+            :src="`/src/assets/microcontrollers/${microcontroller.id}.png`"
+            :alt="`Pinout Image of ${microcontroller.name}`"
+            class="board-image"
+          />
+          <small class="license-link base-300">
+            Image License:
+            <a v-bind:href="microcontroller.licenseUrl" target="_blank" class="link-primary pr-1">{{
+              microcontroller.license
+            }}</a
+            >|<a v-bind:href="microcontroller.imageUrl" target="_blank" class="link-primary pl-1"
+              >source</a
+            >
+          </small>
+        </div>
       </div>
-    </div>
 
       <div v-if="!keyboardStore.controller">
         <p class="py-4">
@@ -223,7 +228,6 @@
         <p class="py-4">Just look for a pinout and use any pin that is starting with GP.</p>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -292,24 +296,23 @@ const numberOfSplitPins = computed(() => {
   return pins
 })
 
-function showKeyboardstoreController(){
+function showKeyboardstoreController() {
   console.log('here')
   console.log(keyboardStore.controller)
 }
-
-
-
 </script>
 <style lang="scss" scoped>
-.license-link{
+.license-link {
   font-size: 0.55em;
 }
-.board-image{
+
+.board-image {
   width: 180px;
   max-width: 180px;
   height: auto;
   font-size: 0.7em;
 }
+
 .controller-labels {
   @apply absolute grid;
   width: 130px;
@@ -318,19 +321,23 @@ function showKeyboardstoreController(){
   line-height: 21.4px;
   font-family: 'Lucida Console', monospace;
   z-index: 2;
+
   &-right {
     @apply right-0 text-left;
     //width: 188px;
   }
+
   &-left {
     @apply text-right;
   }
+
   &-bottom {
     transform: rotateZ(-90deg);
     @apply text-right;
     top: 295px;
     left: 128px;
   }
+
   & > div {
     @apply rounded px-3;
     &:hover {
