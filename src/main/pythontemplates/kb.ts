@@ -1,6 +1,7 @@
-export const kbpy = `# kb.py KB base config - v0.9.5
+export const kbpy = `# kb.py KB base config - v0.9.8
 import board
 import pog
+import microcontroller
 
 from kmk.kmk_keyboard import KMKKeyboard
 from kmk.scanners import DiodeOrientation
@@ -73,23 +74,26 @@ class POGKeyboard(KMKKeyboard):
                 print("split with 2 pins")
                 self.split = Split(
                     split_type=SplitType.BLE,
-                    split_side=side)
+                    split_side=side,
+                    split_flip=pog.splitFlip)
             elif pog.keyboardType == "splitSerial":
                 print("split with 2 pins (UART)")
                 self.split = Split(
                     split_side=side,
                     split_type=SplitType.UART,
-                    split_flip=False,
                     data_pin=pog.splitPinA,
                     data_pin2=pog.splitPinB,
-                    use_pio=True)
+                    use_pio=pog.splitUsePio,
+                    split_flip=pog.splitFlip,
+                    uart_flip=pog.splitUartFlip)
             else:
                 # Nested under pog.split == True => splitOnewire
                 print('split with 1 pin')
                 self.split = Split(
                     split_side=side,
                     data_pin=pog.splitPinA,
-                    use_pio=True)
+                    use_pio=pog.splitUsePio,
+                    split_flip=pog.splitFlip)
 
             self.modules.append(self.split)
 

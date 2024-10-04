@@ -2,6 +2,7 @@ export const pogpy = `# pog.py Import the pog config - v0.9.5
 import json
 import board
 from kmk.keys import KC
+import microcontroller
 
 config = {}
 configbuffer = bytearray()
@@ -132,6 +133,9 @@ if config.get('splitPinA'):
     splitPinA = eval(renderPin(config['splitPinA']))
 if config.get('splitPinB'):
     splitPinB = eval(renderPin(config['splitPinB']))
+splitUsePio = config.get('splitUsePio')
+splitFlip = config.get('splitFlip')
+splitUartFlip = config.get('splitUartFlip')
 
 vbusPin = None
 if config.get('vbusPin') and config.get('splitSide') == 'vbus' and pinValid("board." + config['vbusPin']):
