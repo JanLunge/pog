@@ -143,7 +143,7 @@
       </div>
     </div>
     <!-- RIGHT COLUMN -->
-    <div class="flex w-1/2 flex-col items-center" style="width: 400px">
+    <div class="flex w-1/3 flex-col items-center" style="width: 400px">
       <div class="mb-4 w-full">
         <p class="mb-2 text-sm">Pin Prefix</p>
         <select v-model="keyboardStore.pinPrefix" class="select select-bordered mb-2 w-full">
@@ -177,58 +177,71 @@
       <div class="mt-4 w-full">
         <p class="mb-2 text-sm">Microcontroller</p>
         <select v-model="keyboardStore.controller" class="select select-bordered w-full">
-          <option value="0xcb-helios">0xCB Helios</option>
+          <option
+            v-for="microcontroller of microcontrollers"
+            :key="microcontroller.id"
+            :value="microcontroller.id"
+          >
+            {{ microcontroller.name }}
+          </option>
           <option value="">other</option>
         </select>
       </div>
-      <div v-if="keyboardStore.controller === '0xcb-helios'">
-        <p class="py-4">
-          The
-          <a
-            class="link-primary link"
-            target="_blank"
-            href="https://keeb.supply/products/0xcb-helios"
-            >0xCB Helios</a
-          >
-          is an Elite-C compatible MicroController that is based on the RP2040.
-        </p>
-        <img
-          src="@renderer/assets/microcontrollers/0xcb-helios.png"
-          alt=""
-          width="400"
-          height="300"
-        />
-      </div>
-      <div v-if="!keyboardStore.controller">
-        <ul class="py-4">
-          <li>
-            <a
-              class="link-primary link"
-              target="_blank"
-              href="https://datasheets.raspberrypi.com/pico/Pico-R3-A4-Pinout.pdf"
-              >Pi Pico</a
+    </div>
+    <div class="flex w-1/3 flex-col items-center">
+      <div
+        v-for="microcontroller of microcontrollers"
+        :key="microcontroller.id"
+        :value="microcontroller.id"
+      >
+        <div v-if="keyboardStore.controller === microcontroller.id">
+          <p class="py-4" v-html="microcontroller.information"></p>
+          <img
+            v-if="microcontroller.image"
+            :src="`/src/assets/microcontrollers/${microcontroller.id}.png`"
+            :alt="`Pinout Image of ${microcontroller.name}`"
+            class="board-image"
+          />
+          <small class="license-link base-300">
+            Image License:
+            <a v-bind:href="microcontroller.licenseUrl" target="_blank" class="link-primary pr-1">{{
+              microcontroller.license
+            }}</a
+            >|<a v-bind:href="microcontroller.imageUrl" target="_blank" class="link-primary pl-1"
+              >source</a
             >
-          </li>
-        </ul>
+          </small>
+        </div>
+      </div>
+
+      <div v-if="!keyboardStore.controller">
         <p class="py-4">
           Feel free to submit other microcontroller pinouts. Ensure you have the permission to use
           the pinout image if it has not been created by you. In the meantime here are links to
           other pinouts
         </p>
         <p>Currently this tool works with any RP2040 controller.</p>
-        <p class="py-4">Just look for a pinout and use any pin that is starting with GP</p>
+        <p class="py-4">Just look for a pinout and use any pin that is starting with GP.</p>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-// import { useRouter } from 'vue-router'
-import { keyboardStore, pinPrefixHint, splitSideHint, vbusPinHint, splitPinHint } from '../store'
-// const router = useRouter()
+import { computed, onMounted } from 'vue' // import { useRouter } from 'vue-router'
+import { keyboardStore } from '../store' // const router = useRouter()
+import microcontrollers from '@renderer/assets/microcontrollers/microcontrollers.json'
 
 defineProps(['initialSetup'])
+
+onMounted(() => {
+  // Getting correct Microcontroller from JSON
+  microcontrollers.forEach((m) =>
+    m.id === keyboardStore.controller
+      ? (keyboardStore.controllerJson = m)
+      : (keyboardStore.controllerJson = {})
+  )
+})
 
 // validate pin count
 if (keyboardStore.wiringMethod === 'matrix') {
@@ -276,27 +289,42 @@ const numberOfSplitPins = computed(() => {
 })
 </script>
 <style lang="scss" scoped>
+.license-link {
+  font-size: 0.55em;
+}
+
+.board-image {
+  width: 180px;
+  max-width: 180px;
+  height: auto;
+  font-size: 0.7em;
+}
+
 .controller-labels {
   @apply absolute grid;
   width: 130px;
   padding-top: 15px;
   font-size: 14px;
   line-height: 21.4px;
-  font-family: Monospaced 'Lucida Console';
+  font-family: 'Lucida Console', monospace;
   z-index: 2;
+
   &-right {
     @apply right-0 text-left;
     //width: 188px;
   }
+
   &-left {
     @apply text-right;
   }
+
   &-bottom {
     transform: rotateZ(-90deg);
     @apply text-right;
     top: 295px;
     left: 128px;
   }
+
   & > div {
     @apply rounded px-3;
     &:hover {
