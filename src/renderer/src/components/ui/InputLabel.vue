@@ -22,7 +22,7 @@ const localValue = ref('')
 onMounted(() => {
   localValue.value = props.modelValue
 })
-watch(props.modelValue, () => {
+watch(() => props.modelValue, () => {
   localValue.value = props.modelValue
 })
 const changed = () => {
