@@ -5,6 +5,7 @@ import { useRouter } from 'vue-router'
 import { matrixPositionToIndex } from '../helpers'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
+
 const router = useRouter()
 // @ts-ignore will be used later
 type KeyActions = {
@@ -85,6 +86,7 @@ export class Key {
   encoderIndex?: number = undefined
   variant?: [number, number] = undefined
   keyboard?: any
+
   constructor({
     x,
     y,
@@ -129,6 +131,7 @@ export class Key {
     if (typeof encoderIndex === 'number') this.encoderIndex = encoderIndex
     this.keyboard = keyboard
   }
+
   serialize() {
     const tmpKey: KeyInfo = {
       x: this.x,
@@ -175,7 +178,9 @@ export class Key {
     }
     return tmpKey
   }
+
   set({}) {}
+
   // happity hoppety property
   delta({ property, value }: { value: number; property: keyof BaseKeyInfo }) {
     console.log('writing delta', property, value, this[property])
@@ -192,6 +197,7 @@ export class Key {
       this[property] = value
     }
   }
+
   getKeymapIndex() {
     // if (!this.matrix && typeof this.coordMapIndex !== 'number') return undefined
     // if (this.keyboard.wiringMethod === 'matrix') {
@@ -203,6 +209,7 @@ export class Key {
     return this.coordMapIndex
     // }
   }
+
   setOnKeymap(keyCode) {
     const keyIndex = this.getKeymapIndex()
     console.log('index', keyIndex, keyCode)
@@ -227,6 +234,7 @@ export class Key {
     }
     keyboardStore.keymap[selectedLayer.value][keyIndex] = keyCode
   }
+
   getMatrixLabel() {
     if (typeof this.coordMapIndex === 'number') return this.coordMapIndex
     if (this.matrix) {
@@ -244,6 +252,7 @@ export class Key {
     }
     return ''
   }
+
   getEncoderLabel() {
     if (typeof this.encoderIndex !== 'number') return { a: '', b: '' }
     return {
@@ -319,12 +328,17 @@ export class Keyboard {
   // features
 
   encoders: { pad_a: string; pad_b: string }[] = []
+
+  // split features
   keyboardType: 'normal' | 'splitBLE' | 'splitSerial' | 'splitOnewire' = 'normal'
   splitSide: 'left' | 'right' | 'vbus' | 'label' = 'left'
   // split = false
   splitPinA = ''
   splitPinB = ''
   vbusPin = 'VBUS_SENSE'
+  splitUsePio = true
+  splitFlip = false
+  splitUartFlip = false
 
   // keymaps
 
@@ -355,6 +369,7 @@ export class Keyboard {
       this.keys.push(tmpKey)
     })
   }
+
   getKeys() {
     return this.keys.map((key) => key.serialize())
   }
@@ -366,6 +381,7 @@ export class Keyboard {
   removeKeys({ ids }: { ids: string[] }) {
     this.keys = this.keys.filter((a) => !ids.includes(a.id))
   }
+
   deltaForKeys({
     keyIndexes,
     property,
@@ -488,6 +504,9 @@ export class Keyboard {
       if (configContents.splitPinB) this.splitPinB = configContents.splitPinB
       if (configContents.splitSide) this.splitSide = configContents.splitSide
       if (configContents.vbusPin) this.vbusPin = configContents.vbusPin
+      if (configContents.splitUsePio) this.splitUsePio = configContents.splitUsePio
+      if (configContents.splitFlip) this.splitFlip = configContents.splitFlip
+      if (configContents.splitUartFlip) this.splitUartFlip = configContents.splitUartFlip
 
       // encoders
       if (configContents.encoders) this.encoders = configContents.encoders
@@ -544,6 +563,9 @@ export class Keyboard {
     this.splitPinB = ''
     this.splitSide = 'left'
     this.vbusPin = 'VBUS_SENSE'
+    this.splitUsePio = true
+    this.splitFlip = false
+    this.splitUartFlip = false
   }
 
   serialize() {
@@ -580,6 +602,9 @@ export class Keyboard {
       splitPinB: this.splitPinB,
       splitSide: this.splitSide,
       vbusPin: this.vbusPin,
+      splitUsePio: this.splitUsePio,
+      splitFlip: this.splitFlip,
+      spitUartFlip: this.splitUartFlip,
 
       coordMap: this.coordMap,
       pinPrefix: this.pinPrefix,

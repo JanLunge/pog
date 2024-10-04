@@ -189,29 +189,26 @@
       </div>
     </div>
     <div class="flex w-1/3 flex-col items-center">
-      <div
-        v-for="microcontroller of microcontrollers"
-        :key="microcontroller.id"
-        :value="microcontroller.id"
-      >
-        <div v-if="keyboardStore.controller === microcontroller.id">
-          <p class="py-4" v-html="microcontroller.information"></p>
-          <img
-            v-if="microcontroller.image"
-            :src="`/src/assets/microcontrollers/${microcontroller.id}.png`"
-            :alt="`Pinout Image of ${microcontroller.name}`"
-            class="board-image"
-          />
-          <small class="license-link base-300">
-            Image License:
-            <a v-bind:href="microcontroller.licenseUrl" target="_blank" class="link-primary pr-1">{{
-              microcontroller.license
-            }}</a
-            >|<a v-bind:href="microcontroller.imageUrl" target="_blank" class="link-primary pl-1"
-              >source</a
-            >
-          </small>
-        </div>
+      <div v-if="selectedMicrocontroller.id">
+        <p class="py-4" v-html="selectedMicrocontroller.information"></p>
+        <img
+          v-if="selectedMicrocontroller.image"
+          :src="`/src/assets/microcontrollers/${selectedMicrocontroller.id}.png`"
+          :alt="`Pinout Image of ${selectedMicrocontroller.name}`"
+          class="board-image"
+        />
+        <small class="license-link base-300">
+          Image License:
+          <a
+            :href="selectedMicrocontroller.licenseUrl"
+            target="_blank"
+            class="link-primary pr-1"
+            v-text="selectedMicrocontroller.license"
+          ></a
+          >|<a :href="selectedMicrocontroller.imageUrl" target="_blank" class="link-primary pl-1"
+            >source</a
+          >
+        </small>
       </div>
 
       <div v-if="!keyboardStore.controller">
@@ -228,20 +225,24 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted } from 'vue' // import { useRouter } from 'vue-router'
-import { keyboardStore } from '../store' // const router = useRouter()
+import { computed } from 'vue' // import { useRouter } from 'vue-router'
+import {keyboardStore, pinPrefixHint, splitPinHint, splitSideHint, vbusPinHint} from '../store' // const router = useRouter()
 import microcontrollers from '@renderer/assets/microcontrollers/microcontrollers.json'
 
 defineProps(['initialSetup'])
 
-onMounted(() => {
-  // Getting correct Microcontroller from JSON
-  microcontrollers.forEach((m) =>
-    m.id === keyboardStore.controller
-      ? (keyboardStore.controllerJson = m)
-      : (keyboardStore.controllerJson = {})
-  )
-})
+const selectedMicrocontroller = computed(
+  () =>
+    microcontrollers.find((m) => m.id == keyboardStore.controller) || {
+      id: false,
+      license: '',
+      licenseUrl: '',
+      information: '',
+      imageUrl: '',
+      name: '',
+      image: ''
+    }
+)
 
 // validate pin count
 if (keyboardStore.wiringMethod === 'matrix') {
@@ -294,10 +295,12 @@ const numberOfSplitPins = computed(() => {
 }
 
 .board-image {
-  width: 180px;
-  max-width: 180px;
+  //width: 180px;
+  //max-width: 180px;
+  max-height: 60vh;
   height: auto;
   font-size: 0.7em;
+  background-size: contain;
 }
 
 .controller-labels {

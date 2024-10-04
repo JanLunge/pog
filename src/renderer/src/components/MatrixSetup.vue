@@ -4,14 +4,38 @@
       Define the size of your keyboard matrix here, set it as big as you need. For easier wiring set
       it to the max number of cols/rows on your keyboard
     </p>
-    <div class="mb-4">
-      <p class="mb-2 text-sm">Keyboard Type</p>
-      <select v-model="keyboardStore.keyboardType" class="select select-bordered mb-2 w-full">
-        <option value="normal">Normal</option>
-        <option value="splitBle">Split (Bluetooth)</option>
-        <option value="splitSerial">Split (Serial)</option>
-        <option value="splitOnewire">Split (1 Pin)</option>
-      </select>
+    <div class="mb-4 flex flex-col gap-2">
+      <div>
+        <p class="mb-2 text-sm">Keyboard Type</p>
+        <select v-model="keyboardStore.keyboardType" class="select select-bordered mb-2 w-full">
+          <option value="normal">Normal</option>
+          <option value="splitBle">Split (Bluetooth)</option>
+          <option value="splitSerial">Split (Serial)</option>
+          <option value="splitOnewire">Split (1 Pin)</option>
+        </select>
+      </div>
+      <label
+        v-if="['splitSerial', 'splitOnewire'].includes(keyboardStore.keyboardType)"
+        class="flex gap-2"
+      >
+        <input v-model="keyboardStore.splitUsePio" type="checkbox" class="checkbox" />
+        <span>usePio</span>
+      </label>
+      <label
+        v-if="['splitSerial'].includes(keyboardStore.keyboardType)"
+        class="flex gap-2"
+      >
+        <input v-model="keyboardStore.splitUartFlip" type="checkbox" class="checkbox" />
+        <span>uartFlip</span>
+      </label>
+
+      <label
+        v-if="['splitSerial', 'splitOnewire', 'splitBle'].includes(keyboardStore.keyboardType)"
+        class="flex gap-2"
+      >
+        <input v-model="keyboardStore.splitFlip" type="checkbox" class="checkbox" />
+        <span>splitFlip</span>
+      </label>
     </div>
     <div class="mb-4">
       <p class="mb-2 text-sm">Wiring Method</p>
@@ -70,6 +94,7 @@
 import InputLabel from './ui/InputLabel.vue'
 import { keyboardStore } from '../store'
 import { computed } from 'vue'
+
 defineProps(['initialSetup'])
 const matrixEmpty = computed(() => {
   return !(
