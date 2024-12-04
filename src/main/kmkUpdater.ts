@@ -5,16 +5,11 @@ import decompress from 'decompress'
 import { mainWindow } from './index'
 
 // downloads kmk to app storage
-export const updateFirmware = () => {
-  console.log(appDir)
-  downloadFile(
-    'https://github.com/KMKfw/kmk_firmware/archive/refs/heads/main.zip',
-    appDir + 'kmk.zip'
-  )
-}
-
-// download kmk and copy it to the keyboard
-export const downloadFile = async (file_url, targetPath) => {
+export const updateFirmware = async () => {
+  const versionSha = 'f6346937d865f7e1f6baaae93ae5c9be935aae75'
+  console.log('updating kmk firmware', appDir, versionSha)
+  const file_url = `https://github.com/KMKfw/kmk_firmware/archive/${versionSha}.zip`
+  const targetPath = appDir + 'kmk.zip'
   if (!fs.existsSync(appDir)) {
     fs.mkdirSync(appDir)
   }
@@ -73,6 +68,8 @@ export const downloadFile = async (file_url, targetPath) => {
   // file copy needs to await the decompression
   try {
     console.log('moving kmk into keyboard')
+    // write a file to the keyboard with the version sha
+    fs.writeFileSync(`${currentKeyboard.path}/kmk/version`, versionSha)
     fs.cp(
       `${appDir}kmk/kmk_firmware-main/kmk`,
       `${currentKeyboard.path}/kmk`,

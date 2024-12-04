@@ -1,4 +1,4 @@
-export const kbpy = `# kb.py KB base config - v0.9.8
+export const kbpy = `# kb.py KB base config - v1.0.0
 import board
 import pog
 import microcontroller
@@ -22,9 +22,12 @@ class POGKeyboard(KMKKeyboard):
             from pog_serial import pogSerial; self.modules.append(pogSerial())
 
         if "oneshot" in features:
-            from kmk.modules.oneshot import OneShot
-            self.oneshot = OneShot()
-            self.modules.append(self.oneshot)
+            from kmk.modules.sticky_keys import StickyKeys
+            sticky_keys = StickyKeys()
+            # optional: set a custom release timeout in ms (default: 1000ms)
+            # sticky_keys = StickyKeys(release_after=5000)
+            self.modules.append(sticky_keys)
+            
 
         if "tapdance" in features:
             from kmk.modules.tapdance import TapDance
@@ -42,10 +45,10 @@ class POGKeyboard(KMKKeyboard):
             self.combos = Combos()
             self.modules.append(self.combos)
 
-        if "macros" in features:
-            from kmk.modules.macros import Macros
-            self.macros = Macros()
-            self.modules.append(self.macros)
+        # if "macros" in features:
+        from kmk.modules.macros import Macros
+        self.macros = Macros()
+        self.modules.append(self.macros)
 
         # TODO: not tested yet
         if "capsword" in features:
