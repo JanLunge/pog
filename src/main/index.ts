@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { checkForUSBKeyboards, handleSelectDrive, selectKeyboard } from './selectKeyboard'
 import { updateFirmware } from './kmkUpdater'
-import { handleKeymapSave, saveConfiguration } from './saveConfig'
+import { saveConfiguration } from './saveConfig'
 import { autoUpdater } from 'electron-updater'
 import serialPort from 'serialport'
 import { ReadlineParser } from '@serialport/parser-readline'
@@ -404,8 +404,6 @@ export const connectSerialKeyboard = async (keyboard) => {
           console.log('done sending')
           const dif = new Date().getTime() - startTime.getTime()
           console.log(`took ${dif / 1000}s`)
-          // now saving keymap
-          handleKeymapSave({ pogConfig: JSON.parse(pogconfigbuffer), serial: true })
         } else {
           sendConfigChunk(connectedKeyboardPort)
           currentChunk += 1
@@ -425,11 +423,6 @@ export const connectSerialKeyboard = async (keyboard) => {
       }
     } else if (data === 'y') {
       console.log('something else', data)
-      // if sendmode = pog config send keymap as well
-      if (sendMode === 'saveConfig') {
-        handleKeymapSave({ pogConfig: JSON.parse(pogconfigbuffer), serial: true })
-        return
-      }
       // general reset
       sendMode = ''
       currentChunk = 0
