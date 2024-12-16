@@ -27,6 +27,7 @@ install everything with
 then just run it with dev to start
 `yarn dev`
 
+to release a new version use `npm version minor` or `major` or `patch` then just push and github actions will do the rest
 
 # Tasks
 ## bugs
@@ -50,32 +51,6 @@ then just run it with dev to start
 - [ ] way to handle differences between pog.json to kmk code
 - [ ] wiring preview
 
-## done
-- [x] 1 row / 1col says pin has no len()
-- [x] overwrite on first flash
-- [x] boot.py generation
-- [x] versioning for python files
-- [x] direct pin wiring support
-- [x] save a backup of the json in electron
-- [x] dragging keys on the layout editor
-- [x] Layout editor to replace KLE
-- [x] save pog.json (use as main storage for everything)
-- [x] adjust keymap when matrix changes
-- [x] drag and drop keys
-
-## Using Electron
-
-### Install
-
-```bash
-$ npm install
-```
-
-### Development
-
-```bash
-$ npm run dev
-```
 
 ### Build
 
