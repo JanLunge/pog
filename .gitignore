@@ -4,4 +4,4 @@ out
 *.log*
 .idea
 .DS_Store
-.pog.code-workspacepackage-lock.json
+.pog.code-workspace
