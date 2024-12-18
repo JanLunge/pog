@@ -1,10 +1,9 @@
 export const keymappy = `#keymap.py KB base config - v1.0.0
 from kmk.keys import KC
 from kmk.modules.macros import Macros, Press, Release, Tap, Delay
-import pog
-import customkey
 from kmk.modules.combos import Chord, Sequence
-from kb import combos
+import pog
+import customkeys
 
 keymap = []
 for l, layer in enumerate(pog.config['keymap']):
