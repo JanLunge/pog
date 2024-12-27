@@ -6,7 +6,7 @@ import { mainWindow } from './index'
 
 // downloads kmk to app storage
 export const updateFirmware = async () => {
-  const versionSha = 'f6346937d865f7e1f6baaae93ae5c9be935aae75'
+  const versionSha = 'dbc26504ac9111e6f0b5ba99d1dbf35275319e27'
   console.log('updating kmk firmware', appDir, versionSha)
   const file_url = `https://github.com/KMKfw/kmk_firmware/archive/${versionSha}.zip`
   const targetPath = appDir + 'kmk.zip'
