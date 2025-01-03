@@ -30,13 +30,60 @@
       </label>
 
       <label
-        v-if="['splitSerial', 'splitOnewire', 'splitBle'].includes(keyboardStore.keyboardType)"
+        v-if="['splitI2C'].includes(keyboardStore.keyboardType)"
         class="flex gap-2"
       >
+      </label>
+
+      <label
+        v-if="['splitSerial', 'splitOnewire', 'splitBle', 'splitI2C'].includes(keyboardStore.keyboardType)"
+        class="flex gap-2"
+      >
+
         <input v-model="keyboardStore.splitFlip" type="checkbox" class="checkbox" />
         <span>splitFlip</span>
       </label>
     </div>
+    <div class="mb-4">
+      <p class="mb-2 text-sm">Track Ball</p>
+      <select v-model="keyboardStore.trackball" class="select select-tracktall w-full">
+        <option value="none">None</option>
+        <option value="pimoroni">Pimoroni Tackball </option>
+      </select>
+      <label
+        v-if="keyboardStore.trackball === 'pimoroni'"
+        class="flex gap-2">
+        <InputLabel
+          v-model="keyboardStore.i2cAddress"
+          placeholder="0x00"
+          input-type="text"
+          label="I2C Address (hex)"
+          pattern="^0x[0-9A-Fa-f]{2}$"
+          @input="(value) => {
+            const hex = value.startsWith('0x') ? value : '0x' + value;
+            keyboardStore.i2cAddress = hex;
+            checkMatrix();
+          }"
+        ></InputLabel>
+        <InputLabel
+          v-model="keyboardStore.i2cSda"
+          placeholder="1"
+          input-type="number"
+          label="I2C SDA Pin"
+          :min="0"
+          @input="checkMatrix"
+        ></InputLabel>
+        <InputLabel
+          v-model="keyboardStore.i2cScl"
+          placeholder="1"
+          input-type="number"
+          label="I2C SCL Pin"
+          :min="0"
+          @input="checkMatrix"
+        ></InputLabel>
+      </label>
+    </div>
+
     <div class="mb-4">
       <p class="mb-2 text-sm">Wiring Method</p>
       <select v-model="keyboardStore.wiringMethod" class="select select-bordered w-full">
@@ -108,6 +155,11 @@ const checkMatrix = () => {
   if (keyboardStore.rows < 0) keyboardStore.rows = 0
   if (keyboardStore.pins < 0) keyboardStore.pins = 0
 }
+
+const validateHex = (value: string) => {
+  const hexPattern = /^0x[0-9A-Fa-f]{2}$/;
+  return hexPattern.test(value);
+};
 </script>
 
 <style lang="scss" scoped>

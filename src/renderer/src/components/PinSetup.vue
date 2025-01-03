@@ -117,7 +117,7 @@
             />
           </label>
           <label
-            v-if="keyboardStore.keyboardType === 'splitSerial'"
+            v-if="keyboardStore.keyboardType === 'splitSerial' || keyboardStore.keyboardType === 'splitI2C'"
             class="mb-2 flex items-center gap-2"
           >
             <span class="mr-2 text-right">SplitPin A</span>
@@ -128,7 +128,7 @@
             />
           </label>
           <label
-            v-if="keyboardStore.keyboardType === 'splitSerial'"
+            v-if="keyboardStore.keyboardType === 'splitSerial' || keyboardStore.keyboardType === 'splitI2C'"
             class="mb-2 flex items-center gap-2"
           >
             <span class="mr-2 text-right">SplitPin B</span>
@@ -277,14 +277,14 @@ const pinsCompleted = computed(() => {
 
 const showVbusOption = computed(() => {
   return (
-    keyboardStore.keyboardType === 'splitSerial' || keyboardStore.keyboardType === 'splitOnewire'
+    keyboardStore.keyboardType === 'splitSerial' || keyboardStore.keyboardType === 'splitOnewire' || keyboardStore.keyboardType === 'splitI2C'
   )
 })
 
 const numberOfSplitPins = computed(() => {
   let pins = 0
   if (keyboardStore.splitSide === 'vbus') pins++
-  if (keyboardStore.keyboardType === 'splitSerial') return pins + 2
+  if (keyboardStore.keyboardType === 'splitSerial' || keyboardStore.keyboardType === 'splitI2C') return pins + 2
   if (keyboardStore.keyboardType === 'splitOnewire') return pins + 1
   return pins
 })

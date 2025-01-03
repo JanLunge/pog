@@ -33,18 +33,22 @@ def pinValid(pin):
 
 # Pin setup
 def renderPin(pin):
+    # Convert pin to string if it's a number
+    pin = str(pin)
+    
     pinLabel = ''
     if config["pinPrefix"] == "gp":
-        pinLabel = "board.GP" + pin
+        pinLabel = f"board.GP{pin}"
     elif config["pinPrefix"] == "board":
-        pinLabel = "board." + pin
+        pinLabel = f"board.{pin}"
     elif config["pinPrefix"] == "quickpin":
-        pinLabel = "pins[" + pin + "]"
+        pinLabel = f"pins[{pin}]"
     else:
         pinLabel = pin
+        
     if pinValid(pinLabel):
         return pinLabel
-
+    return None        
 
 
 colPinsArray = []
@@ -136,6 +140,20 @@ if config.get('splitPinB'):
 splitUsePio = config.get('splitUsePio')
 splitFlip = config.get('splitFlip')
 splitUartFlip = config.get('splitUartFlip')
+
+i2cAddress = None
+i2cSda = None
+i2Scl = None
+if config.get('i2cAddress'):
+    try:
+        i2cAddress = int(config['i2cAddress'], 16) if '0x' in config['i2cAddress'] else int(config['i2cAddress'])
+    except ValueError:
+        print(f"Invalid I2C address: {config['i2cAddress']}")
+
+if config.get('i2cSda'):
+    i2cSda = eval(renderPin(config['i2cSda']))
+if config.get('i2cScl'):
+    i2cScl = eval(renderPin(config['i2cScl']))
 
 vbusPin = None
 if config.get('vbusPin') and config.get('splitSide') == 'vbus' and pinValid("board." + config['vbusPin']):

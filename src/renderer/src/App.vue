@@ -20,6 +20,12 @@ window.api.keyboardScan((_event: Event, value: { keyboards }) => {
 
 window.api.serialKeyboardPogConfig((_event: Event, value: { pogconfig }) => {
   console.log('loaded pog config', value)
+  console.log('Trackball config:', value.pogconfig.trackball)
+  console.log('I2C config:', {
+    address: value.pogconfig.i2cAddress,
+    sda: value.pogconfig.i2cSda,
+    scl: value.pogconfig.i2cScl
+  })  
   keyboardStore.import({
     path: '',
     serial: true,

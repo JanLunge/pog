@@ -304,6 +304,7 @@ export class Keyboard {
   controller = ''
   diodeDirection: 'ROW2COL' | 'COL2ROW' = 'COL2ROW'
   wiringMethod: 'matrix' | 'direct' = 'matrix'
+  trackball: 'none' | 'pimoroni' = 'none'
   rows = 1
   cols = 1
   pins = 1
@@ -340,6 +341,10 @@ export class Keyboard {
   splitFlip = false
   splitUartFlip = false
 
+  i2cAddress = '0x0a'
+  i2cSda = 0
+  i2cScl = 0
+
   // keymaps
 
   // layer > encoder index > encoder action index > keycode
@@ -355,8 +360,10 @@ export class Keyboard {
     'holdtap',
     'mousekeys',
     'combos',
-    'macros'
+    'macros',
+    'trackball'
   ]
+  
 
   constructor() {}
 
@@ -508,6 +515,12 @@ export class Keyboard {
       if (configContents.splitFlip) this.splitFlip = configContents.splitFlip
       if (configContents.splitUartFlip) this.splitUartFlip = configContents.splitUartFlip
 
+      
+      if (configContents.trackball) this.trackball = configContents.trackball
+      if (configContents.i2cAddress) this.i2cAddress = configContents.i2cAddress
+      if (configContents.i2cSda) this.i2cSda = configContents.i2cSda
+      if (configContents.i2cScl) this.i2cScl = configContents.i2cScl
+
       // encoders
       if (configContents.encoders) this.encoders = configContents.encoders
       if (configContents.encoderKeymap) this.encoderKeymap = configContents.encoderKeymap
@@ -532,6 +545,7 @@ export class Keyboard {
     this.manufacturer = ''
     this.keyboardType = 'normal'
     this.wiringMethod = 'matrix'
+    this.trackball = 'none'
     this.flashingMode = 'automatic'
     this.pinPrefix = 'gp'
     this.coordMapSetup = false
@@ -566,6 +580,10 @@ export class Keyboard {
     this.splitUsePio = true
     this.splitFlip = false
     this.splitUartFlip = false
+
+    this.i2cAddress = ''
+    this.i2cSda = 0
+    this.i2cScl = 0
   }
 
   serialize() {
@@ -579,6 +597,7 @@ export class Keyboard {
       keyboardType: this.keyboardType,
 
       wiringMethod: this.wiringMethod,
+      trackball: this.trackball,
       diodeDirection: this.wiringMethod == 'matrix' ? this.diodeDirection : '',
       rows: this.wiringMethod == 'matrix' ? this.rows : 0,
       cols: this.wiringMethod == 'matrix' ? this.cols : 0,
@@ -606,6 +625,10 @@ export class Keyboard {
       splitFlip: this.splitFlip,
       spitUartFlip: this.splitUartFlip,
 
+      i2cAddress: this.i2cAddress,
+      i2cSda: this.i2cSda,
+      i2cScl: this.i2cScl,
+
       coordMap: this.coordMap,
       pinPrefix: this.pinPrefix,
       coordMapSetup: this.coordMapSetup,
@@ -615,6 +638,7 @@ export class Keyboard {
       rgbOptions: this.rgbOptions,
 
       kbFeatures: this.kbFeatures,
+
 
       flashingMode: this.flashingMode,
       lastEdited: dayjs().format('YYYY-MM-DD HH:mm')

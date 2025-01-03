@@ -100,6 +100,21 @@ class POGKeyboard(KMKKeyboard):
 
             self.modules.append(self.split)
 
+        print("before trackball")
+        if "pimorni_trackball" in features:
+            print("trackball enabled")
+            from kmk.modules.pimoroni_trackball import Trackball, TrackballMode, ScrollDirection
+            from adafruit_bus_device.i2c_device import I2CDevice
+            import board
+            import busio
+            i2c = busio.I2C(pog.i2cScl, pog.i2cSda)
+            trackball = Trackball(
+                i2c,
+                address=pog.i2cAddress,
+                mode=TrackballMode.MOUSE_MODE
+            )
+            trackball.set_rgbw(255, 0, 0, 0)  
+            self.modules.append(trackball)            
         # Add your own modules and extensions here
         # or sort them into the correct spot to have the correct import order
 
