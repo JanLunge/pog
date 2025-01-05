@@ -208,7 +208,7 @@ const tmpKey = ref<{
   h: number | ''
   w2: number | ''
   h2: number | ''
-  d: boolean | ''
+
   matrix: (number | '')[]
   variant: (number | '')[]
   coordMapIndex?: number | ''
@@ -225,7 +225,7 @@ const tmpKey = ref<{
   h: 1,
   w2: 0,
   h2: 0,
-  d: false,
+
   matrix: ['', ''],
   variant: ['', ''],
   coordMapIndex: '',
@@ -261,13 +261,21 @@ const updateSelectedKey = () => {
     // only load overlapping data from all selected keys
 
     tmpKey.value = {
-      ...keyToLoad
-    }
-    if (keyToLoad.variant == undefined) {
-      tmpKey.value.variant = ['', '']
-    }
-    if (keyToLoad.matrix == undefined) {
-      tmpKey.value.matrix = ['', '']
+      x: keyToLoad.x,
+      y: keyToLoad.y,
+      x2: keyToLoad.x2 ?? '',
+      y2: keyToLoad.y2 ?? '',
+      w: keyToLoad.w,
+      h: keyToLoad.h,
+      w2: keyToLoad.w2 ?? '',
+      h2: keyToLoad.h2 ?? '',
+      r: keyToLoad.r,
+      rx: keyToLoad.rx,
+      ry: keyToLoad.ry,
+      matrix: keyToLoad.matrix ?? ['', ''],
+      variant: keyToLoad.variant ?? ['', ''],
+      coordMapIndex: keyToLoad.coordMapIndex ?? '',
+      encoderIndex: keyToLoad.encoderIndex ?? ''
     }
   } else {
     // set every property that has different values to ""
@@ -284,7 +292,6 @@ const updateSelectedKey = () => {
       h: '',
       w2: '',
       h2: '',
-      d: '',
       r: '',
       rx: '',
       ry: ''
@@ -329,16 +336,12 @@ const updateKey = () => {
 
     // Handle coordMapIndex only if it was explicitly changed
     if (tmpKey.value.coordMapIndex !== '') {
-      updates.coordMapIndex = !isNaN(tmpKey.value.coordMapIndex as any)
-        ? Number(tmpKey.value.coordMapIndex)
-        : ''
+      updates.coordMapIndex = Number(tmpKey.value.coordMapIndex)
     }
 
     // Handle encoderIndex only if it was explicitly changed
     if (tmpKey.value.encoderIndex !== '') {
-      updates.encoderIndex = !isNaN(Number(tmpKey.value.encoderIndex))
-        ? Number(tmpKey.value.encoderIndex)
-        : undefined
+      updates.encoderIndex = Number(tmpKey.value.encoderIndex)
     }
 
     // Handle matrix updates
@@ -380,7 +383,7 @@ const updateKey = () => {
     }
 
     // Update the key in our new layout copy
-    newLayout[keyIndex] = { ...newLayout[keyIndex], ...updates }
+    newLayout[keyIndex] = Object.assign(newLayout[keyIndex], updates)
     savePartialLayout(newLayout)
   })
 
