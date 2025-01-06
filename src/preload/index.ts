@@ -19,9 +19,11 @@ export const API = {
   checkForUSBKeyboards: (data) => ipcRenderer.invoke('checkForUSBKeyboards', data),
   deselectKeyboard: () => ipcRenderer.invoke('deselectKeyboard'),
   serialData: (callback) => ipcRenderer.on('serialData', callback),
+  serialConnectionStatus: (callback) => ipcRenderer.on('serialConnectionStatus', callback),
   serialPorts: () => ipcRenderer.invoke('serialPorts'),
   serialSend: (data) => ipcRenderer.send('serialSend', data),
   serialConnect: (data) => ipcRenderer.invoke('serialConnect', data),
+  serialDisconnect: () => ipcRenderer.invoke('serialDisconnect'),
   openExternal: (data) => ipcRenderer.invoke('openExternal', data)
 }
 

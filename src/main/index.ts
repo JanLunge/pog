@@ -466,23 +466,125 @@ const deselectKeyboard = () => {
   }
 }
 
-const sendSerial = (message) => {
-  console.log('sending serial', message)
-  mainWindow?.webContents.send('serialData', { message: `> sent: ${message}\n` })
-  if (message === 'ctrlc') {
-    message = Buffer.from('\x03\x03', 'utf8')
-  } else if (message === 'ctrld') {
-    message = Buffer.from('\x04', 'utf8')
-  } else {
-    const buffermessage = Buffer.from(message + `\r\n`, 'utf8')
-    message = buffermessage
-  }
-  debugPort.write(message, (err) => {
-    if (err) {
-      console.error('error sending serial', err)
+let debugPort: any = undefined
+const CONNECTION_TIMEOUT = 5000 // 5 seconds timeout
+
+const notifyConnectionStatus = (connected: boolean, error?: string) => {
+  mainWindow?.webContents.send('serialConnectionStatus', { connected, error })
+}
+
+const closeDebugPort = () => {
+  return new Promise<void>((resolve) => {
+    if (debugPort?.isOpen) {
+      debugPort.close(() => {
+        debugPort = undefined
+        resolve()
+      })
+    } else {
+      debugPort = undefined
+      resolve()
     }
   })
 }
+
+const serialConnect = async (port) => {
+  console.log('connecting to serial port', port)
+  
+  try {
+    // First ensure any existing connection is properly closed
+    await closeDebugPort()
+    
+    // Create a promise that will reject after timeout
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Connection timeout')), CONNECTION_TIMEOUT)
+    })
+    
+    // Create the connection promise
+    const connectionPromise = new Promise((resolve, reject) => {
+      try {
+        debugPort = new serialPort.SerialPort(
+          { path: port, baudRate, autoOpen: true },
+          (err) => {
+            if (err) {
+              reject(err)
+              return
+            }
+            
+            const parser = debugPort.pipe(new ReadlineParser({ delimiter: '\n' }))
+            
+            parser.on('data', (data) => {
+              console.log('got data from serial', data)
+              mainWindow?.webContents.send('serialData', { message: data + '\n' })
+            })
+            
+            debugPort.on('error', (error) => {
+              console.error('Serial port error:', error)
+              notifyConnectionStatus(false, error.message)
+              closeDebugPort()
+            })
+            
+            debugPort.on('close', () => {
+              console.log('Serial port closed')
+              notifyConnectionStatus(false)
+            })
+            
+            resolve(true)
+          }
+        )
+      } catch (err) {
+        reject(err)
+      }
+    })
+    
+    // Wait for either connection or timeout
+    await Promise.race([connectionPromise, timeoutPromise])
+    
+    console.log('Successfully connected to serial port')
+    notifyConnectionStatus(true)
+    
+  } catch (error) {
+    console.error('Failed to connect:', error)
+    await closeDebugPort()
+    notifyConnectionStatus(false, error.message)
+    throw error
+  }
+}
+
+const sendSerial = (message) => {
+  if (!debugPort?.isOpen) {
+    console.error('Cannot send: port not open')
+    return
+  }
+  
+  console.log('sending serial', message)
+  mainWindow?.webContents.send('serialData', { message: `> sent: ${message}\n` })
+  
+  try {
+    let buffer
+    if (message === 'ctrlc') {
+      buffer = Buffer.from('\x03\x03', 'utf8')
+    } else if (message === 'ctrld') {
+      buffer = Buffer.from('\x04', 'utf8')
+    } else {
+      buffer = Buffer.from(message + '\r\n', 'utf8')
+    }
+    
+    debugPort.write(buffer, (err) => {
+      if (err) {
+        console.error('error sending serial', err)
+        notifyConnectionStatus(false, 'Failed to send data')
+      }
+    })
+  } catch (error) {
+    console.error('Error sending serial data:', error)
+    notifyConnectionStatus(false, 'Failed to send data')
+  }
+}
+
+// Add new IPC handler for disconnect
+ipcMain.handle('serialDisconnect', async () => {
+  await closeDebugPort()
+})
 
 const checkSerialDevices = async () => {
   try {
@@ -507,28 +609,6 @@ const checkSerialDevices = async () => {
   } catch (error) {
     console.error('Error fetching the list of serial ports:', error)
     return []
-  }
-}
-
-let debugPort: any = undefined
-const serialConnect = async (port) => {
-  if (debugPort !== undefined) {
-    debugPort.close(() => {
-      console.log('closed serial port')
-      debugPort = undefined
-    })
-  }
-  console.log('connecting to serial port', port)
-  try {
-    debugPort = new serialPort.SerialPort({ path: port, baudRate, autoOpen: true }, (e) => {})
-    const parser = debugPort.pipe(new ReadlineParser({ delimiter: '\n' }))
-    parser.on('data', (data) => {
-      console.log('got data from serial', data)
-      mainWindow?.webContents.send('serialData', { message: data })
-    })
-    console.log('connected to serial port and listening for messages', port)
-  } catch (e) {
-    console.log('error connecting to serial port', e)
   }
 }
 

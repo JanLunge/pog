@@ -1,60 +1,99 @@
 <template>
-  Here you can connect to a keyboard via serial for more verbose debug output. <br />
-  Note: This is still very much a work in progress. <br />
-  <br />
-  <ul class="ml-4 list-disc">
-    <li>First create a reload key on your keymap and press it to reload the keyboard</li>
-    <li>
-      Then, press connect to connect to the keyboard (the keyboard has 2 serial consoles,connect to
-      the first one with the lower number for debugging)
-    </li>
-    <li>Then you can see the output below</li>
-    <li>
-      If the output does not appear unplug and replug the keyboard and try again (this is the WIP
-      part)
-    </li>
-  </ul>
-  <div>
-    <div class="my-2 flex justify-between gap-2">
-      <select v-model="selectedPort" class="select">
-        <option v-for="port in sortedPorts" :key="port.port" :value="port.port">
-          {{ port.manufacturer }} - {{ port.port }} - {{ port.serialNumber }}
-        </option>
-      </select>
-
-      <button class="btn" :disabled="!selectedPort" @click="connect">connect</button>
+  <div class="flex flex-col h-full">
+    <div class="text-sm mb-2">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="font-bold">Debug Console</h3>
+        <div class="form-control">
+          <label class="label cursor-pointer">
+            <input
+              v-model="autoscroll"
+              type="checkbox"
+              class="checkbox checkbox-xs"
+            />
+            <span class="label-text pl-1 text-xs">autoscroll</span>
+          </label>
+        </div>
+      </div>
+      <div class="text-xs opacity-70 mb-2">
+        Connect to your keyboard's serial console for debugging. Press the reload key on your keyboard first.
+      </div>
     </div>
+
+    <div class="flex gap-2 mb-2">
+      <div class="flex-grow flex gap-2">
+        <select v-model="selectedPort" class="select select-sm flex-grow" :disabled="isConnected || isConnecting">
+          <option value="">Select a port</option>
+          <option v-for="port in sortedPorts" :key="port.port" :value="port.port">
+            {{ port.manufacturer }} - {{ port.port }}
+          </option>
+        </select>
+        <button class="btn btn-sm btn-square" @click="refreshPorts" :disabled="isConnected || isConnecting">
+          <i class="mdi mdi-refresh"></i>
+        </button>
+      </div>
+
+      <button 
+        v-if="!isConnected" 
+        class="btn btn-sm" 
+        :disabled="!selectedPort || isConnecting" 
+        @click="connect"
+      >
+        {{ isConnecting ? 'Connecting...' : 'Connect' }}
+      </button>
+      <button 
+        v-else 
+        class="btn btn-sm btn-error" 
+        @click="disconnect"
+      >
+        Disconnect
+      </button>
+    </div>
+
+    <div v-if="statusMessage" class="mb-2">
+      <div class="badge badge-sm" :class="isConnected ? 'badge-success' : 'badge-error'">
+        {{ statusMessage }}
+      </div>
+    </div>
+
     <textarea
       v-model="output"
-      class="textarea w-full p-2"
+      class="textarea textarea-bordered flex-grow text-xs font-mono p-2 mb-2"
       id="repl-output"
-      style="min-height: 200px"
       readonly
     ></textarea>
+
+    <div class="flex gap-2 mb-2">
+      <input 
+        v-model="inputData" 
+        class="input input-sm input-bordered flex-grow text-xs" 
+        :disabled="!isConnected"
+        @keyup.enter="sendData" 
+        placeholder="Enter command..."
+      />
+      <button 
+        class="btn btn-sm" 
+        :disabled="!isConnected"
+        @click="sendData"
+      >
+        Send
+      </button>
+    </div>
+
     <div class="flex gap-2">
-      <input v-model="inputData" class="input input-sm w-full" @keyup.enter="sendData" />
-      <button class="btn btn-sm" @click="sendData">Send</button>
-    </div>
-    <div class="flex">
-      <button class="btn btn-sm" @click="enterRepl">enter REPL</button>
-      <button class="btn btn-sm" @click="exitRepl">exit REPL</button>
-      <div v-if="statusMessage" class="pl-1 pt-2 text-sm text-gray-500">
-        <div class="badge badge-outline">{{ statusMessage }}</div>
-      </div>
-      <div class="form-control absolute right-4">
-        <label class="label cursor-pointer">
-          <input
-            v-model="autoscroll"
-            type="checkbox"
-            class="checkbox checkbox-sm"
-          />
-          <span class="label-text pl-1">autoscroll</span>
-        </label>
-      </div>
-    </div>
-    <div v-if="false" class="mt-4">
-      <p>we can load some info from the controller to know what features it offers</p>
-      <buttom class="btn">check which pins the controller has</buttom>
+      <button 
+        class="btn btn-sm flex-grow" 
+        :disabled="!isConnected"
+        @click="enterRepl"
+      >
+        Enter REPL
+      </button>
+      <button 
+        class="btn btn-sm flex-grow" 
+        :disabled="!isConnected"
+        @click="exitRepl"
+      >
+        Exit REPL
+      </button>
     </div>
   </div>
 </template>
@@ -69,6 +108,9 @@ const ports = ref<any[]>([])
 const selectedPort = ref('')
 const statusMessage = ref('')
 const autoscroll = ref(true)
+const isConnected = ref(false)
+const isConnecting = ref(false)
+
 const sortedPorts = computed(() => {
   return [...ports.value]
     .sort((a, b) => {
@@ -93,38 +135,93 @@ const scrollTextarea = () => {
 }
 
 onMounted(async () => {
-  ports.value = await window.api.serialPorts()
-  // select default port for the one with the current serial number
-
+  await refreshPorts()
   window.api.serialData((event, data) => {
     console.log(event, data)
     output.value += data.message
     scrollTextarea()
   })
-  console.log(keyboardStore)
+  window.api.serialConnectionStatus((event, status) => {
+    console.log('Connection status:', status)
+    isConnected.value = status.connected
+    isConnecting.value = false
+    statusMessage.value = status.connected ? 'Connected' : (status.error || 'Disconnected')
+  })
 })
 
+const refreshPorts = async () => {
+  try {
+    ports.value = await window.api.serialPorts()
+    if (ports.value.length === 0) {
+      statusMessage.value = 'No ports available'
+    }
+  } catch (error) {
+    console.error('Failed to refresh ports:', error)
+    statusMessage.value = 'Failed to refresh ports'
+  }
+}
+
 const sendData = () => {
+  if (!isConnected.value) {
+    statusMessage.value = 'Not connected'
+    return
+  }
+  if (!inputData.value.trim()) {
+    return
+  }
   window.api.serialSend(inputData.value)
   inputData.value = ''
 }
+
 const connect = async () => {
+  if (!selectedPort.value) {
+    statusMessage.value = 'Please select a port'
+    return
+  }
+  
   try {
+    isConnecting.value = true
+    statusMessage.value = 'Connecting...'
     await window.api.serialConnect(selectedPort.value)
-    statusMessage.value = 'Connected!'
   } catch (error) {
-    statusMessage.value = 'Failed to connect.'
     console.error('Failed to connect to the port:', error)
-    alert('Failed to connect to the selected port.')
+    statusMessage.value = error.message || 'Failed to connect'
+    isConnecting.value = false
+    isConnected.value = false
   }
 }
+
+const disconnect = async () => {
+  try {
+    statusMessage.value = 'Disconnecting...'
+    await window.api.serialDisconnect()
+    isConnected.value = false
+    selectedPort.value = ''
+    statusMessage.value = 'Disconnected'
+  } catch (error) {
+    console.error('Failed to disconnect:', error)
+    statusMessage.value = error.message || 'Failed to disconnect'
+  }
+}
+
 const enterRepl = () => {
+  if (!isConnected.value) {
+    statusMessage.value = 'Not connected'
+    return
+  }
+  statusMessage.value = 'Entering REPL...'
   window.api.serialSend('ctrlc')
   setTimeout(() => {
     window.api.serialSend('ctrlc')
   }, 1000)
 }
+
 const exitRepl = () => {
+  if (!isConnected.value) {
+    statusMessage.value = 'Not connected'
+    return
+  }
+  statusMessage.value = 'Exiting REPL...'
   window.api.serialSend('ctrld')
 }
 </script>
