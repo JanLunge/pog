@@ -69,6 +69,10 @@ export const updateFirmware = async () => {
   try {
     console.log('moving kmk into keyboard')
     // write a file to the keyboard with the version sha
+    if (fs.existsSync(`${currentKeyboard.path}/kmk`)) {
+      console.log('removing old kmk folder')
+      fs.rmSync(`${currentKeyboard.path}/kmk`, { recursive: true, force: true })
+    }
     if (!fs.existsSync(`${currentKeyboard.path}/kmk`)) {
       fs.mkdirSync(`${currentKeyboard.path}/kmk`)
     }
@@ -99,12 +103,12 @@ export const updateFirmware = async () => {
           await fs.ensureDir(destPath)
           await copyWithProgress(srcPath, destPath, totalFiles)
         } else {
-          console.log('copying file', destPath)
+          console.log('copying file', destPath, processedFiles, totalFiles, processedFiles / totalFiles)
           await fs.copy(srcPath, destPath)
           processedFiles++
           mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
             state: 'copying',
-            progress: processedFiles / totalFiles
+            progress: (processedFiles / totalFiles) * 100
           })
         }
       }
