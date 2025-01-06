@@ -63,11 +63,6 @@
       <li>
         <router-link to="/configurator/rgb"><i class="mdi mdi-led-on"></i>RGB</router-link>
       </li>
-      <li>
-        <router-link to="/configurator/debug"><i class="mdi mdi-bug"></i>Debug</router-link>
-      </li>
-
-      <!--      <li><router-link to="/configurator/community">Community</router-link></li>-->
     </ul>
     <div class="flex h-full w-full flex-col overflow-y-auto">
       <div class="z-10 flex items-center justify-between bg-base-100 py-4 shadow-xl">
@@ -86,9 +81,20 @@
         <div class="btn btn-primary mr-4" @click="saveKeymap">
           <i class="mdi mdi-content-save text-2xl"></i>
         </div>
+        <div class="btn mr-4" :class="{ 'btn-primary': showDebug }" @click="toggleDebug">
+          <i class="mdi mdi-bug text-2xl"></i>
+        </div>
       </div>
-      <div class="flex-grow overflow-y-auto bg-base-200 px-4 pt-4">
-        <router-view></router-view>
+      <div class="flex flex-grow overflow-hidden bg-base-200">
+        <div class="flex-grow overflow-y-auto px-4 pt-4">
+          <router-view></router-view>
+        </div>
+        <div 
+          v-show="showDebug" 
+          class="flex-shrink-0 w-[600px] border-l border-base-300 bg-base-100 overflow-y-auto p-4"
+        >
+          <Debug />
+        </div>
       </div>
     </div>
   </div>
@@ -98,13 +104,20 @@
 import { addToHistory, keyboardStore } from '../store'
 import { useRoute, useRouter } from 'vue-router'
 import { computed, onMounted, ref } from 'vue'
+import Debug from '../components/debug.vue'
+
 const router = useRouter()
 const route = useRoute()
+const showDebug = ref(false)
 
 // nav guard
 console.log('path is', keyboardStore.path)
 if (!keyboardStore.path && !keyboardStore.usingSerial) {
   router.push('/')
+}
+
+const toggleDebug = () => {
+  showDebug.value = !showDebug.value
 }
 
 const reselectKeyboard = () => {
@@ -131,6 +144,7 @@ const iconClick = () => {
   // menuOpen.value = !menuOpen.value
   reselectKeyboard()
 }
+
 onMounted(() => {
   const title = document.getElementById('navTitle')
   title?.addEventListener('blur', () => {
@@ -155,12 +169,8 @@ const info = () => {
 }
 .menu {
   width: 80px;
-  //position: absolute;
-  //height: 100px;
   overflow: hidden;
   overflow-y: auto;
-  //border: none;
-  //white-space: nowrap;
   flex-wrap: nowrap;
   * {
     white-space: nowrap;

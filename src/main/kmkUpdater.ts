@@ -69,8 +69,12 @@ export const updateFirmware = async () => {
   try {
     console.log('moving kmk into keyboard')
     // write a file to the keyboard with the version sha
-    fs.mkdirSync(`${currentKeyboard.path}/kmk`)
+    if (!fs.existsSync(`${currentKeyboard.path}/kmk`)) {
+      fs.mkdirSync(`${currentKeyboard.path}/kmk`)
+    }
+    console.log('writing version to keyboard', versionSha)
     fs.writeFileSync(`${currentKeyboard.path}/kmk/version`, versionSha)
+    console.log('copying kmk to keyboard', `${currentKeyboard.path}/kmk`)
     fs.cp(
       `${appDir}/kmk/kmk_firmware-${versionSha}/kmk`,
       `${currentKeyboard.path}/kmk`,
