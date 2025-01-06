@@ -75,18 +75,60 @@ export const updateFirmware = async () => {
     console.log('writing version to keyboard', versionSha)
     fs.writeFileSync(`${currentKeyboard.path}/kmk/version`, versionSha)
     console.log('copying kmk to keyboard', `${currentKeyboard.path}/kmk`)
-    fs.cp(
-      `${appDir}/kmk/kmk_firmware-${versionSha}/kmk`,
-      `${currentKeyboard.path}/kmk`,
-      { recursive: true },
-      (e) => {
-        console.log('Copying of KMK done', e)
-        mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
-          state: 'done',
-          progress: 0
-        })
+    const countFiles = async (src: string): Promise<number> => {
+      const files = await fs.readdir(src, { withFileTypes: true })
+      let count = files.length
+
+      for (const file of files) {
+        if (file.isDirectory()) {
+          count += await countFiles(`${src}/${file.name}`) - 1 // subtract 1 to not count the directory itself twice
+        }
       }
-    )
+      return count
+    }
+
+    let processedFiles = 0
+    const copyWithProgress = async (src: string, dest: string, totalFiles: number) => {
+      const files = await fs.readdir(src, { withFileTypes: true })
+
+      for (const file of files) {
+        const srcPath = `${src}/${file.name}`
+        const destPath = `${dest}/${file.name}`
+
+        if (file.isDirectory()) {
+          await fs.ensureDir(destPath)
+          await copyWithProgress(srcPath, destPath, totalFiles)
+        } else {
+          console.log('copying file', destPath)
+          await fs.copy(srcPath, destPath)
+          processedFiles++
+          mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
+            state: 'copying',
+            progress: processedFiles / totalFiles
+          })
+        }
+      }
+    }
+
+    try {
+      const sourcePath = `${appDir}/kmk/kmk_firmware-${versionSha}/kmk`
+      const totalFiles = await countFiles(sourcePath)
+      await copyWithProgress(
+        sourcePath,
+        `${currentKeyboard.path}/kmk`,
+        totalFiles
+      )
+      mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
+        state: 'done',
+        progress: 1
+      })
+    } catch (err) {
+      console.error('Error during copy:', err)
+      mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
+        state: 'error',
+        progress: 0
+      })
+    }
   } catch (err) {
     console.error(err)
   }
