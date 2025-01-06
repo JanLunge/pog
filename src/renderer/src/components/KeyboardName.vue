@@ -28,6 +28,21 @@
       >
       </VueMultiselect>
     </div>
+    
+    <div class="mb-4">
+      <p class="mb-2 text-sm">Keyboard Features</p>
+      <VueMultiselect
+        v-model="keyboardStore.kbFeatures"
+        :options="availableFeatures"
+        :multiple="true"
+        class="w-full"
+      >
+        <template #option="{ option }">
+          <span>{{ formatFeatureName(option) }}</span>
+        </template>
+      </VueMultiselect>
+    </div>
+
     <div class="mt-8 flex justify-center">
       <button v-if="initialSetup" class="btn btn-primary" @click="$emit('next')">next</button>
     </div>
@@ -44,6 +59,25 @@ const addTag = (tag) => {
   console.log(tag)
   keyboardStore.tags.push(tag)
 }
+
+const availableFeatures = [
+  'basic',
+  'serial',
+  'oneshot',
+  'tapdance',
+  'holdtap',
+  'mousekeys',
+  'combos',
+  'macros',
+  'capsword',
+  'international'
+]
+
+const formatFeatureName = (feature: string) => {
+  return feature.split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
+}
 </script>
 
 <style lang="scss">
@@ -55,5 +89,15 @@ const addTag = (tag) => {
 }
 .multiselect__placeholder {
   background: transparent;
+}
+.multiselect__option--selected.multiselect__option {
+  background: #674848;
+}
+.multiselect__option {
+  background: #252525;
+  color: #fff;
+  &:hover {
+    background: #353535;
+  }
 }
 </style>
