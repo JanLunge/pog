@@ -542,10 +542,10 @@ const serialConnect = async (port) => {
     console.log('Successfully connected to serial port')
     notifyConnectionStatus(true)
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to connect:', error)
     await closeDebugPort()
-    notifyConnectionStatus(false, error.message)
+    notifyConnectionStatus(false, error instanceof Error ? error.message : 'Unknown error')
     throw error
   }
 }
