@@ -100,7 +100,6 @@
 
 <script lang="ts" setup>
 import { computed, nextTick, onMounted, ref } from 'vue'
-import { keyboardStore } from '../store'
 
 const output = ref('')
 const inputData = ref('')
@@ -141,7 +140,7 @@ onMounted(async () => {
     output.value += data.message
     scrollTextarea()
   })
-  window.api.serialConnectionStatus((event, status) => {
+  window.api.serialConnectionStatus((_event: Event, status: any) => {
     console.log('Connection status:', status)
     isConnected.value = status.connected
     isConnecting.value = false
@@ -183,7 +182,7 @@ const connect = async () => {
     isConnecting.value = true
     statusMessage.value = 'Connecting...'
     await window.api.serialConnect(selectedPort.value)
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to connect to the port:', error)
     statusMessage.value = error.message || 'Failed to connect'
     isConnecting.value = false
@@ -198,7 +197,7 @@ const disconnect = async () => {
     isConnected.value = false
     selectedPort.value = ''
     statusMessage.value = 'Disconnected'
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to disconnect:', error)
     statusMessage.value = error.message || 'Failed to disconnect'
   }
