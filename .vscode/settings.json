@@ -7,5 +7,18 @@
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "python.languageServer": "Pylance",
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportMissingModuleSource": "none",
+    "reportShadowedImports": "none"
+  },
+  "circuitpython.board.version": null,
+  "python.analysis.extraPaths": [
+    "c:\\Users\\amirk\\.vscode\\extensions\\wmerkens.vscode-circuitpython-v2-0.3.1\\boards\\0x2E8A\\0x101F",
+    "c:\\Users\\amirk\\.vscode\\extensions\\wmerkens.vscode-circuitpython-v2-0.3.1\\stubs",
+    "c:\\Users\\amirk\\AppData\\Roaming\\Code\\User\\globalStorage\\wmerkens.vscode-circuitpython-v2\\bundle\\20241231\\adafruit-circuitpython-bundle-py-20241231\\lib"
+  ],
+  "circuitpython.board.vid": "0x2E8A",
+  "circuitpython.board.pid": "0x101F"
 }
