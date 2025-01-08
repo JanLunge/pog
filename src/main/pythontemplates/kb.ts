@@ -17,7 +17,9 @@ class POGKeyboard(KMKKeyboard):
             }
             self.modules.append(Layers(combo_layers))
             from kmk.extensions.media_keys import MediaKeys; self.extensions.append(MediaKeys())
-
+        if "international" in features:
+            from kmk.extensions.international import International 
+            self.extensions.append(International())
         if "serial" in features:
             from pog_serial import pogSerial; self.modules.append(pogSerial())
 
