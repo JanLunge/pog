@@ -85,7 +85,7 @@ export const updateFirmware = async () => {
 
       for (const file of files) {
         if (file.isDirectory()) {
-          count += await countFiles(`${src}/${file.name}`) - 1 // subtract 1 to not count the directory itself twice
+          count += (await countFiles(`${src}/${file.name}`)) - 1 // subtract 1 to not count the directory itself twice
         }
       }
       return count
@@ -103,7 +103,13 @@ export const updateFirmware = async () => {
           await fs.ensureDir(destPath)
           await copyWithProgress(srcPath, destPath, totalFiles)
         } else {
-          console.log('copying file', destPath, processedFiles, totalFiles, processedFiles / totalFiles)
+          console.log(
+            'copying file',
+            destPath,
+            processedFiles,
+            totalFiles,
+            processedFiles / totalFiles
+          )
           await fs.copy(srcPath, destPath)
           processedFiles++
           mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
@@ -117,14 +123,11 @@ export const updateFirmware = async () => {
     try {
       const sourcePath = `${appDir}/kmk/kmk_firmware-${versionSha}/kmk`
       const totalFiles = await countFiles(sourcePath)
-      await copyWithProgress(
-        sourcePath,
-        `${currentKeyboard.path}/kmk`,
-        totalFiles
-      )
+      await copyWithProgress(sourcePath, `${currentKeyboard.path}/kmk`, totalFiles)
       mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
         state: 'done',
-        progress: 1
+        progress: 1,
+        message: 'Firmware updated successfully, to version ' + versionSha
       })
     } catch (err) {
       console.error('Error during copy:', err)
