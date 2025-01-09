@@ -1,10 +1,20 @@
 <template>
   <div class="flex flex-col p-4">
-    <div class="flex flex-col items-center">
+    <div class="flex items-center justify-between px-12">
       <div class="flex items-center gap-2">
-        <img src="../assets/icon.png" alt="" class="w-16" />
+        <div class="flex items-center gap-2">
+          <img src="../assets/icon.png" alt="" class="w-16" />
+        </div>
+        <div>
+          <p class="text-2xl font-bold">Easy Keyboard Configurator</p>
+          <p class="text-sm">Effortlessly customize your keyboard with Pog</p>
+        </div>
       </div>
-      <p class="pt-6">Effortlessly customize your keyboard with Pog</p>
+      <div class="my-4 flex flex-col items-center justify-center gap-2">
+        <button class="btn btn-primary" @click="goToAddKeyboard">
+          <i class="mdi mdi-plus mr-1 text-lg"></i><span class="text-xs">add keyboard</span>
+        </button>
+      </div>
     </div>
     <div v-if="sortedKeyboards.length !== 0" class="divider"></div>
     <div class="absolute right-2 top-40 flex justify-end">
@@ -64,7 +74,7 @@
           </button>
           <p class="font-bold">{{ keyboard.name }}</p>
           <p class="text-sm italic">{{ keyboard.manufacturer }}</p>
-          <p class="mt-2 mt-2 text-xs italic">{{ keyboard.path }}</p>
+          <p class="mt-2 text-xs italic">{{ keyboard.path }}</p>
           <p class="mt-2" style="font-size: 12px">{{ keyboard.description }}</p>
           <div class="mt-2">
             <div v-for="tag in keyboard.tags" :key="tag" class="badge badge-outline">
@@ -74,17 +84,6 @@
         </div>
       </div>
     </TransitionGroup>
-    <div class="divider"></div>
-    <div class="my-4 flex flex-col items-center justify-center gap-2">
-      <p>Select the CircuitPython drive of your keyboard</p>
-      <button class="btn btn-primary" @click="selectDrive">
-        <i class="mdi mdi-plus mr-1 text-lg"></i><span class="text-xs">add new keyboard</span>
-      </button>
-    </div>
-    <div class="text-center italic opacity-50">
-      (Note: your controller needs to be running
-      <a href="https://circuitpython.org/downloads" target="_blank" class="link">CircuitPython</a>)
-    </div>
   </div>
 </template>
 
@@ -102,22 +101,9 @@ import {
 import KeyboardLayout from '../components/KeyboardLayout.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 const router = useRouter()
-
 selectedLayer.value = 0
 
-const selectDrive = async () => {
-  const keyboard = await window.api.selectDrive()
-  console.log(keyboard)
-  keyboardStore.import(keyboard)
-  console.log(keyboardStore)
-  if (keyboardStore.pogConfigured) {
-    router.push('/configurator')
-    // also save to history
-    addToHistory(keyboardStore)
-  } else {
-    router.push('/setup-wizard')
-  }
-}
+
 
 const sortedKeyboards = computed(() => {
   return [...keyboards.value].sort((a, b) => {
@@ -145,7 +131,7 @@ const selectKeyboard = async (keyboard) => {
       return
     }
     keyboardStore.import(keyboardData)
-    router.push('/configurator')
+    router.push('/configurator/keymap')
   }
 }
 
@@ -206,6 +192,10 @@ watch(serialKeyboards, () => {
 const refreshConnectedBoards = () => {
   checkForUSBKeyboards()
   addSerialKeyboards()
+}
+
+const goToAddKeyboard = () => {
+  router.push('/keyboard-selector')
 }
 
 onMounted(() => {

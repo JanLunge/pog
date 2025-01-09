@@ -2,6 +2,7 @@ import * as fs from 'fs-extra'
 import { currentKeyboard } from './store'
 import { dialog } from 'electron'
 import { connectedKeyboardPort, connectSerialKeyboard, serialBoards } from './index'
+import * as serialPort from 'serialport'
 
 // invoked from frontend to select a drive or folder load the conig from
 export const handleSelectDrive = async () => {
@@ -43,12 +44,26 @@ const loadKeyboard = async (path) => {
   }
 }
 export const selectKeyboard = async ({ path, id }: { path: string; id: string }) => {
-  console.log(path, id)
+  console.log('Selecting keyboard:', path, id)
   if (id) {
     // connect serial if available
     const port = serialBoards.value.find((a) => a.id === id)
     if (!port) return { error: 'not a serial keyboard' }
-    console.log(serialBoards, id)
+    console.log('Found serial board:', serialBoards, id)
+
+    // Find both ports for this keyboard
+    const allPorts = await serialPort.SerialPort.list()
+    const keyboardPorts = allPorts
+      .filter(p => p.serialNumber === port.serialNumber)
+      .sort((a, b) => a.path.localeCompare(b.path))
+
+    if (keyboardPorts.length >= 2) {
+      currentKeyboard.serialPortA = keyboardPorts[0].path
+      currentKeyboard.serialPortB = keyboardPorts[1].path
+      currentKeyboard.serialNumber = port.serialNumber
+      console.log('Set keyboard ports:', currentKeyboard.serialPortA, currentKeyboard.serialPortB)
+    }
+
     await connectSerialKeyboard(port)
     connectedKeyboardPort.write('info\n')
   }

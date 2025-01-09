@@ -2,7 +2,7 @@ import { contextBridge, ipcRenderer } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
-export const API = {
+const api = {
   selectDrive: () => ipcRenderer.invoke('selectDrive'),
   updateFirmware: () => ipcRenderer.invoke('updateFirmware'),
   saveConfiguration: (data) => ipcRenderer.send('saveConfiguration', data),
@@ -20,11 +20,22 @@ export const API = {
   deselectKeyboard: () => ipcRenderer.invoke('deselectKeyboard'),
   serialData: (callback) => ipcRenderer.on('serialData', callback),
   serialConnectionStatus: (callback) => ipcRenderer.on('serialConnectionStatus', callback),
-  serialPorts: () => ipcRenderer.invoke('serialPorts'),
+  serialPorts: () => ipcRenderer.invoke('serial-ports'),
   serialSend: (data) => ipcRenderer.send('serialSend', data),
-  serialConnect: (data) => ipcRenderer.invoke('serialConnect', data),
-  serialDisconnect: () => ipcRenderer.invoke('serialDisconnect'),
-  openExternal: (data) => ipcRenderer.invoke('openExternal', data)
+  serialConnect: (port: string) => ipcRenderer.invoke('serial-connect', port),
+  serialDisconnect: () => ipcRenderer.invoke('serial-disconnect'),
+  openExternal: (data) => ipcRenderer.invoke('openExternal', data),
+  // Keyboard Detection API
+  startDetection: () => ipcRenderer.invoke('start-detection'),
+  stopDetection: () => ipcRenderer.invoke('stop-detection'),
+  getDetectionData: () => ipcRenderer.invoke('get-detection-data'),
+  onDetectionUpdate: (callback) => 
+    ipcRenderer.on('detection-update', callback),
+  // Keyboard History API
+  listKeyboards: () => ipcRenderer.invoke('list-keyboards'),
+  // Drive and Firmware API
+  listDrives: () => ipcRenderer.invoke('list-drives'),
+  flashDetectionFirmware: (drivePath: string) => ipcRenderer.invoke('flash-detection-firmware', drivePath)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to
@@ -33,7 +44,7 @@ export const API = {
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld('electron', electronAPI)
-    contextBridge.exposeInMainWorld('api', API)
+    contextBridge.exposeInMainWorld('api', api)
   } catch (error) {
     console.error(error)
   }
@@ -41,5 +52,5 @@ if (process.contextIsolated) {
   // @ts-ignore (define in dts)
   window.electron = electronAPI
   // @ts-ignore (define in dts)
-  window.api = API
+  window.api = api
 }

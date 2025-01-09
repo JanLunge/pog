@@ -3,6 +3,11 @@ import * as fs from 'fs-extra'
 import request from 'request'
 import decompress from 'decompress'
 import { mainWindow } from './index'
+import { detectionFirmware } from './pythontemplates/detection'
+import { writeFile } from 'fs/promises'
+import { join } from 'path'
+import { app } from 'electron'
+import { bootpy } from './pythontemplates/boot'
 
 // downloads kmk to app storage
 export const updateFirmware = async () => {
@@ -71,7 +76,7 @@ export const updateFirmware = async () => {
     // write a file to the keyboard with the version sha
     if (fs.existsSync(`${currentKeyboard.path}/kmk`)) {
       console.log('removing old kmk folder')
-      fs.rmSync(`${currentKeyboard.path}/kmk`, { recursive: true, force: true })
+      await fs.promises.rm(`${currentKeyboard.path}/kmk`, { recursive: true, force: true })
     }
     if (!fs.existsSync(`${currentKeyboard.path}/kmk`)) {
       fs.mkdirSync(`${currentKeyboard.path}/kmk`)
@@ -138,5 +143,28 @@ export const updateFirmware = async () => {
     }
   } catch (err) {
     console.error(err)
+  }
+}
+
+export async function flashFirmware(firmwarePath: string): Promise<void> {
+  try {
+    console.log('flashing firmware initial', firmwarePath)
+    // Create detection firmware file
+    const detectionPath = join(firmwarePath, 'code.py')
+    await writeFile(detectionPath, detectionFirmware)
+
+    const bootPath = join(firmwarePath, 'boot.py')
+    await writeFile(bootPath, bootpy)
+    
+    // Wait for the board to restart
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
+      state: 'done',
+      progress: 1,
+      message: 'Initiated detection firmware flashed'
+    })
+  } catch (error) {
+    console.error('Failed to flash firmware:', error)
+    throw error
   }
 }

@@ -136,7 +136,7 @@ const saveKeymap = async () => {
   )
 }
 
-const currentRouteName = computed(() => route.matched[1].name)
+const currentRouteName = computed(() => route.matched[1]?.name)
 
 const menuOpen = ref(true)
 

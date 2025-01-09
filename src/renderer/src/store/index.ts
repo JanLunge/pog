@@ -284,6 +284,8 @@ export class Keyboard {
   port?: string = undefined // only set when serial is available
   usingSerial = false
   serialNumber = ''
+  serialPortA?: string = undefined // Port with lower number
+  serialPortB?: string = undefined // Port with higher number
 
   driveConnected = false
   driveContents: string[] = []
@@ -324,7 +326,7 @@ export class Keyboard {
     knightEffectLength: 3
   }
 
-  pinPrefix = 'gp'
+  pinPrefix: 'board' | 'gp' | 'none' | 'quickpin' = 'gp'
   // features
 
   encoders: { pad_a: string; pad_b: string }[] = []
@@ -566,6 +568,10 @@ export class Keyboard {
     this.splitUsePio = true
     this.splitFlip = false
     this.splitUartFlip = false
+    // Reset serial ports
+    this.serialPortA = undefined
+    this.serialPortB = undefined
+    this.serialNumber = ''
   }
 
   serialize() {
