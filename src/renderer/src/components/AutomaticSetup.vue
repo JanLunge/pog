@@ -1,7 +1,12 @@
 <template>
   <div class="min-h-screen bg-base-100 p-6">
     <div class="mx-auto max-w-5xl space-y-8">
-      <h2 class="text-center text-4xl font-bold text-base-content">Mapping your Pinout</h2>
+      <div class="flex items-center justify-between">
+        <h2 class="text-center text-4xl font-bold text-base-content">Mapping your Pinout</h2>
+        <button class="btn btn-ghost" @click="toggleDebug">
+          <i class="mdi mdi-bug text-2xl" :class="{ 'text-primary': showDebug }"></i>
+        </button>
+      </div>
 
       <div class="grid gap-6 md:grid-cols-2">
         <!-- Detection Info Panel -->
@@ -62,6 +67,13 @@
         </div>
       </div>
 
+      <!-- Debug Panel -->
+      <div v-if="showDebug" class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+          <Debug />
+        </div>
+      </div>
+
       <!-- Key Preview -->
       <div class="card bg-base-200 shadow-lg">
         <div class="card-body">
@@ -103,7 +115,9 @@
 import router from '@renderer/router'
 import { keyboardStore } from '@renderer/store'
 import { ref, onMounted, onUnmounted } from 'vue'
+import Debug from './debug.vue'
 
+const showDebug = ref(false)
 const currentStep = ref(0)
 const detectionData = ref<{
   rows: string[]
@@ -176,4 +190,8 @@ onUnmounted(() => {
   //   window.api.removeDetectionListeners()
   //   window.api.stopDetection()
 })
+
+function toggleDebug() {
+  showDebug.value = !showDebug.value
+}
 </script>

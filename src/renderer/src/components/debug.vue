@@ -84,7 +84,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { keyboardStore } from '@renderer/store'
 
 const output = ref('')
 const inputData = ref('')
@@ -97,17 +98,32 @@ const isConnecting = ref(false)
 
 const sortedPorts = computed(() => {
   return [...ports.value]
+    .filter((a) => a.serialNumber !== undefined)
     .sort((a, b) => {
-      if (a.port < b.port) {
-        return -1
+      // First try to match by serial number if available
+      if (keyboardStore.serialNumber) {
+        const aMatchesSerial = a.serialNumber === keyboardStore.serialNumber
+        const bMatchesSerial = b.serialNumber === keyboardStore.serialNumber
+        if (aMatchesSerial && !bMatchesSerial) return -1
+        if (!aMatchesSerial && bMatchesSerial) return 1
       }
-      if (a.port > b.port) {
-        return 1
-      }
+      
+      // Then sort by port number
+      const aNum = parseInt(a.port.replace(/[^\d]/g, ''))
+      const bNum = parseInt(b.port.replace(/[^\d]/g, ''))
+      if (aNum < bNum) return -1
+      if (aNum > bNum) return 1
       return 0
     })
-    .filter((a) => a.serialNumber !== undefined)
 })
+
+// Auto-connect to the first available port when ports are refreshed
+watch(sortedPorts, (newPorts) => {
+  if (!isConnected.value && !isConnecting.value && newPorts.length > 0) {
+    selectedPort.value = newPorts[0].port
+    connect()
+  }
+}, { immediate: true })
 
 const scrollTextarea = () => {
   nextTick(() => {

@@ -76,7 +76,42 @@ export const updateFirmware = async () => {
     // write a file to the keyboard with the version sha
     if (fs.existsSync(`${currentKeyboard.path}/kmk`)) {
       console.log('removing old kmk folder')
-      await fs.promises.rm(`${currentKeyboard.path}/kmk`, { recursive: true, force: true })
+      const countFilesRecursive = async (dir: string): Promise<number> => {
+        const files = await fs.readdir(dir, { withFileTypes: true })
+        let count = files.length
+
+        for (const file of files) {
+          if (file.isDirectory()) {
+            count += await countFilesRecursive(`${dir}/${file.name}`)
+          }
+        }
+        return count
+      }
+
+      const deleteWithProgress = async (dir: string) => {
+        let processedFiles = 0
+        const totalFiles = await countFilesRecursive(dir)
+
+        const deleteRecursive = async (currentDir: string) => {
+          const currentFiles = await fs.readdir(currentDir, { withFileTypes: true })
+          for (const file of currentFiles) {
+            const filePath = `${currentDir}/${file.name}`
+            if (file.isDirectory()) {
+              await deleteRecursive(filePath)
+            }
+            await fs.promises.rm(filePath, { force: true, recursive: true })
+            processedFiles++
+            mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
+              state: 'cleaning', 
+              progress: (processedFiles / totalFiles) * 100
+            })
+          }
+        }
+
+        await deleteRecursive(dir)
+      }
+      
+      await deleteWithProgress(`${currentKeyboard.path}/kmk`)
     }
     if (!fs.existsSync(`${currentKeyboard.path}/kmk`)) {
       fs.mkdirSync(`${currentKeyboard.path}/kmk`)
