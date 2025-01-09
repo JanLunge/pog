@@ -14,13 +14,13 @@ import KeyboardName from '../components/KeyboardName.vue'
 import CoordMap from '../components/CoordMap.vue'
 import RgbSetup from '../components/RgbSetup.vue'
 import Community from '../components/Community.vue'
-import Debug from '../components/debug.vue'
+// import Debug from '../components/debug.vue'
 
 import KeyboardSelector from '../screens/KeyboardSelector.vue'
 import CircuitPythonSetup from '../components/CircuitPythonSetup.vue'
 import SetupMethodSelector from '../components/SetupMethodSelector.vue'
 import AutomaticSetup from '../components/AutomaticSetup.vue'
-import KeyboardSetup from '../screens/KeyboardSetup.vue'
+// import KeyboardSetup from '../screens/KeyboardSetup.vue'
 import InstallPogFirmware from '../components/installPogFirmware.vue'
 
 const routes = [

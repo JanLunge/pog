@@ -68,12 +68,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import router from '../router'
+import { keyboardStore } from '../store'
 
 const showDriveSelect = ref(false)
 const selectedDrive = ref('')
 const drives = ref<{ path: string; name: string }[]>([])
-import router from '../router'
-import { keyboardStore } from '@renderer/store';
+
 async function scanDrives() {
   try {
     const result = await window.api.listDrives()

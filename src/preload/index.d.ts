@@ -1,39 +1,53 @@
 import { ElectronAPI } from '@electron-toolkit/preload'
-import { API } from './index'
+
 
 export interface IElectronAPI {
   // Keyboard History API
-  listKeyboards: () => Promise<Array<{
-    id: string
-    name: string
-    path: string
-    usingSerial?: boolean
-  }>>
-  
+  listKeyboards: () => Promise<
+    Array<{
+      id: string
+      name: string
+      path: string
+      usingSerial?: boolean
+    }>
+  >
+  keyboardScan: (callback: (event: Event, value: { keyboards: any[] }) => void) => void
+  serialKeyboardPogConfig: (callback: (event: Event, value: { pogconfig: any }) => void) => void
+
   // Drive and Firmware API
-  listDrives: () => Promise<Array<{
-    path: string
-    name: string
-    isReadOnly: boolean
-    isRemovable: boolean
-    isSystem: boolean
-    isUSB: boolean
-    isCard: boolean
-  }>>
-  flashDetectionFirmware: ({drivePath: string, serialNumber?: string}) => Promise<{ success: boolean }>
-  
-  // Serial Port API
-  serialPorts: () => Promise<Array<{
-    port: string
-    manufacturer?: string
+  listDrives: () => Promise<
+    Array<{
+      path: string
+      name: string
+      isReadOnly: boolean
+      isRemovable: boolean
+      isSystem: boolean
+      isUSB: boolean
+      isCard: boolean
+    }>
+  >
+
+  flashDetectionFirmware: (params: {
+    drivePath: string
     serialNumber?: string
-  }>>
+  }) => Promise<{ success: boolean }>
+
+  // Serial Port API
+  serialPorts: () => Promise<
+    Array<{
+      port: string
+      manufacturer?: string
+      serialNumber?: string
+    }>
+  >
   serialConnect: (port: string) => Promise<void>
   serialDisconnect: () => Promise<void>
   serialData: (callback: (event: any, data: { message: string }) => void) => void
-  serialConnectionStatus: (callback: (event: any, data: { connected: boolean, error?: string }) => void) => void
+  serialConnectionStatus: (
+    callback: (event: any, data: { connected: boolean; error?: string }) => void
+  ) => void
   serialSend: (message: string) => void
-  
+
   // Keyboard Detection API
   startDetection: () => Promise<{ success: boolean }>
   stopDetection: () => Promise<{ success: boolean }>
@@ -46,6 +60,7 @@ export interface IElectronAPI {
   onDetectionUpdate: (callback: (data: any, event: any) => void) => void
   removeDetectionListeners: () => void
   onUpdateFirmwareInstallProgress: (callback: (data: any, event: any) => void) => void
+
   // Legacy API (to be migrated)
   selectKeyboard: (data: any) => Promise<any>
   deselectKeyboard: () => Promise<void>
@@ -53,9 +68,11 @@ export interface IElectronAPI {
   selectDrive: () => Promise<any>
   updateFirmware: () => Promise<void>
   saveConfiguration: (data: any) => Promise<void>
+  rescanKeyboards: () => Promise<void>
+  checkForUSBKeyboards: (keyboardPaths: string[]) => Promise<any>
 }
 
-declare global {
+export declare global {
   interface Window {
     electron: ElectronAPI
     api: IElectronAPI

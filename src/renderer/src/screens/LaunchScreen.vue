@@ -92,7 +92,6 @@ import { useRouter } from 'vue-router'
 import {
   keyboardStore,
   keyboardHistory,
-  addToHistory,
   notifications,
   KeyboardStore,
   selectedLayer,

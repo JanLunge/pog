@@ -666,15 +666,15 @@ ipcMain.handle(
   }
 )
 
-// Keyboard History handlers
-ipcMain.handle('list-keyboards', () => {
-  try {
-    return listKeyboards()
-  } catch (error) {
-    console.error('Failed to list keyboards:', error)
-    throw error
-  }
-})
+// // Keyboard History handlers
+// ipcMain.handle('list-keyboards', () => {
+//   try {
+//     return listKeyboards()
+//   } catch (error) {
+//     console.error('Failed to list keyboards:', error)
+//     throw error
+//   }
+// })
 
 // Serial Port handlers
 ipcMain.handle('serial-ports', async () => {

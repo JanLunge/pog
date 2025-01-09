@@ -9,7 +9,7 @@
             : 'Firmware installed'
         }}
       </p>
-      <progress class="progress progress-primary w-56" v-if="kmkInstallState !== 'done'"></progress>
+      <progress v-if="kmkInstallState !== 'done'" class="progress progress-primary w-56"></progress>
       <p v-else>
         initial Firmware install complete, please unplug your keyboard and plug it back in to
         continue
@@ -93,7 +93,7 @@
 import { keyboardStore } from '@renderer/store'
 import { ref, onMounted } from 'vue'
 import router from '../router'
-import { directiveHooks } from '@vueuse/core'
+// import { directiveHooks } from '@vueuse/core'
 
 interface SerialPort {
   port: string
@@ -177,7 +177,7 @@ onMounted(() => {
   scanPorts()
   // flash the firmware
   window.api.flashDetectionFirmware({
-    drivePath: keyboardStore.path
+    drivePath: keyboardStore.path || '',
     // serialNumber: keyboardStore.serialNumber
   })
 })
@@ -202,7 +202,7 @@ async function handleMethodSelect({ method }: { method: 'manual' | 'automatic' }
       console.log('flashing detection firmware', keyboardStore.path, keyboardStore.serialNumber)
       // For automatic setup, we need to flash the detection firmware first
       window.api.flashDetectionFirmware({
-        drivePath: keyboardStore.path,
+        drivePath: keyboardStore.path || '',
         serialNumber: keyboardStore.serialNumber
       })
       router.push('/automatic-setup/mapping')

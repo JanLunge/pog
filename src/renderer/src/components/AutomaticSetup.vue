@@ -28,11 +28,15 @@
               </div>
               <div class="flex justify-between">
                 <span class="font-medium">Matrix Size:</span>
-                <span class="font-mono text-primary">{{ detectionData.rows.length }}x{{ detectionData.cols.length }}</span>
+                <span class="font-mono text-primary"
+                  >{{ detectionData.rows.length }}x{{ detectionData.cols.length }}</span
+                >
               </div>
               <div class="flex justify-between">
                 <span class="font-medium">Total Pins:</span>
-                <span class="font-mono text-primary">{{ detectionData.cols.length + detectionData.rows.length }}</span>
+                <span class="font-mono text-primary">{{
+                  detectionData.cols.length + detectionData.rows.length
+                }}</span>
               </div>
             </div>
           </div>
@@ -89,7 +93,7 @@
                   detectionData.lastKeyPress.row === key.row &&
                   detectionData.lastKeyPress.col === key.col
                 ),
-                'bg-primary text-primary-content shadow-md scale-105':
+                'scale-105 bg-primary text-primary-content shadow-md':
                   detectionData.lastKeyPress &&
                   detectionData.lastKeyPress.row === key.row &&
                   detectionData.lastKeyPress.col === key.col
@@ -103,9 +107,7 @@
 
       <!-- Action Button -->
       <div class="flex justify-center">
-        <button class="btn btn-primary" @click="proceed">
-          Done pressing keys
-        </button>
+        <button class="btn btn-primary" @click="proceed">Done pressing keys</button>
       </div>
     </div>
   </div>
@@ -118,7 +120,6 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import Debug from './debug.vue'
 
 const showDebug = ref(false)
-const currentStep = ref(0)
 const detectionData = ref<{
   rows: string[]
   cols: string[]
@@ -134,10 +135,6 @@ const detectionData = ref<{
 onMounted(async () => {
   await window.api.startDetection()
 })
-async function startDetection() {
-  await window.api.startDetection()
-  currentStep.value = 1
-}
 
 function handleDetectionUpdate(data: any, event: any) {
   //   detectionData.value = data
@@ -179,7 +176,7 @@ function proceed() {
   router.push('/automatic-setup/firmware')
 }
 
-const emit = defineEmits(['setup-complete'])
+defineEmits(['setup-complete'])
 
 onMounted(() => {
   console.log('onMounted')

@@ -90,21 +90,6 @@ async function addExistingKeyboard() {
     router.push('/setup-wizard')
   }
 }
-async function importConfiguration() {
-  try {
-    const result = await window.api.selectKeyboard()
-    if (result) {
-      const config = JSON.parse(result)
-      // Load configuration into store
-      Object.assign(keyboardStore, config.pogConfig)
-      keyboardStore.usingSerial = config.serial
-      // Navigate to configurator
-      router.push('/configurator/keymap')
-    }
-  } catch (error) {
-    console.error('Failed to import configuration:', error)
-  }
-}
 
 function selectKeyboard(keyboard: Keyboard) {
   // Load keyboard configuration
