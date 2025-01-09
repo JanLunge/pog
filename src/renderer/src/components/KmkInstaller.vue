@@ -49,19 +49,18 @@
         </div>
       </div>
       <div
-        v-if="[''].includes(kmkInstallState)"
+        v-if="['', 'done'].includes(kmkInstallState)"
         class="mt-8 flex flex-col items-center justify-center"
       >
-        <div
-          v-if="keyboardStore.firmwareInstalled"
-          class="mt-8 grid grid-cols-2 justify-center gap-4"
-        >
-          <button class="btn btn-primary" @click="updateKMK">update KMK</button>
+        <div class="mt-8 grid grid-cols-2 justify-center gap-4">
+          <button class="btn btn-primary" @click="updateKMK">
+            {{ keyboardStore.firmwareInstalled ? 'update' : 'install' }} KMK
+          </button>
           <button class="btn btn-primary" @click="openModal">update Firmware</button>
         </div>
-        <button v-else class="btn btn-primary mt-8" @click="updateKMK">install KMK</button>
+        <button class="btn btn-primary mt-8" @click="updateKMK">install KMK</button>
       </div>
-      <div class="mt-8 flex justify-center">
+      <div v-if="initialSetup" class="mt-8 flex justify-center">
         <button
           v-if="keyboardStore.firmwareInstalled"
           class="btn btn-primary mt-4 block"
@@ -69,9 +68,7 @@
         >
           Next
         </button>
-        <button v-else class="btn mt-4 block" @click="$emit('next')">
-          I installed KMK manually
-        </button>
+        <button class="btn mt-4 block" @click="$emit('next')">I installed KMK manually</button>
       </div>
 
       <div
@@ -93,8 +90,8 @@ import dayjs from 'dayjs'
 const progress = ref(0)
 const kmkInstallState = ref('')
 
-defineProps(['initialSetup'])
-
+defineProps<{ initialSetup: boolean }>()
+defineEmits(['next'])
 const startTime = ref(dayjs())
 const endTime = ref(dayjs())
 

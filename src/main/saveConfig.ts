@@ -8,16 +8,10 @@ import { codepy } from './pythontemplates/code'
 import { bootpy } from './pythontemplates/boot'
 import { pog_serialpy } from './pythontemplates/pog_serial'
 import { keymappy } from './pythontemplates/keymap'
-import {
-  connectedKeyboardPort,
-  pogconfigbuffer,
-  writeKeymapViaSerial,
-  writePogConfViaSerial
-} from './index'
-// save code.py based on pog.json
+import { writePogConfViaSerial } from './index'
 
 export const saveConfiguration = (data: string) => {
-  const { pogConfig, serial, overwriteFiles, writeFirmware } = JSON.parse(data)
+  const { pogConfig, serial, writeFirmware } = JSON.parse(data)
   if (serial) {
     // write by serial to current keyboard
     console.log('writing firmware via usb serial')
@@ -25,66 +19,30 @@ export const saveConfiguration = (data: string) => {
   } else {
     // write pog.json
     console.log('writing firmware via usb files', 'overwriting Firmware:', writeFirmware)
-    fs.writeFile(currentKeyboard.path + '/pog.json', JSON.stringify(pogConfig, null, 4), () => {
-      console.log('pog File written successfully\n')
+    fs.writeFile(currentKeyboard.path + '/pog.json', JSON.stringify(pogConfig, null, 4), (e) => {
+      if (e) {
+        console.log('error writing pog.json', e)
+      } else {
+        console.log('pog.json written successfully')
+      }
     })
 
-    saveKeyboardConfig(pogConfig, writeFirmware) // initialize files if they don't exist
+    const files = [
+      { name: 'pog.py', contents: pogpy },
+      { name: 'code.py', contents: codepy },
+      { name: 'coordmaphelper.py', contents: coordmaphelperpy },
+      { name: 'customkeys.py', contents: customkeyspy },
+      { name: 'boot.py', contents: bootpy },
+      { name: 'pog_serial.py', contents: pog_serialpy },
+      { name: 'keymap.py', contents: keymappy },
+      { name: 'kb.py', contents: kbpy }
+    ]
+    for (const file of files) {
+      if (!fs.existsSync(currentKeyboard.path + '/' + file.name) || writeFirmware) {
+        fs.writeFile(currentKeyboard.path + '/' + file.name, file.contents, () => {
+          console.log(file.name + 'File written successfully')
+        })
+      }
+    }
   }
-}
-
-const flashFileToKB = ({ fileName, overwrite, fileContents }) => {
-  if (!fs.existsSync(currentKeyboard.path + '/' + fileName) || overwrite) {
-    fs.writeFile(currentKeyboard.path + '/' + fileName, fileContents, () => {
-      console.log(fileName + 'File written successfully')
-    })
-  }
-}
-
-export const saveKeyboardConfig = (pogConfig, writeFirmware) => {
-  // TODO: add option to overwrite files eg. force flash (writeFirmware)
-
-  // add pog helper and keyboard setup
-  flashFileToKB({
-    fileName: 'kb.py',
-    overwrite: writeFirmware,
-    fileContents: kbpy
-  })
-
-  // save pog helper
-  flashFileToKB({
-    fileName: 'pog.py',
-    overwrite: writeFirmware,
-    fileContents: pogpy
-  })
-  flashFileToKB({
-    fileName: 'code.py',
-    overwrite: writeFirmware,
-    fileContents: codepy
-  })
-  flashFileToKB({
-    fileName: 'coordmaphelper.py',
-    overwrite: writeFirmware,
-    fileContents: coordmaphelperpy
-  })
-  flashFileToKB({
-    fileName: 'customkeys.py',
-    overwrite: writeFirmware,
-    fileContents: customkeyspy
-  })
-  flashFileToKB({
-    fileName: 'boot.py',
-    overwrite: writeFirmware,
-    fileContents: bootpy
-  })
-  flashFileToKB({
-    fileName: 'pog_serial.py',
-    overwrite: writeFirmware,
-    fileContents: pog_serialpy
-  })
-  flashFileToKB({
-    fileName: 'keymap.py',
-    overwrite: writeFirmware,
-    fileContents: keymappy
-  })
 }

@@ -34,9 +34,12 @@
         If this did not help check the diode direction or pins.
       </p>
       <p class="py-4">
-        the coordmap should be printed as a list of 3 digit numbers seperated by spaces. eg 001 005 008 002 ... <br/>
-        it will print this via a hotkey on the number row so make sure to switch to something like qwerty if you are using azerty or another layout that mapps other keys to the number row.
-        for split keyboards try the coordmap with the type set to normal as depending on the split side detection the secondary half might not output to usb.
+        the coordmap should be printed as a list of 3 digit numbers seperated by spaces.<br />
+        eg 001 005 008 002 ... <br />
+        it will print this via a hotkey on the number row so make sure to switch to something like
+        qwerty if you are using azerty or another layout that maps other keys to the number row. for
+        split keyboards try the coordmap with the type set to normal as depending on the split side
+        detection the secondary half might not output to usb.
       </p>
       <textarea
         id="keycapture"
@@ -83,7 +86,7 @@ import { computed, ref } from 'vue'
 import KeyboardLayout from './KeyboardLayout.vue'
 import { Key, keyboardStore, KeyInfo } from '../store'
 const coordmap = ref('')
-const props = defineProps(['initialSetup'])
+const props = defineProps<{ initialSetup: boolean }>()
 const emits = defineEmits(['next'])
 
 console.log('loading coordmap', keyboardStore.coordMap)

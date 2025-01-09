@@ -226,11 +226,11 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue' // import { useRouter } from 'vue-router'
-import {keyboardStore, pinPrefixHint, splitPinHint, splitSideHint, vbusPinHint} from '../store' // const router = useRouter()
+import { keyboardStore, pinPrefixHint, splitPinHint, splitSideHint, vbusPinHint } from '../store' // const router = useRouter()
 import microcontrollers from '@renderer/assets/microcontrollers/microcontrollers.json'
 
-defineProps(['initialSetup'])
-
+defineProps<{ initialSetup: boolean }>()
+defineEmits(['next'])
 const selectedMicrocontroller = computed(
   () =>
     microcontrollers.find((m) => m.id == keyboardStore.controller) || {

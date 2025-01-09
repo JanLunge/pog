@@ -1,15 +1,18 @@
-import { app, shell, BrowserWindow, ipcMain, Menu, SerialPort } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import drivelist from 'drivelist'
+import { flashFirmware } from './kmkUpdater'
+// import './saveConfig'
 import { checkForUSBKeyboards, handleSelectDrive, selectKeyboard } from './selectKeyboard'
 import { updateFirmware } from './kmkUpdater'
-import { saveConfiguration } from './saveConfig'
-import { autoUpdater } from 'electron-updater'
+import './keyboardDetector' // Import keyboard detector
 import serialPort from 'serialport'
 import { ReadlineParser } from '@serialport/parser-readline'
-import { log } from 'util'
-
+import fs from 'fs'
+import { currentKeyboard } from './store'
+import { saveConfiguration } from './saveConfig'
 let mainWindow: BrowserWindow | null = null
 export { mainWindow }
 
@@ -24,12 +27,12 @@ const template: unknown = [
           label: app.name,
           submenu: [
             { role: 'about' },
-            {
-              label: 'Check for Updates...',
-              click: () => {
-                autoUpdater.checkForUpdatesAndNotify()
-              }
-            },
+            // {
+            //   label: 'Check for Updates...',
+            //   click: () => {
+            //     autoUpdater.checkForUpdates()
+            //   }
+            // },
             { type: 'separator' },
             { role: 'services' },
             { type: 'separator' },
@@ -117,23 +120,23 @@ Menu.setApplicationMenu(menu)
 const createWindow = async () => {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 1100,
-    height: 800,
-    minWidth: 700,
-    minHeight: 200,
+    width: 900,
+    height: 670,
     show: false,
-    // autoHideMenuBar: true,
+    autoHideMenuBar: true,
     backgroundColor: '#000000',
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
+      nodeIntegration: true,
+      contextIsolation: true,
       experimentalFeatures: true
     }
   })
 
   mainWindow.on('ready-to-show', () => {
-    if (mainWindow) mainWindow.show()
+    mainWindow?.show()
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -153,9 +156,9 @@ const createWindow = async () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(async () => {
+app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('de.heaper.pog')
+  electronApp.setAppUserModelId('de.janlunge.pog')
 
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
@@ -219,12 +222,12 @@ ipcMain.on('serialSend', (_event, data) => sendSerial(data))
 ipcMain.handle('serialConnect', (_event, data) => serialConnect(data))
 ipcMain.handle('openExternal', (_event, data) => openExternal(data))
 
-autoUpdater.on('update-available', () => {
-  if (mainWindow) mainWindow.webContents.send('update_available')
-})
-autoUpdater.on('update-downloaded', () => {
-  if (mainWindow) mainWindow.webContents.send('update_downloaded')
-})
+// autoUpdater.on('update-available', () => {
+//   if (mainWindow) mainWindow.webContents.send('update_available')
+// })
+// autoUpdater.on('update-downloaded', () => {
+//   if (mainWindow) mainWindow.webContents.send('update_downloaded')
+// })
 
 const baudRate = 9600
 const startTime = new Date()
@@ -489,59 +492,55 @@ const closeDebugPort = () => {
 
 const serialConnect = async (port) => {
   console.log('connecting to serial port', port)
-  
+
   try {
     // First ensure any existing connection is properly closed
     await closeDebugPort()
-    
+
     // Create a promise that will reject after timeout
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error('Connection timeout')), CONNECTION_TIMEOUT)
     })
-    
+
     // Create the connection promise
     const connectionPromise = new Promise((resolve, reject) => {
       try {
-        debugPort = new serialPort.SerialPort(
-          { path: port, baudRate, autoOpen: true },
-          (err) => {
-            if (err) {
-              reject(err)
-              return
-            }
-            
-            const parser = debugPort.pipe(new ReadlineParser({ delimiter: '\n' }))
-            
-            parser.on('data', (data) => {
-              console.log('got data from serial', data)
-              mainWindow?.webContents.send('serialData', { message: data + '\n' })
-            })
-            
-            debugPort.on('error', (error) => {
-              console.error('Serial port error:', error)
-              notifyConnectionStatus(false, error.message)
-              closeDebugPort()
-            })
-            
-            debugPort.on('close', () => {
-              console.log('Serial port closed')
-              notifyConnectionStatus(false)
-            })
-            
-            resolve(true)
+        debugPort = new serialPort.SerialPort({ path: port, baudRate, autoOpen: true }, (err) => {
+          if (err) {
+            reject(err)
+            return
           }
-        )
+
+          const parser = debugPort.pipe(new ReadlineParser({ delimiter: '\n' }))
+
+          parser.on('data', (data) => {
+            console.log('got data from serial', data)
+            mainWindow?.webContents.send('serialData', { message: data + '\n' })
+          })
+
+          debugPort.on('error', (error) => {
+            console.error('Serial port error:', error)
+            notifyConnectionStatus(false, error.message)
+            closeDebugPort()
+          })
+
+          debugPort.on('close', () => {
+            console.log('Serial port closed')
+            notifyConnectionStatus(false)
+          })
+
+          resolve(true)
+        })
       } catch (err) {
         reject(err)
       }
     })
-    
+
     // Wait for either connection or timeout
     await Promise.race([connectionPromise, timeoutPromise])
-    
+
     console.log('Successfully connected to serial port')
     notifyConnectionStatus(true)
-    
   } catch (error: any) {
     console.error('Failed to connect:', error)
     await closeDebugPort()
@@ -555,10 +554,10 @@ const sendSerial = (message) => {
     console.error('Cannot send: port not open')
     return
   }
-  
+
   console.log('sending serial', message)
   mainWindow?.webContents.send('serialData', { message: `> sent: ${message}\n` })
-  
+
   try {
     let buffer
     if (message === 'ctrlc') {
@@ -568,7 +567,7 @@ const sendSerial = (message) => {
     } else {
       buffer = Buffer.from(message + '\r\n', 'utf8')
     }
-    
+
     debugPort.write(buffer, (err) => {
       if (err) {
         console.error('error sending serial', err)
@@ -615,3 +614,96 @@ const checkSerialDevices = async () => {
 const openExternal = (url) => {
   shell.openExternal(url)
 }
+
+// Drive and Firmware handlers
+ipcMain.handle('list-drives', async () => {
+  try {
+    const drives = await drivelist.list()
+    const filteredDrives = drives
+      .map((drive) => ({
+        path: drive.mountpoints[0]?.path || '',
+        name: drive.mountpoints[0]?.label || drive.description || 'Unknown Drive',
+        isReadOnly: drive.isReadOnly,
+        isRemovable: drive.isRemovable,
+        isSystem: drive.isSystem,
+        isUSB: drive.isUSB,
+        isCard: drive.isCard
+      }))
+      .filter((drive) => drive.path !== '' && drive.isUSB)
+    console.log('drives', filteredDrives)
+    return filteredDrives
+  } catch (error) {
+    console.error('Failed to list drives:', error)
+    throw error
+  }
+})
+
+ipcMain.handle(
+  'flash-detection-firmware',
+  async (_event, { drivePath, serialNumber }: { drivePath: string; serialNumber: string }) => {
+    try {
+      // Set the current keyboard path
+      currentKeyboard.path = drivePath
+      currentKeyboard.name = 'New Keyboard'
+      currentKeyboard.id = Date.now().toString()
+      currentKeyboard.serialNumber = serialNumber
+      console.log('flashing detection firmware currentKeyboard', currentKeyboard)
+
+      // Create necessary directories if they don't exist
+      if (!fs.existsSync(drivePath)) {
+        throw new Error(`Drive path ${drivePath} does not exist`)
+      }
+
+      // Flash the detection firmware
+      await flashFirmware(drivePath)
+
+      // setup both ports to listen for detection
+      return { success: true }
+    } catch (error) {
+      console.error('Failed to flash firmware:', error)
+      throw error
+    }
+  }
+)
+
+// Keyboard History handlers
+ipcMain.handle('list-keyboards', () => {
+  try {
+    return listKeyboards()
+  } catch (error) {
+    console.error('Failed to list keyboards:', error)
+    throw error
+  }
+})
+
+// Serial Port handlers
+ipcMain.handle('serial-ports', async () => {
+  try {
+    console.log('checking serial devices')
+    const ports = await serialPort.SerialPort.list()
+
+    if (ports.length === 0) {
+      console.log('No serial ports found')
+      return []
+    }
+
+    const returnPorts = ports.map((port) => ({
+      port: port.path,
+      manufacturer: port.manufacturer,
+      serialNumber: port.serialNumber
+    }))
+    console.log('found serial ports', returnPorts)
+    return returnPorts
+  } catch (error) {
+    console.error('Error fetching the list of serial ports:', error)
+    return []
+  }
+})
+
+ipcMain.handle('serial-connect', async (_event, port: string) => {
+  return serialConnect(port)
+})
+
+ipcMain.handle('serial-disconnect', async () => {
+  return closeDebugPort()
+})

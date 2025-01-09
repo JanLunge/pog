@@ -3,6 +3,11 @@ import * as fs from 'fs-extra'
 import request from 'request'
 import decompress from 'decompress'
 import { mainWindow } from './index'
+import { detectionFirmware } from './pythontemplates/detection'
+import { writeFile } from 'fs/promises'
+import { join } from 'path'
+import { app } from 'electron'
+import { bootpy } from './pythontemplates/boot'
 
 // downloads kmk to app storage
 export const updateFirmware = async () => {
@@ -71,7 +76,42 @@ export const updateFirmware = async () => {
     // write a file to the keyboard with the version sha
     if (fs.existsSync(`${currentKeyboard.path}/kmk`)) {
       console.log('removing old kmk folder')
-      fs.rmSync(`${currentKeyboard.path}/kmk`, { recursive: true, force: true })
+      const countFilesRecursive = async (dir: string): Promise<number> => {
+        const files = await fs.readdir(dir, { withFileTypes: true })
+        let count = files.length
+
+        for (const file of files) {
+          if (file.isDirectory()) {
+            count += await countFilesRecursive(`${dir}/${file.name}`)
+          }
+        }
+        return count
+      }
+
+      const deleteWithProgress = async (dir: string) => {
+        let processedFiles = 0
+        const totalFiles = await countFilesRecursive(dir)
+
+        const deleteRecursive = async (currentDir: string) => {
+          const currentFiles = await fs.readdir(currentDir, { withFileTypes: true })
+          for (const file of currentFiles) {
+            const filePath = `${currentDir}/${file.name}`
+            if (file.isDirectory()) {
+              await deleteRecursive(filePath)
+            }
+            await fs.promises.rm(filePath, { force: true, recursive: true })
+            processedFiles++
+            mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
+              state: 'cleaning', 
+              progress: (processedFiles / totalFiles) * 100
+            })
+          }
+        }
+
+        await deleteRecursive(dir)
+      }
+      
+      await deleteWithProgress(`${currentKeyboard.path}/kmk`)
     }
     if (!fs.existsSync(`${currentKeyboard.path}/kmk`)) {
       fs.mkdirSync(`${currentKeyboard.path}/kmk`)
@@ -85,7 +125,7 @@ export const updateFirmware = async () => {
 
       for (const file of files) {
         if (file.isDirectory()) {
-          count += await countFiles(`${src}/${file.name}`) - 1 // subtract 1 to not count the directory itself twice
+          count += (await countFiles(`${src}/${file.name}`)) - 1 // subtract 1 to not count the directory itself twice
         }
       }
       return count
@@ -103,7 +143,13 @@ export const updateFirmware = async () => {
           await fs.ensureDir(destPath)
           await copyWithProgress(srcPath, destPath, totalFiles)
         } else {
-          console.log('copying file', destPath, processedFiles, totalFiles, processedFiles / totalFiles)
+          console.log(
+            'copying file',
+            destPath,
+            processedFiles,
+            totalFiles,
+            processedFiles / totalFiles
+          )
           await fs.copy(srcPath, destPath)
           processedFiles++
           mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
@@ -117,14 +163,11 @@ export const updateFirmware = async () => {
     try {
       const sourcePath = `${appDir}/kmk/kmk_firmware-${versionSha}/kmk`
       const totalFiles = await countFiles(sourcePath)
-      await copyWithProgress(
-        sourcePath,
-        `${currentKeyboard.path}/kmk`,
-        totalFiles
-      )
+      await copyWithProgress(sourcePath, `${currentKeyboard.path}/kmk`, totalFiles)
       mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
         state: 'done',
-        progress: 1
+        progress: 1,
+        message: 'Firmware updated successfully, to version ' + versionSha
       })
     } catch (err) {
       console.error('Error during copy:', err)
@@ -135,5 +178,28 @@ export const updateFirmware = async () => {
     }
   } catch (err) {
     console.error(err)
+  }
+}
+
+export async function flashFirmware(firmwarePath: string): Promise<void> {
+  try {
+    console.log('flashing firmware initial', firmwarePath)
+    // Create detection firmware file
+    const detectionPath = join(firmwarePath, 'code.py')
+    await writeFile(detectionPath, detectionFirmware)
+
+    const bootPath = join(firmwarePath, 'boot.py')
+    await writeFile(bootPath, bootpy)
+    
+    // Wait for the board to restart
+    await new Promise(resolve => setTimeout(resolve, 2000))
+    mainWindow?.webContents.send('onUpdateFirmwareInstallProgress', {
+      state: 'done',
+      progress: 1,
+      message: 'Initiated detection firmware flashed'
+    })
+  } catch (error) {
+    console.error('Failed to flash firmware:', error)
+    throw error
   }
 }

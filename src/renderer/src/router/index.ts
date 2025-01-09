@@ -12,100 +12,136 @@ import PinSetup from '../components/PinSetup.vue'
 import RawKeymapEditor from '../components/RawKeymapEditor.vue'
 import KeyboardName from '../components/KeyboardName.vue'
 import CoordMap from '../components/CoordMap.vue'
+import RgbSetup from '../components/RgbSetup.vue'
 import Community from '../components/Community.vue'
 import Debug from '../components/debug.vue'
-import RgbSetup from '../components/RgbSetup.vue'
 
-const router = createRouter({
+import KeyboardSelector from '../screens/KeyboardSelector.vue'
+import CircuitPythonSetup from '../components/CircuitPythonSetup.vue'
+import SetupMethodSelector from '../components/SetupMethodSelector.vue'
+import AutomaticSetup from '../components/AutomaticSetup.vue'
+import KeyboardSetup from '../screens/KeyboardSetup.vue'
+import InstallPogFirmware from '../components/installPogFirmware.vue'
+
+const routes = [
+  {
+    path: '/',
+    name: 'Launch',
+    component: LaunchScreen
+  },
+  {
+    path: '/add-keyboard',
+    name: 'Add Keyboard',
+    component: AddKeyboard
+  },
+  {
+    // manual setup
+    path: '/setup-wizard',
+    name: 'Setup Wizard',
+    component: SetupWizard
+  },
+  {
+    path: '/keyboard-selector',
+    name: 'Keyboard Selector',
+    component: KeyboardSelector
+  },
+  {
+    path: '/automatic-setup',
+    name: 'Automatic Setup',
+    children: [
+      {
+        path: 'circuit-python',
+        name: 'CircuitPython Setup',
+        component: CircuitPythonSetup
+      },
+      {
+        path: 'method',
+        name: 'Setup Method',
+        component: SetupMethodSelector
+      },
+      {
+        path: 'mapping',
+        name: 'Automatic Setup',
+        component: AutomaticSetup
+      },
+      {
+        path: 'firmware',
+        name: 'Pog Firmware',
+        component: InstallPogFirmware
+      }
+    ]
+  },
+  {
+    path: '/configurator',
+    name: 'Configurator',
+    component: KeyboardConfigurator,
+    children: [
+      {
+        path: 'keymap',
+        name: 'Keymap',
+        component: KeymapEditor
+      },
+      {
+        path: 'layout-editor',
+        name: 'Layout Editor',
+        component: LayoutEditor
+      },
+      {
+        path: 'encoder',
+        name: 'Encoder',
+        component: EncoderSetup
+      },
+      {
+        path: 'info',
+        name: 'Info',
+        component: KeyboardName
+      },
+      {
+        path: 'matrix',
+        name: 'Matrix',
+        component: MatrixSetup
+      },
+      {
+        path: 'pins',
+        name: 'Pins',
+        component: PinSetup
+      },
+      {
+        path: 'coordmap',
+        name: 'CoordMap',
+        component: CoordMap
+      },
+      {
+        path: 'raw-keymap',
+        name: 'Raw Keymap',
+        component: RawKeymapEditor
+      },
+      {
+        path: 'firmware',
+        name: 'Firmware',
+        component: KmkInstaller
+      },
+      {
+        path: 'coordmap',
+        component: CoordMap,
+        name: 'CoordMap'
+      },
+      {
+        path: 'community',
+        component: Community,
+        name: 'Community'
+      },
+      {
+        path: 'rgb',
+        name: 'RGB',
+        component: RgbSetup
+      }
+    ]
+  }
+]
+
+export const router = createRouter({
   history: createWebHashHistory(),
-  routes: [
-    {
-      path: '/',
-      name: 'Launch',
-      component: LaunchScreen
-    },
-    {
-      path: '/add-keyboard',
-      name: 'Add Keyboard',
-      component: AddKeyboard
-    },
-    {
-      path: '/setup-wizard',
-      name: 'Setup Wizard',
-      component: SetupWizard
-    },
-    {
-      path: '/configurator',
-      name: 'Configurator',
-      component: KeyboardConfigurator,
-      children: [
-        {
-          path: '',
-          redirect: '/configurator/keymap'
-        },
-        {
-          path: 'firmware',
-          component: KmkInstaller,
-          name: 'Firmware'
-        },
-        {
-          path: 'layout-editor',
-          component: LayoutEditor,
-          name: 'Layout Editor'
-        },
-        {
-          path: 'keymap',
-          component: KeymapEditor,
-          name: 'Keymap Editor'
-        },
-        {
-          path: 'encoder',
-          component: EncoderSetup,
-          name: 'Rotary Encoders'
-        },
-        {
-          path: 'matrix',
-          component: MatrixSetup,
-          name: 'Matrix Setup'
-        },
-        {
-          path: 'pins',
-          component: PinSetup,
-          name: 'Pin Setup'
-        },
-        {
-          path: 'raw-keymap',
-          component: RawKeymapEditor,
-          name: 'Raw Keymap'
-        },
-        {
-          path: 'info',
-          component: KeyboardName,
-          name: 'Info'
-        },
-        {
-          path: 'coordmap',
-          component: CoordMap,
-          name: 'CoordMap'
-        },
-        {
-          path: 'community',
-          component: Community,
-          name: 'Community'
-        },
-        {
-          path: 'rgb',
-          component: RgbSetup,
-          name: 'RGB'
-        },
-        {
-          path: 'debug',
-          component: Debug,
-          name: 'Debug'
-        }
-      ]
-    }
-  ]
+  routes
 })
-
 export default router
