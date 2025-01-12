@@ -106,6 +106,7 @@ const selectedPort = ref('')
 async function scanPorts() {
   try {
     const result = await window.api.serialPorts()
+    console.log('raw serialPorts', result)
     // Group ports by serial number
     const portsBySerial = result.reduce((acc, port) => {
       if (port.serialNumber) {
@@ -116,27 +117,27 @@ async function scanPorts() {
       }
       return acc
     }, {} as Record<string, SerialPort[]>)
-
+    console.log('portsBySerial', portsBySerial)
     // Sort ports within each group and take only the first port (lower number)
-    ports.value = Object.entries(portsBySerial)
-      .map(([serialNumber, ports]) => {
-        ports.sort((a, b) => a.port.localeCompare(b.port))
-        // Store both ports in the keyboard store
-        if (ports.length >= 2) {
-          const keyboard = {
-            serialNumber,
-            serialPortA: ports[0].port,
-            serialPortB: ports[1].port,
-            manufacturer: ports[0].manufacturer,
-            port: ports[0].port, // Keep the first port as the main port for backwards compatibility
-            hasDataSerial: ports.length >= 2
-          }
-          return keyboard
+    ports.value = Object.entries(portsBySerial).map(([serialNumber, ports]) => {
+      ports.sort((a, b) => a.port.localeCompare(b.port))
+      // Store both ports in the keyboard store
+      if (ports.length >= 2) {
+        const keyboard = {
+          serialNumber,
+          serialPortA: ports[0].port,
+          serialPortB: ports[1].port,
+          manufacturer: ports[0].manufacturer,
+          port: ports[0].port, // Keep the first port as the main port for backwards compatibility
+          hasDataSerial: ports.length >= 2
         }
-        //   return ports[0]
-        return false
-      })
-      .filter((port) => port !== false)
+        return keyboard
+      }
+      return ports[0]
+      // return false
+    })
+    //   .filter((port) => port !== false)
+    console.log('ports', ports.value)
 
     // Auto-select recommended port if available
     const recommended = ports.value.find((port) => isRecommendedPort(port))
@@ -177,7 +178,7 @@ onMounted(() => {
   scanPorts()
   // flash the firmware
   window.api.flashDetectionFirmware({
-    drivePath: keyboardStore.path || '',
+    drivePath: keyboardStore.path || ''
     // serialNumber: keyboardStore.serialNumber
   })
 })
