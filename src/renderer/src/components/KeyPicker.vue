@@ -1,154 +1,23 @@
 <template>
+  <div class="tabs tabs-boxed my-4">
+    <a class="tab" :class="{ 'tab-active': layout === 'qwerty' }" @click="layout = 'qwerty'"
+      >QWERTY</a
+    >
+    <a class="tab" :class="{ 'tab-active': layout === 'colemak' }" @click="layout = 'colemak'"
+      >Colemak</a
+    >
+    <a class="tab" :class="{ 'tab-active': layout === 'colemak-dh' }" @click="layout = 'colemak-dh'"
+      >Colemak DH</a
+    >
+    <a class="tab" :class="{ 'tab-active': layout === 'dvorak' }" @click="layout = 'dvorak'"
+      >Dvorak</a
+    >
+  </div>
   <div id="keyboard-picker" :style="{ transform: `scale(${scale})` }">
-    <div class="key-chooser flex">
-      <div class="row">
-        <div class="key" @click="setKey('KC.ESC')">ESC</div>
-        <div class="blocker-full"></div>
-        <div class="key" @click="setKey('KC.F1')">F1</div>
-        <div class="key" @click="setKey('KC.F2')">F2</div>
-        <div class="key" @click="setKey('KC.F3')">F3</div>
-        <div class="key" @click="setKey('KC.F4')">F4</div>
-        <div class="blocker-half"></div>
-        <div class="key" @click="setKey('KC.F5')">F5</div>
-        <div class="key" @click="setKey('KC.F6')">F6</div>
-        <div class="key" @click="setKey('KC.F7')">F7</div>
-        <div class="key" @click="setKey('KC.F8')">F8</div>
-        <div class="blocker-half"></div>
-        <div class="key" @click="setKey('KC.F9')">F9</div>
-        <div class="key" @click="setKey('KC.F10')">F10</div>
-        <div class="key" @click="setKey('KC.F11')">F11</div>
-        <div class="key" @click="setKey('KC.F12')">F12</div>
-        <div class="blocker-half"></div>
-        <div class="key sm" @click="setKey('KC.PSCREEN')">Print Screen</div>
-        <div class="key sm" @click="setKey('KC.SCROLLLOCK')">Scroll Lock</div>
-        <div class="key sm" @click="setKey('KC.PAUSE')">Pause</div>
-        <div class="blocker-half"></div>
-        <div class="blocker-full"></div>
-        <div class="blocker-full"></div>
-        <div class="blocker-full"></div>
-        <div class="blocker-full"></div>
-      </div>
-      <div class="row">
-        <div class="key" @click="setKey('KC.GRV')"><span>~</span><span>`</span></div>
-        <div class="key" @click="setKey('KC.N1')"><span>!</span><span>1</span></div>
-        <div class="key" @click="setKey('KC.N2')"><span>@</span><span>2</span></div>
-        <div class="key" @click="setKey('KC.N3')"><span>#</span><span>3</span></div>
-        <div class="key" @click="setKey('KC.N4')"><span>$</span><span>4</span></div>
-        <div class="key" @click="setKey('KC.N5')"><span>%</span><span>5</span></div>
-        <div class="key" @click="setKey('KC.N6')"><span>^</span><span>6</span></div>
-        <div class="key" @click="setKey('KC.N7')"><span>&</span><span>7</span></div>
-        <div class="key" @click="setKey('KC.N8')"><span>*</span><span>8</span></div>
-        <div class="key" @click="setKey('KC.N9')"><span>(</span><span>9</span></div>
-        <div class="key" @click="setKey('KC.N0')"><span>)</span><span>0</span></div>
-        <div class="key" @click="setKey('KC.MINS')"><span>_</span><span>-</span></div>
-        <div class="key" @click="setKey('KC.EQL')"><span>+</span><span>=</span></div>
-        <div class="key key-2u" @click="setKey('KC.BSPC')">Bksp</div>
-        <div class="blocker-half"></div>
-        <div class="key sm" @click="setKey('KC.INSERT')">Insert</div>
-        <div class="key sm" @click="setKey('KC.HOME')">Home</div>
-        <div class="key sm" @click="setKey('KC.PGUP')">Page Up</div>
-        <div class="blocker-half"></div>
-        <div class="key sm" @click="setKey('KC.NUMLOCK')">Num Lock</div>
-        <div class="key" @click="setKey('KC.KP_SLASH')">/</div>
-        <div class="key" @click="setKey('KC.KP_ASTERISK')">*</div>
-        <div class="key" @click="setKey('KC.KP_MINUS')">-</div>
-      </div>
-      <div class="row">
-        <div class="key key-1-5u" @click="setKey('KC.TAB')">Tab</div>
-        <div class="key" @click="setKey('KC.Q')">Q</div>
-        <div class="key" @click="setKey('KC.W')">W</div>
-        <div class="key" @click="setKey('KC.E')">E</div>
-        <div class="key" @click="setKey('KC.R')">R</div>
-        <div class="key" @click="setKey('KC.T')">T</div>
-        <div class="key" @click="setKey('KC.Y')">Y</div>
-        <div class="key" @click="setKey('KC.U')">U</div>
-        <div class="key" @click="setKey('KC.I')">I</div>
-        <div class="key" @click="setKey('KC.O')">O</div>
-        <div class="key" @click="setKey('KC.P')">P</div>
-        <div class="key" @click="setKey('KC.LBRC')"><span>{</span><span>[</span></div>
-        <div class="key" @click="setKey('KC.RBRC')"><span>}</span><span>]</span></div>
-        <div class="key key-1-5u" @click="setKey('KC.BSLS')"><span>|</span><span>\</span></div>
-        <div class="blocker-half"></div>
-        <div class="key" @click="setKey('KC.DEL')">Del</div>
-        <div class="key" @click="setKey('KC.END')">End</div>
-        <div class="key sm" @click="setKey('KC.PGDOWN')">Page Down</div>
-        <div class="blocker-half"></div>
-        <div class="key" @click="setKey('KC.KP_7')">7</div>
-        <div class="key" @click="setKey('KC.KP_8')">8</div>
-        <div class="key" @click="setKey('KC.KP_9')">9</div>
-        <div class="key" @click="setKey('KC.KP_PLUS')">+</div>
-      </div>
-      <div class="row">
-        <div class="key key-1-75u" @click="setKey('KC.CAPS')">Caps Lock</div>
-        <div class="key" @click="setKey('KC.A')">A</div>
-        <div class="key" @click="setKey('KC.S')">S</div>
-        <div class="key" @click="setKey('KC.D')">D</div>
-        <div class="key" @click="setKey('KC.F')">F</div>
-        <div class="key" @click="setKey('KC.G')">G</div>
-        <div class="key" @click="setKey('KC.H')">H</div>
-        <div class="key" @click="setKey('KC.J')">J</div>
-        <div class="key" @click="setKey('KC.K')">K</div>
-        <div class="key" @click="setKey('KC.L')">L</div>
-        <div class="key" @click="setKey('KC.SCLN')"><span>:</span><span>;</span></div>
-        <div class="key" @click="setKey('KC.QUOT')"><span>"</span><span>'</span></div>
-        <div class="key key-2-25u" @click="setKey('KC.ENT')">Enter</div>
-
-        <div class="blocker-half"></div>
-        <div class="blocker-full"></div>
-        <div class="blocker-full"></div>
-        <div class="blocker-full"></div>
-        <div class="blocker-half"></div>
-
-        <div class="key" @click="setKey('KC.KP_4')">4</div>
-        <div class="key" @click="setKey('KC.KP_5')">5</div>
-        <div class="key" @click="setKey('KC.KP_6')">6</div>
-        <div class="key" @click="setKey('KC.KP_PLUS')">+</div>
-      </div>
-      <div class="row">
-        <div class="key key-2-5u" @click="setKey('KC.LSFT')">LShift</div>
-        <div class="key" @click="setKey('KC.Z')">Z</div>
-        <div class="key" @click="setKey('KC.X')">X</div>
-        <div class="key" @click="setKey('KC.C')">C</div>
-        <div class="key" @click="setKey('KC.V')">V</div>
-        <div class="key" @click="setKey('KC.B')">B</div>
-        <div class="key" @click="setKey('KC.N')">N</div>
-        <div class="key" @click="setKey('KC.M')">M</div>
-        <div class="key" @click="setKey('KC.COMM')"><span>&lt;</span><span>,</span></div>
-        <div class="key" @click="setKey('KC.DOT')"><span>&gt;</span><span>,</span></div>
-        <div class="key" @click="setKey('KC.SLSH')"><span>?</span><span>/</span></div>
-        <div class="key key-2-5u" @click="setKey('KC.RSFT')">RShift</div>
-        <div class="blocker-half"></div>
-        <div class="blocker-full"></div>
-        <div class="key" @click="setKey('KC.UP')"><i class="mdi mdi-arrow-up"></i></div>
-        <div class="blocker-full"></div>
-        <div class="blocker-half"></div>
-        <div class="key" @click="setKey('KC.KP_1')">1</div>
-        <div class="key" @click="setKey('KC.KP_2')">2</div>
-        <div class="key" @click="setKey('KC.KP_3')">3</div>
-        <div class="key sm" @click="setKey('KC.KP_ENTER')">Num Enter</div>
-      </div>
-      <div class="row">
-        <div class="key key-1-25u" @click="setKey('KC.LCTL')">LCtrl</div>
-        <div class="key key-1-25u" @click="setKey('KC.LGUI')">LGui</div>
-        <div class="key key-1-25u" @click="setKey('KC.LALT')">LAlt</div>
-
-        <div class="key key-6u" @click="setKey('KC.SPC')">Space</div>
-
-        <div class="key key-1-25u" @click="setKey('KC.RALT')">RAlt</div>
-        <div class="key key-1-25u" @click="setKey('KC.RGUI')">RGui</div>
-        <div class="key key-1-25u" @click="setKey('KC.APP')">Menu</div>
-        <div class="key key-1-25u" @click="setKey('KC.RCTL')">RCTL</div>
-        <div class="blocker-half"></div>
-        <div class="key" @click="setKey('KC.LEFT')"><i class="mdi mdi-arrow-left"></i></div>
-        <div class="key" @click="setKey('KC.DOWN')"><i class="mdi mdi-arrow-down"></i></div>
-        <div class="key" @click="setKey('KC.RIGHT')"><i class="mdi mdi-arrow-right"></i></div>
-        <div class="blocker-half"></div>
-        <div class="key" @click="setKey('KC.KP_0')">0</div>
-        <div class="key" @click="setKey('KC.KP_0')">0</div>
-        <div class="key" @click="setKey('KC.KP_DOT')">.</div>
-        <div class="key sm" @click="setKey('KC.KP_ENTER')">Num Enter</div>
-      </div>
-    </div>
+    <Qwerty v-if="layout === 'qwerty'" @key="setKey" />
+    <Colemak v-if="layout === 'colemak'" @key="setKey" />
+    <ColemakDH v-if="layout === 'colemak-dh'" @key="setKey" />
+    <Dvorak v-if="layout === 'dvorak'" @key="setKey" />
   </div>
   <div class="secondary mb-4">
     <div class="tabs tabs-boxed mt-4">
@@ -303,7 +172,12 @@
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue'
 import { keyboardStore } from '../store'
+import Qwerty from './picker-layouts/Qwerty.vue'
+import Colemak from './picker-layouts/Colemak.vue'
+import ColemakDH from './picker-layouts/ColemakDH.vue'
+import Dvorak from './picker-layouts/Dvorak.vue'
 
+const layout = ref('qwerty')
 const category = ref('basic')
 const emit = defineEmits(['setKey'])
 
