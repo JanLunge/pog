@@ -610,7 +610,7 @@ export class Keyboard {
       vbusPin: this.vbusPin,
       splitUsePio: this.splitUsePio,
       splitFlip: this.splitFlip,
-      spitUartFlip: this.splitUartFlip,
+      splitUartFlip: this.splitUartFlip,
 
       coordMap: this.coordMap,
       pinPrefix: this.pinPrefix,

@@ -127,6 +127,10 @@ splitSide = None
 if config.get('splitSide'):
     splitSide = config['splitSide']
 
+splitTargetLeft = None
+if config.get('splitTargetLeft'):
+    splitTargetLeft = config['splitTargetLeft']
+
 splitPinA = None
 splitPinB = None
 if config.get('splitPinA'):

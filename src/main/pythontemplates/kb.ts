@@ -85,6 +85,7 @@ class POGKeyboard(KMKKeyboard):
                 print("split with 2 pins (UART)")
                 self.split = Split(
                     split_side=side,
+                    split_target_left=pog.splitTargetLeft,
                     split_type=SplitType.UART,
                     data_pin=pog.splitPinA,
                     data_pin2=pog.splitPinB,
@@ -96,6 +97,7 @@ class POGKeyboard(KMKKeyboard):
                 print('split with 1 pin')
                 self.split = Split(
                     split_side=side,
+                    split_target_left=pog.splitTargetLeft,
                     data_pin=pog.splitPinA,
                     use_pio=pog.splitUsePio,
                     split_flip=pog.splitFlip)
