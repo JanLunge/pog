@@ -314,6 +314,8 @@ export const renderLabel = (keycode: string) => {
     RGB_HUD: { label: 'RGB<br/>Hue -' },
     RGB_SAI: { label: 'RGB<br/>Sat +' },
     RGB_SAD: { label: 'RGB<br/>Sat -' },
+    RGB_VAI: { label: 'RGB<br/>Val +' },
+    RGB_VAD: { label: 'RGB<br/>Val -' },
     RGB_ANI: { label: 'RGB<br/>Animation +' },
     RGB_AND: { label: 'RGB<br/>Animation -' },
     RGB_MODE_SWIRL: { label: 'RGB<br/>Swirl' },
