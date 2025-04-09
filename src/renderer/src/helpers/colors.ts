@@ -42,6 +42,7 @@ export const hexToHSL = (hex): {hue: number, sat: number, val: number} => {
 }
 
 export function hslToHex(h, s, l): string {
+  h *= 360 / 255
   s /= 255
   l /= 255
 
