@@ -15,7 +15,7 @@ KMK GUI, Layout Editor, Keymap Editor, Flashing Utility
 the documentation is available [here](https://github.com/JanLunge/pog-docs). Feel free to contribute
 
 # Installation
-Download the pre-built binaries for Windows, Mac and Linux are available in the [releases](https://github.com/JanLunge/pog/releases)
+download the pre-built binaries for Windows, Mac and Linux are available in the [releases](https://github.com/JanLunge/pog/releases)
 
 # Development Setup
 ## dependencies
