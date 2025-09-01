@@ -98,17 +98,21 @@
       </div>
     </div>
   </div>
+
+  <LoadingOverlay :is-visible="isLoading && !showDebug" title="Saving" message="Please wait..." />
 </template>
 
 <script lang="ts" setup>
 import { addToHistory, keyboardStore } from '../store'
 import { useRoute, useRouter } from 'vue-router'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Debug from '../components/debug.vue'
+import LoadingOverlay from '../components/LoadingOverlay.vue'
 
 const router = useRouter()
 const route = useRoute()
 const showDebug = ref(false)
+const isLoading = ref(false)
 
 // nav guard
 console.log('path is', keyboardStore.path)
@@ -125,15 +129,51 @@ const reselectKeyboard = () => {
   router.push('/')
 }
 
+let globalSerialDataHandler: ((event: any, data: { message: string }) => void) | null = null
+let fallbackTimeout: number | null = null
+
 const saveKeymap = async () => {
-  // save to keyboard history
-  keyboardStore.coordMapSetup = false
-  const keyboardData = keyboardStore.serialize()
-  addToHistory(keyboardStore)
-  console.log(keyboardStore.coordMapSetup)
-  await window.api.saveConfiguration(
-    JSON.stringify({ pogConfig: keyboardData, serial: keyboardStore.usingSerial })
-  )
+  if (isLoading.value) return
+  try {
+    isLoading.value = true
+    keyboardStore.coordMapSetup = false
+    const keyboardData = keyboardStore.serialize()
+    addToHistory(keyboardStore)
+    console.log(keyboardStore.coordMapSetup)
+    await window.api.saveConfiguration(
+      JSON.stringify({ pogConfig: keyboardData, serial: keyboardStore.usingSerial })
+    )
+
+    if (!globalSerialDataHandler) {
+      globalSerialDataHandler = (_event: any, data: { message: string }) => {
+        const message = data.message.toLowerCase()
+        if (
+          message.includes('initialising pogkeyboard') ||
+          message.includes('use 6kro') ||
+          message.includes('mem_info used:') ||
+          message.includes('enable mouse')
+        ) {
+          hideLoadingOverlay()
+        }
+      }
+      window.api.serialData(globalSerialDataHandler)
+    }
+
+    fallbackTimeout = setTimeout(() => {
+      if (isLoading.value) hideLoadingOverlay()
+    }, 15000) as unknown as number
+  } catch (error) {
+    console.error('Error saving keymap:', error)
+    hideLoadingOverlay()
+  }
+}
+
+const hideLoadingOverlay = () => {
+  if (fallbackTimeout) {
+    clearTimeout(fallbackTimeout)
+    fallbackTimeout = null
+  }
+  isLoading.value = false
 }
 
 const currentRouteName = computed(() => route.matched[1]?.name)
@@ -155,6 +195,14 @@ onMounted(() => {
   title?.addEventListener('focus', () => {
     title.innerText = ''
   })
+})
+
+onUnmounted(() => {
+  if (fallbackTimeout) {
+    clearTimeout(fallbackTimeout)
+    fallbackTimeout = null
+  }
+  isLoading.value = false
 })
 
 const info = () => {

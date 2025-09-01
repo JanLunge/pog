@@ -78,7 +78,7 @@ const router = useRouter()
 // const steps = ref(["kmk", "matrix", "pins", "layout"]);
 const currentStep = ref(0)
 const toConfigurator = () => {
-  router.push('/configurator')
+  router.push('/configurator/keymap')
 }
 
 watch(currentStep, () => {
