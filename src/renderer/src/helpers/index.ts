@@ -341,14 +341,13 @@ export const renderLabel = (keycode: string) => {
   }
 
   // Check if the keycode is a sequence
-  if (keycode.startsWith('macro(') && keycode.endsWith(')')) {
-    // Remove the sequence function wrapper and split the keys
-    const keys = keycode.slice(5, -1).split(',')
-
-    // Get the label for each key and join them with a "+"
-    keylabel.action = keys.map((k) => renderLabel(k.trim())).join(' + ')
-  } else if (keycode.startsWith('send_string(') && keycode.endsWith(')')) {
-    keylabel.action = '<p class="keylabel-small">String</p>'
+  if (keycode.startsWith('KC.MACRO(') && keycode.endsWith(')')) {
+    const reg = /^\s*KC\.MACRO\(\s*"([^"]*)"\s*\)\s*$/
+    if (reg.test(keycode)) {
+      keylabel.action = '<p class="keylabel-small">String</p>'
+    } else {
+      keylabel.action = '<p class="keylabel-small">Macro</p>'
+    }
   } else if (keycode.startsWith('customkeys.')) {
     keylabel.action = 'custom'
     keylabel.simple = false

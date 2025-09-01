@@ -29,7 +29,7 @@ window.api.serialKeyboardPogConfig((_event: Event, value: { pogconfig }) => {
   if (keyboardStore.pogConfigured) {
     addToHistory(keyboardStore)
   }
-  router.push('/configurator')
+  router.push('/configurator/keymap')
 })
 </script>
 

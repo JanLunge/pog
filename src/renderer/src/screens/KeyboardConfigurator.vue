@@ -28,12 +28,15 @@
           ><i class="mdi mdi-keyboard-variant"></i>Keyboard Layout</router-link
         >
       </li>
-      <hr class="border-white border-opacity-20" />
       <li>
         <router-link to="/configurator/encoder"
           ><i class="mdi mdi-axis-z-rotate-clockwise"></i>Encoder</router-link
         >
       </li>
+      <li>
+        <router-link to="/configurator/rgb"><i class="mdi mdi-led-on"></i>RGB</router-link>
+      </li>
+      <hr class="border-white border-opacity-20" />
       <li>
         <router-link to="/configurator/info"
           ><i class="mdi mdi-information-outline"></i>Info</router-link
@@ -59,9 +62,6 @@
       </li>
       <li>
         <router-link to="/configurator/firmware"><i class="mdi mdi-flash"></i>Firmware</router-link>
-      </li>
-      <li>
-        <router-link to="/configurator/rgb"><i class="mdi mdi-led-on"></i>RGB</router-link>
       </li>
     </ul>
     <div class="flex h-full w-full flex-col overflow-y-auto">
@@ -89,9 +89,9 @@
         <div class="flex-grow overflow-y-auto px-4 pt-4">
           <router-view></router-view>
         </div>
-        <div 
-          v-show="showDebug" 
-          class="flex-shrink-0 w-[600px] border-l border-base-300 bg-base-100 overflow-y-auto p-4"
+        <div
+          v-show="showDebug"
+          class="w-[600px] flex-shrink-0 overflow-y-auto border-l border-base-300 bg-base-100 p-4"
         >
           <Debug />
         </div>

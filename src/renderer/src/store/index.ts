@@ -700,7 +700,7 @@ export const vbusPinHint = computed(() => {
 
 export const userSettings = useStorage('user-settings', {
   reduceKeymapColors: false,
-  autoSelectNextKey: false
+  autoSelectNextKey: true
 })
 
 export const serialKeyboards = ref<any[]>([])

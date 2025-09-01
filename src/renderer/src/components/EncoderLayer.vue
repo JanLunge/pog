@@ -8,11 +8,13 @@
       v-model="keyboardStore.encoderKeymap[lindex][eindex][0]"
       type="text"
       class="input input-bordered input-sm"
+      @blur="handleBlur(0)"
     />
     <input
       v-model="keyboardStore.encoderKeymap[lindex][eindex][1]"
       type="text"
       class="input input-bordered input-sm"
+      @blur="handleBlur(1)"
     />
   </div>
 </template>
@@ -26,6 +28,13 @@ if (!keyboardStore.encoderKeymap[props.lindex]) {
 }
 if (!keyboardStore.encoderKeymap[props.lindex][props.eindex]) {
   keyboardStore.encoderKeymap[props.lindex][props.eindex] = ['KC.TRNS', 'KC.TRNS']
+}
+
+const handleBlur = (index: number) => {
+  const value = keyboardStore.encoderKeymap[props.lindex][props.eindex][index]
+  if (!value || value === '▽') {
+    keyboardStore.encoderKeymap[props.lindex][props.eindex][index] = 'KC.TRNS'
+  }
 }
 </script>
 
