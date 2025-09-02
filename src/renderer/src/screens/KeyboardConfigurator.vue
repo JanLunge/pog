@@ -24,11 +24,6 @@
         >
       </li>
       <li>
-        <router-link to="/configurator/layout-editor"
-          ><i class="mdi mdi-keyboard-variant"></i>Keyboard Layout</router-link
-        >
-      </li>
-      <li>
         <router-link to="/configurator/encoder"
           ><i class="mdi mdi-axis-z-rotate-clockwise"></i>Encoder</router-link
         >
@@ -38,31 +33,53 @@
       </li>
       <hr class="border-white border-opacity-20" />
       <li>
-        <router-link to="/configurator/info"
-          ><i class="mdi mdi-information-outline"></i>Info</router-link
-        >
+        <div class="cursor-pointer" @click="toggleSettings">
+          <p class="flex items-center text-gray-500">
+            <i
+              class="mdi mdi-cog mr-2 transition-transform duration-200"
+              :class="{ 'rotate-180': settingsOpen }"
+            ></i>
+            Settings
+          </p>
+        </div>
       </li>
-      <li>
-        <router-link to="/configurator/matrix"><i class="mdi mdi-grid"></i>Matrix</router-link>
-      </li>
-      <li>
-        <router-link to="/configurator/pins"
-          ><i class="mdi mdi-electric-switch"></i>Pins</router-link
-        >
-      </li>
-      <li>
-        <router-link to="/configurator/coordmap"
-          ><i class="mdi mdi-sort-numeric-ascending"></i>CoordMap</router-link
-        >
-      </li>
-      <li>
-        <router-link to="/configurator/raw-keymap"
-          ><i class="mdi mdi-code-brackets"></i>Raw Keymap</router-link
-        >
-      </li>
-      <li>
-        <router-link to="/configurator/firmware"><i class="mdi mdi-flash"></i>Firmware</router-link>
-      </li>
+      <transition name="slide-down">
+        <div v-show="settingsOpen">
+          <li>
+            <router-link to="/configurator/layout-editor"
+              ><i class="mdi mdi-keyboard-variant"></i>Keyboard Layout</router-link
+            >
+          </li>
+          <li>
+            <router-link to="/configurator/matrix"><i class="mdi mdi-grid"></i>Matrix</router-link>
+          </li>
+          <li>
+            <router-link to="/configurator/pins"
+              ><i class="mdi mdi-electric-switch"></i>Pins</router-link
+            >
+          </li>
+          <li>
+            <router-link to="/configurator/coordmap"
+              ><i class="mdi mdi-sort-numeric-ascending"></i>CoordMap</router-link
+            >
+          </li>
+          <li>
+            <router-link to="/configurator/raw-keymap"
+              ><i class="mdi mdi-code-brackets"></i>Raw Keymap</router-link
+            >
+          </li>
+          <li>
+            <router-link to="/configurator/firmware"
+              ><i class="mdi mdi-flash"></i>Firmware</router-link
+            >
+          </li>
+          <li>
+            <router-link to="/configurator/info"
+              ><i class="mdi mdi-information-outline"></i>Info</router-link
+            >
+          </li>
+        </div>
+      </transition>
     </ul>
     <div class="flex h-full w-full flex-col overflow-y-auto">
       <div class="z-10 flex items-center justify-between bg-base-100 py-4 shadow-xl">
@@ -110,6 +127,7 @@ import { saveConfigurationWithLoading } from '../helpers/saveConfigurationWrappe
 const router = useRouter()
 const route = useRoute()
 const showDebug = ref(false)
+const settingsOpen = ref(false)
 
 // nav guard
 console.log('path is', keyboardStore.path)
@@ -119,6 +137,10 @@ if (!keyboardStore.path && !keyboardStore.usingSerial) {
 
 const toggleDebug = () => {
   showDebug.value = !showDebug.value
+}
+
+const toggleSettings = () => {
+  settingsOpen.value = !settingsOpen.value
 }
 
 const reselectKeyboard = () => {
@@ -206,5 +228,28 @@ const info = () => {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Slide transition effects */
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.slide-down-enter-from {
+  max-height: 0;
+  opacity: 0;
+}
+
+.slide-down-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.slide-down-enter-to,
+.slide-down-leave-from {
+  max-height: 500px;
+  opacity: 1;
 }
 </style>

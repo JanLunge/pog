@@ -1,18 +1,18 @@
 <template>
-  <div class="min-h-screen bg-base-200 flex items-center justify-center">
-    <div class="max-w-2xl w-full p-8">
-      <div class="text-center mb-12">
+  <div class="flex min-h-screen items-center justify-center bg-base-200">
+    <div class="w-full max-w-2xl p-8">
+      <div class="mb-12 text-center">
         <button class="btn btn-primary" @click="router.back()">Back</button>
       </div>
 
       <!-- Recent Keyboards -->
       <div v-if="recentKeyboards.length > 0" class="mb-12">
-        <h2 class="text-2xl font-semibold mb-4">Recent Keyboards</h2>
+        <h2 class="mb-4 text-2xl font-semibold">Recent Keyboards</h2>
         <div class="grid gap-4">
           <div
             v-for="keyboard in recentKeyboards"
             :key="keyboard.id"
-            class="bg-base-100 p-4 rounded-lg flex items-center justify-between cursor-pointer hover:bg-base-300"
+            class="flex cursor-pointer items-center justify-between rounded-lg bg-base-100 p-4 hover:bg-base-300"
             @click="selectKeyboard(keyboard)"
           >
             <div>
@@ -25,20 +25,17 @@
       </div>
 
       <!-- Setup New Keyboard -->
-      <div class="bg-base-100 rounded-lg p-8">
-        <h2 class="text-2xl font-semibold mb-4">Set Up New Keyboard</h2>
+      <div class="rounded-lg bg-base-100 p-8">
+        <h2 class="mb-4 text-2xl font-semibold">Set Up New Keyboard</h2>
         <div class="space-y-4">
-          <button
+          <!-- <button
             class="btn btn-primary w-full"
             @click="setupNewKeyboard"
           >
             <i class="mdi mdi-plus-circle mr-2"></i>
             New Keyboard
-          </button>
-          <button
-            class="btn w-full"
-            @click="addExistingKeyboard"
-          >
+          </button> -->
+          <button class="btn w-full" @click="addExistingKeyboard">
             <i class="mdi mdi-file-import mr-2"></i>
             Add existing POG keyboard
           </button>
@@ -72,10 +69,10 @@ async function loadRecentKeyboards() {
   }
 }
 
-async function setupNewKeyboard() {
-  console.log('setupNewKeyboard')
-  router.push('/automatic-setup/circuit-python')
-}
+// async function setupNewKeyboard() {
+//   console.log('setupNewKeyboard')
+//   router.push('/automatic-setup/circuit-python')
+// }
 
 async function addExistingKeyboard() {
   const keyboard = await window.api.selectDrive()
@@ -102,4 +99,4 @@ onMounted(() => {
   console.log('KeyboardSelector onMounted')
   loadRecentKeyboards()
 })
-</script> 
+</script>
