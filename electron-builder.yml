@@ -10,6 +10,9 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/*
+  - node_modules/serialport/**
+  - node_modules/drivelist/**
+  - node_modules/@serialport/**
 afterSign: build/notarize.js
 win:
   executableName: pog
@@ -20,6 +23,12 @@ win:
     - target: nsis
       arch:
         - x64
+  extraResources:
+    - from: 'node_modules/serialport/build/Release'
+      to: 'node_modules/serialport/build/Release'
+    - from: 'node_modules/drivelist/build/Release'
+      to: 'node_modules/drivelist/build/Release'
+  forceCodeSigning: false
 nsis:
   artifactName: ${name}-${version}-${arch}-setup.${ext}
   shortcutName: ${productName}
@@ -32,8 +41,8 @@ mac:
     - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
-#  publish:
-#    - generic
+  #  publish:
+  #    - generic
   target:
     - target: dmg
       arch:
@@ -50,13 +59,16 @@ linux:
     - target: AppImage
       arch:
         - x64
-#    - snap
-#    - deb
+  #    - snap
+  #    - deb
   maintainer: Jan Lunge
   category: Utility
 appImage:
   artifactName: ${name}-${version}-${arch}.${ext}
 npmRebuild: false
+buildDependenciesFromSource: false
+nodeGypRebuild: false
+includePdb: false
 publish:
   provider: github
   repo: pog

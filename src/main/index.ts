@@ -2,7 +2,13 @@ import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
-import drivelist from 'drivelist'
+// Import drivelist with fallback
+let drivelist: any = null
+try {
+  drivelist = require('drivelist')
+} catch (error: any) {
+  console.warn('drivelist not available:', error?.message || 'Unknown error')
+}
 import { flashFirmware } from './kmkUpdater'
 // import './saveConfig'
 import { checkForUSBKeyboards, handleSelectDrive, selectKeyboard } from './selectKeyboard'
@@ -618,6 +624,11 @@ const openExternal = (url) => {
 // Drive and Firmware handlers
 ipcMain.handle('list-drives', async () => {
   try {
+    if (!drivelist) {
+      console.warn('drivelist not available, returning empty drives list')
+      return []
+    }
+
     const drives = await drivelist.list()
     const filteredDrives = drives
       .map((drive) => ({
@@ -634,7 +645,8 @@ ipcMain.handle('list-drives', async () => {
     return filteredDrives
   } catch (error) {
     console.error('Failed to list drives:', error)
-    throw error
+    // Return empty array instead of throwing error
+    return []
   }
 })
 
