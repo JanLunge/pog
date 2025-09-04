@@ -43,6 +43,7 @@ export interface IElectronAPI {
   serialConnect: (port: string) => Promise<void>
   serialDisconnect: () => Promise<void>
   serialData: (callback: (event: any, data: { message: string }) => void) => void
+  offSerialData: (callback: (event: any, data: { message: string }) => void) => void
   serialConnectionStatus: (
     callback: (event: any, data: { connected: boolean; error?: string }) => void
   ) => void
@@ -60,6 +61,12 @@ export interface IElectronAPI {
   onDetectionUpdate: (callback: (data: any, event: any) => void) => void
   removeDetectionListeners: () => void
   onUpdateFirmwareInstallProgress: (callback: (data: any, event: any) => void) => void
+  onSaveConfigurationProgress: (
+    callback: (event: any, data: { state: 'writing' | 'done' | 'error'; filename?: string; completed: number; total: number }) => void
+  ) => void
+  offSaveConfigurationProgress: (
+    callback: (event: any, data: { state: 'writing' | 'done' | 'error'; filename?: string; completed: number; total: number }) => void
+  ) => void
 
   // Legacy API (to be migrated)
   selectKeyboard: (data: any) => Promise<any>

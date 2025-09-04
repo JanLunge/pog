@@ -99,7 +99,11 @@
     </div>
   </div>
 
-  <LoadingOverlay :is-visible="isLoading && !showDebug" title="Saving" message="Please wait..." />
+  <LoadingOverlay
+    :is-visible="isLoading"
+    :using-serial="keyboardStore.usingSerial"
+    @done="hideLoadingOverlay"
+  />
 </template>
 
 <script lang="ts" setup>
@@ -129,7 +133,6 @@ const reselectKeyboard = () => {
   router.push('/')
 }
 
-let globalSerialDataHandler: ((event: any, data: { message: string }) => void) | null = null
 let fallbackTimeout: number | null = null
 
 const saveKeymap = async () => {
@@ -144,24 +147,12 @@ const saveKeymap = async () => {
       JSON.stringify({ pogConfig: keyboardData, serial: keyboardStore.usingSerial })
     )
 
-    if (!globalSerialDataHandler) {
-      globalSerialDataHandler = (_event: any, data: { message: string }) => {
-        const message = data.message.toLowerCase()
-        if (
-          message.includes('initialising pogkeyboard') ||
-          message.includes('use 6kro') ||
-          message.includes('mem_info used:') ||
-          message.includes('enable mouse')
-        ) {
-          hideLoadingOverlay()
-        }
-      }
-      window.api.serialData(globalSerialDataHandler)
+    // Only use parent fallback when not using serial; overlay has its own fallback when using serial
+    if (!keyboardStore.usingSerial) {
+      fallbackTimeout = setTimeout(() => {
+        if (isLoading.value) hideLoadingOverlay()
+      }, 15000) as unknown as number
     }
-
-    fallbackTimeout = setTimeout(() => {
-      if (isLoading.value) hideLoadingOverlay()
-    }, 15000) as unknown as number
   } catch (error) {
     console.error('Error saving keymap:', error)
     hideLoadingOverlay()
@@ -238,5 +229,17 @@ const info = () => {
   width: 200px;
   position: relative;
   height: 100vh;
+}
+/* Fallback spinner animation in case Tailwind's animate-spin is unavailable */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>
