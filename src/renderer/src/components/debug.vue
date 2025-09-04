@@ -84,8 +84,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { keyboardStore } from '@renderer/store'
+import { serialLogs } from '@renderer/store/serial'
 
 const output = ref('')
 const inputData = ref('')
@@ -133,20 +134,30 @@ const scrollTextarea = () => {
     }
   })
 }
-
+const unwatch = ref<() => void>()
 onMounted(async () => {
   await refreshPorts()
-  window.api.serialData((event, data) => {
-    console.log(event, data)
-    output.value += data.message
-    scrollTextarea()
-  })
+  // serial handler now centralized in App.vue via store/serial
+  // Listen for updates by watching the store instead of attaching listeners here
+  // Keep textarea in sync
+  unwatch.value = watch(
+    () => serialLogs.value,
+    (logs) => {
+      output.value = logs.slice().reverse().join('\n') + '\n'
+      scrollTextarea()
+    },
+    { immediate: true, deep: true }
+  )
   window.api.serialConnectionStatus((_event: Event, status: any) => {
     console.log('Connection status:', status)
     isConnected.value = status.connected
     isConnecting.value = false
     statusMessage.value = status.connected ? 'Connected' : status.error || 'Disconnected'
   })
+})
+
+onUnmounted(() => {
+  unwatch.value?.()
 })
 
 const refreshPorts = async () => {

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { addToHistory, keyboardStore, notifications, serialKeyboards } from './store'
+import { addSerialLine } from './store/serial'
 import { useRouter } from 'vue-router'
 const router = useRouter()
 const store = computed(() => {
@@ -29,7 +30,17 @@ window.api.serialKeyboardPogConfig((_event: Event, value: { pogconfig }) => {
   if (keyboardStore.pogConfigured) {
     addToHistory(keyboardStore)
   }
-  router.push('/configurator')
+  router.push('/configurator/keymap')
+})
+
+let serialHandler: ((event: any, data: { message: string }) => void) | null = null
+onMounted(() => {
+  serialHandler = (_event, data) => addSerialLine(data.message)
+  window.api.serialData(serialHandler)
+})
+onUnmounted(() => {
+  if (serialHandler) window.api.offSerialData(serialHandler)
+  serialHandler = null
 })
 </script>
 

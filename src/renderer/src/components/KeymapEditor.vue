@@ -143,10 +143,13 @@ const currentKeyCode = computed({
   },
   set(newVal) {
     if (newVal === '▽') return
-    if (selectedKeys.value.size === 0) return
+    let setNewVal = newVal
+    if (!newVal || selectedKeys.value.size === 0) {
+      setNewVal = 'KC.TRNS'
+    }
     const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
     keys.forEach((key) => {
-      key.setOnKeymap(newVal)
+      key.setOnKeymap(setNewVal)
     })
   }
 })
@@ -155,9 +158,9 @@ const switchedKeyCodeType = () => {
   const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
   keys.forEach((key) => {
     if (keycodeModeForSelection.value === 'macro') {
-      key.setOnKeymap('KC.MACRO((KC.A, KC.B))')
+      key.setOnKeymap('KC.MACRO(Press(KC.LCTL),Tap(KC.A),Release(KC.LCTL))')
     } else if (keycodeModeForSelection.value === 'string') {
-      key.setOnKeymap('send_string("")')
+      key.setOnKeymap('KC.MACRO("Sample string")')
     } else if (keycodeModeForSelection.value === 'tapdance') {
       key.setOnKeymap('KC.TD(KC.A,KC.B)')
     } else if (keycodeModeForSelection.value === 'custom') {

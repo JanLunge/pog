@@ -21,7 +21,7 @@ const selectDrive = async () => {
   keyboardStore.import(keyboard)
   console.log(keyboardStore)
   if (keyboardStore.pogConfigured) {
-    router.push('/configurator')
+    router.push('/configurator/keymap')
   } else {
     router.push('/setup-wizard')
   }

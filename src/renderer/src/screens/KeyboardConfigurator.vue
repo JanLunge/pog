@@ -28,12 +28,15 @@
           ><i class="mdi mdi-keyboard-variant"></i>Keyboard Layout</router-link
         >
       </li>
-      <hr class="border-white border-opacity-20" />
       <li>
         <router-link to="/configurator/encoder"
           ><i class="mdi mdi-axis-z-rotate-clockwise"></i>Encoder</router-link
         >
       </li>
+      <li>
+        <router-link to="/configurator/rgb"><i class="mdi mdi-led-on"></i>RGB</router-link>
+      </li>
+      <hr class="border-white border-opacity-20" />
       <li>
         <router-link to="/configurator/info"
           ><i class="mdi mdi-information-outline"></i>Info</router-link
@@ -59,9 +62,6 @@
       </li>
       <li>
         <router-link to="/configurator/firmware"><i class="mdi mdi-flash"></i>Firmware</router-link>
-      </li>
-      <li>
-        <router-link to="/configurator/rgb"><i class="mdi mdi-led-on"></i>RGB</router-link>
       </li>
     </ul>
     <div class="flex h-full w-full flex-col overflow-y-auto">
@@ -89,26 +89,34 @@
         <div class="flex-grow overflow-y-auto px-4 pt-4">
           <router-view></router-view>
         </div>
-        <div 
-          v-show="showDebug" 
-          class="flex-shrink-0 w-[600px] border-l border-base-300 bg-base-100 overflow-y-auto p-4"
+        <div
+          v-show="showDebug"
+          class="w-[600px] flex-shrink-0 overflow-y-auto border-l border-base-300 bg-base-100 p-4"
         >
           <Debug />
         </div>
       </div>
     </div>
   </div>
+
+  <LoadingOverlay
+    :is-visible="isLoading"
+    :using-serial="keyboardStore.usingSerial"
+    @done="hideLoadingOverlay"
+  />
 </template>
 
 <script lang="ts" setup>
 import { addToHistory, keyboardStore } from '../store'
 import { useRoute, useRouter } from 'vue-router'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import Debug from '../components/debug.vue'
+import LoadingOverlay from '../components/LoadingOverlay.vue'
 
 const router = useRouter()
 const route = useRoute()
 const showDebug = ref(false)
+const isLoading = ref(false)
 
 // nav guard
 console.log('path is', keyboardStore.path)
@@ -125,15 +133,38 @@ const reselectKeyboard = () => {
   router.push('/')
 }
 
+let fallbackTimeout: number | null = null
+
 const saveKeymap = async () => {
-  // save to keyboard history
-  keyboardStore.coordMapSetup = false
-  const keyboardData = keyboardStore.serialize()
-  addToHistory(keyboardStore)
-  console.log(keyboardStore.coordMapSetup)
-  await window.api.saveConfiguration(
-    JSON.stringify({ pogConfig: keyboardData, serial: keyboardStore.usingSerial })
-  )
+  if (isLoading.value) return
+  try {
+    isLoading.value = true
+    keyboardStore.coordMapSetup = false
+    const keyboardData = keyboardStore.serialize()
+    addToHistory(keyboardStore)
+    console.log(keyboardStore.coordMapSetup)
+    await window.api.saveConfiguration(
+      JSON.stringify({ pogConfig: keyboardData, serial: keyboardStore.usingSerial })
+    )
+
+    // Only use parent fallback when not using serial; overlay has its own fallback when using serial
+    if (!keyboardStore.usingSerial) {
+      fallbackTimeout = setTimeout(() => {
+        if (isLoading.value) hideLoadingOverlay()
+      }, 15000) as unknown as number
+    }
+  } catch (error) {
+    console.error('Error saving keymap:', error)
+    hideLoadingOverlay()
+  }
+}
+
+const hideLoadingOverlay = () => {
+  if (fallbackTimeout) {
+    clearTimeout(fallbackTimeout)
+    fallbackTimeout = null
+  }
+  isLoading.value = false
 }
 
 const currentRouteName = computed(() => route.matched[1]?.name)
@@ -155,6 +186,14 @@ onMounted(() => {
   title?.addEventListener('focus', () => {
     title.innerText = ''
   })
+})
+
+onUnmounted(() => {
+  if (fallbackTimeout) {
+    clearTimeout(fallbackTimeout)
+    fallbackTimeout = null
+  }
+  isLoading.value = false
 })
 
 const info = () => {
@@ -190,5 +229,17 @@ const info = () => {
   width: 200px;
   position: relative;
   height: 100vh;
+}
+/* Fallback spinner animation in case Tailwind's animate-spin is unavailable */
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

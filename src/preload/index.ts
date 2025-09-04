@@ -9,6 +9,10 @@ const api = {
   selectKeyboard: (data) => ipcRenderer.invoke('selectKeyboard', data),
   onUpdateFirmwareInstallProgress: (callback) =>
     ipcRenderer.on('onUpdateFirmwareInstallProgress', callback),
+  onSaveConfigurationProgress: (callback) =>
+    ipcRenderer.on('save-configuration-progress', callback),
+  offSaveConfigurationProgress: (callback) =>
+    ipcRenderer.removeListener('save-configuration-progress', callback),
   keyboardScan: (callback) => {
     ipcRenderer.on('keyboardScan', callback)
   },
@@ -19,6 +23,7 @@ const api = {
   checkForUSBKeyboards: (data) => ipcRenderer.invoke('checkForUSBKeyboards', data),
   deselectKeyboard: () => ipcRenderer.invoke('deselectKeyboard'),
   serialData: (callback) => ipcRenderer.on('serialData', callback),
+  offSerialData: (callback) => ipcRenderer.removeListener('serialData', callback),
   serialConnectionStatus: (callback) => ipcRenderer.on('serialConnectionStatus', callback),
   serialPorts: () => ipcRenderer.invoke('serial-ports'),
   serialSend: (data) => ipcRenderer.send('serialSend', data),
