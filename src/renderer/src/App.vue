@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted } from 'vue'
 import { addToHistory, keyboardStore, notifications, serialKeyboards } from './store'
 import { addSerialLine } from './store/serial'
 import { useRouter } from 'vue-router'
+import LoadingOverlay from './components/LoadingOverlay.vue'
 const router = useRouter()
 const store = computed(() => {
   return keyboardStore
@@ -69,6 +70,7 @@ onUnmounted(() => {
     </div>
   </div>
   <router-view></router-view>
+  <LoadingOverlay />
 </template>
 <style lang="scss">
 html,

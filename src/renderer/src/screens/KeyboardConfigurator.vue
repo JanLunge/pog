@@ -98,25 +98,18 @@
       </div>
     </div>
   </div>
-
-  <LoadingOverlay
-    :is-visible="isLoading"
-    :using-serial="keyboardStore.usingSerial"
-    @done="hideLoadingOverlay"
-  />
 </template>
 
 <script lang="ts" setup>
 import { addToHistory, keyboardStore } from '../store'
 import { useRoute, useRouter } from 'vue-router'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import Debug from '../components/debug.vue'
-import LoadingOverlay from '../components/LoadingOverlay.vue'
+import { saveConfigurationWithLoading } from '../helpers/saveConfigurationWrapper'
 
 const router = useRouter()
 const route = useRoute()
 const showDebug = ref(false)
-const isLoading = ref(false)
 
 // nav guard
 console.log('path is', keyboardStore.path)
@@ -133,38 +126,18 @@ const reselectKeyboard = () => {
   router.push('/')
 }
 
-let fallbackTimeout: number | null = null
-
 const saveKeymap = async () => {
-  if (isLoading.value) return
   try {
-    isLoading.value = true
     keyboardStore.coordMapSetup = false
     const keyboardData = keyboardStore.serialize()
     addToHistory(keyboardStore)
     console.log(keyboardStore.coordMapSetup)
-    await window.api.saveConfiguration(
+    await saveConfigurationWithLoading(
       JSON.stringify({ pogConfig: keyboardData, serial: keyboardStore.usingSerial })
     )
-
-    // Only use parent fallback when not using serial; overlay has its own fallback when using serial
-    if (!keyboardStore.usingSerial) {
-      fallbackTimeout = setTimeout(() => {
-        if (isLoading.value) hideLoadingOverlay()
-      }, 15000) as unknown as number
-    }
   } catch (error) {
     console.error('Error saving keymap:', error)
-    hideLoadingOverlay()
   }
-}
-
-const hideLoadingOverlay = () => {
-  if (fallbackTimeout) {
-    clearTimeout(fallbackTimeout)
-    fallbackTimeout = null
-  }
-  isLoading.value = false
 }
 
 const currentRouteName = computed(() => route.matched[1]?.name)
@@ -186,14 +159,6 @@ onMounted(() => {
   title?.addEventListener('focus', () => {
     title.innerText = ''
   })
-})
-
-onUnmounted(() => {
-  if (fallbackTimeout) {
-    clearTimeout(fallbackTimeout)
-    fallbackTimeout = null
-  }
-  isLoading.value = false
 })
 
 const info = () => {
