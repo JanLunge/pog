@@ -19,7 +19,7 @@
     <ColemakDH v-if="layout === 'colemak-dh'" @key="setKey" />
     <Dvorak v-if="layout === 'dvorak'" @key="setKey" />
   </div>
-  <div class="secondary mb-4">
+  <div v-show="showSecondary" class="secondary mb-4">
     <div class="tabs tabs-boxed mt-4">
       <a class="tab" :class="{ 'tab-active': category === 'basic' }" @click="category = 'basic'"
         >Basic</a
@@ -170,7 +170,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { keyboardStore } from '../store'
 import Qwerty from './picker-layouts/Qwerty.vue'
 import Colemak from './picker-layouts/Colemak.vue'
@@ -180,6 +180,12 @@ import Dvorak from './picker-layouts/Dvorak.vue'
 const layout = ref('qwerty')
 const category = ref('basic')
 const emit = defineEmits(['setKey'])
+
+const props = defineProps<{
+  showSecondary?: boolean
+}>()
+
+const showSecondary = computed(() => props.showSecondary !== false)
 
 // set the currently selected key to keycode
 const setKey = (key: string | number) => {

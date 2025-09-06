@@ -25,7 +25,12 @@
     </div>
     <div class="mt-4 flex items-center">
       <div class="flex gap-2">
-        <KeymapLayer v-for="(layer, index) in keyboardStore.keymap" :layer="layer" :index="index" />
+        <KeymapLayer
+          v-for="(layer, index) in keyboardStore.keymap"
+          :key="index"
+          :layer="layer"
+          :index="index"
+        />
       </div>
     </div>
   </div>
@@ -45,17 +50,14 @@
     </p>
     <div class="flex gap-2">
       <select
+        v-if="selectedKeys.size > 0"
         v-model="keycodeModeForSelection"
         class="select select-bordered select-sm"
         @change="switchedKeyCodeType"
       >
-        <!-- simple will just inline the keycode -->
-        <option value="simple">Simple</option>
-        <!-- other options will create a separately linked keycode -->
-        <option value="string">String</option>
-        <option value="macro">Macro</option>
-        <option value="tapdance">Tap Dance</option>
-        <option value="custom">Custom</option>
+        <option v-for="option in keycodeModeOptions" :key="option.value" :value="option.value">
+          {{ option.label }}
+        </option>
       </select>
       <div class="flex-grow">
         <input
@@ -65,6 +67,21 @@
           class="input input-bordered input-sm w-full"
         />
       </div>
+      <button
+        v-if="selectedKeys.size > 0 && keycodeModeForSelection === 'macro'"
+        class="btn btn-primary btn-sm"
+        @click="openMacroModal"
+      >
+        Custom Macro
+      </button>
+      <a
+        v-if="selectedKeys.size > 0 && keycodeModeForSelection === 'macro'"
+        class="btn btn-sm"
+        href="https://github.com/KMKfw/kmk_firmware/blob/main/docs/en/macros.md"
+        target="_blank"
+      >
+        Guide
+      </a>
     </div>
     <div v-if="keycodeModeForSelection === 'custom'" class="p-2 text-sm italic">
       <p>
@@ -73,22 +90,49 @@
       </p>
     </div>
   </div>
-  <KeyPicker @setKey="setKey"></KeyPicker>
+  <KeyPicker @set-key="setKey"></KeyPicker>
+
+  <!-- Macro Modal -->
+  <MacroModal
+    :is-open="macroModal.isOpen"
+    :initial-macro-code="macroModal.initialCode"
+    @close="closeMacroModal"
+    @apply="applyMacroCode"
+  />
 </template>
 
 <script lang="ts" setup>
 import { keyboardStore, selectedKeys, selectedLayer, userSettings } from '../store'
 import KeyboardLayout from './KeyboardLayout.vue'
 import KeyPicker from './KeyPicker.vue'
+import MacroModal from './MacroModal.vue'
 import { cleanupKeymap, selectNextKey } from '../helpers'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import KeymapLayer from './KeymapLayer.vue'
 
 selectedKeys.value.clear()
 
-const keycodeModeForSelection = ref<
-  'simple' | 'combo' | 'macro' | 'custom' | 'tapdance' | 'string'
->('simple')
+type KeycodeMode = 'simple' | 'combo' | 'macro' | 'custom' | 'tapdance' | 'string'
+
+const keycodeModeForSelection = ref<KeycodeMode>('simple')
+
+const keycodeModeOptions: { value: KeycodeMode; label: string }[] = [
+  { value: 'simple', label: 'Simple' },
+  { value: 'string', label: 'String' },
+  { value: 'macro', label: 'Macro' },
+  { value: 'tapdance', label: 'Tap Dance' },
+  { value: 'custom', label: 'Custom' }
+]
+
+const detectKeycodeType = (keycode: string): KeycodeMode => {
+  if (!keycode || keycode === 'No key selected' || keycode === '▽') return 'simple'
+  if (keycode.includes('KC.MACRO("') || keycode.includes("KC.MACRO('")) return 'string'
+  if (keycode.includes('KC.MACRO(')) return 'macro'
+  if (keycode.includes('KC.TD(')) return 'tapdance'
+  if (keycode.includes('customkeys.')) return 'custom'
+  if (keycode.includes('KC.COMBO(')) return 'combo'
+  return 'simple'
+}
 const setKey = (keyCode: string) => {
   selectedKeys.value.forEach((index) => {
     keyboardStore.keys[index].setOnKeymap(keyCode)
@@ -173,6 +217,24 @@ const toggleSettings = () => {
   settingsOpen.value = !settingsOpen.value
 }
 
+const macroModal = ref({
+  isOpen: false,
+  initialCode: ''
+})
+
+const openMacroModal = () => {
+  macroModal.value = { isOpen: true, initialCode: currentKeyCode.value }
+}
+
+const closeMacroModal = () => {
+  macroModal.value.isOpen = false
+}
+
+const applyMacroCode = (macroCode: string) => {
+  currentKeyCode.value = macroCode
+  closeMacroModal()
+}
+
 const coordMapWarning = computed(() => {
   // show if any of the selected keys does not have and idx
   const keys = keyboardStore.keys.filter((_k, index) => selectedKeys.value.has(index))
@@ -183,4 +245,15 @@ const coordMapWarning = computed(() => {
   }
   return ''
 })
+
+watch(
+  () => currentKeyCode.value,
+  (newKeyCode) => {
+    if (newKeyCode && newKeyCode !== 'No key selected') {
+      const detectedType = detectKeycodeType(newKeyCode)
+      keycodeModeForSelection.value = detectedType
+    }
+  },
+  { immediate: true }
+)
 </script>
