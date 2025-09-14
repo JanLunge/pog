@@ -8,8 +8,8 @@
     leave-to-class="opacity-0 -translate-y-2"
   >
     <div
-      v-if="props.isVisible"
-      class="fixed left-2 top-2 z-50 w-[350px] rounded-2xl border border-white/20 bg-base-100/10 p-4 text-xs shadow-2xl backdrop-blur-md"
+      v-if="getLoadingState()"
+      class="fixed left-2 top-2 z-50 w-[350px] rounded-2xl border border-white/20 bg-base-100/40 p-4 text-xs shadow-2xl backdrop-blur-md"
     >
       <div class="mb-2 flex items-center gap-3">
         <div class="relative h-6 w-6">
@@ -58,15 +58,9 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, watch, ref, computed } from 'vue'
 import { serialLogs } from '@renderer/store/serial'
+import { getLoadingState, hideLoading } from '../helpers/saveConfigurationWrapper'
 
-interface Props {
-  isVisible: boolean
-  usingSerial?: boolean
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  usingSerial: false
-})
+// No props needed - uses global loading state
 
 const emit = defineEmits<{
   (e: 'done'): void
@@ -171,7 +165,9 @@ const attachListeners = () => {
         transitionToWithMin('saved', () => transitionToWithMin('reloading'))
       }
     }
-    window.api.onSaveConfigurationProgress(saveProgressHandler)
+    if (window.api.onSaveConfigurationProgress) {
+      window.api.onSaveConfigurationProgress(saveProgressHandler)
+    }
   }
   if (!unwatchSerial) {
     unwatchSerial = watch(
@@ -190,7 +186,7 @@ const attachListeners = () => {
 
 const detachListeners = () => {
   // Remove listeners explicitly to avoid duplicates across multiple saves
-  if (saveProgressHandler) {
+  if (saveProgressHandler && window.api.offSaveConfigurationProgress) {
     window.api.offSaveConfigurationProgress(saveProgressHandler)
   }
   if (unwatchSerial) {
@@ -207,6 +203,7 @@ const scheduleDone = () => {
   if (minHideTimeout) clearTimeout(minHideTimeout)
   minHideTimeout = setTimeout(() => {
     emit('done')
+    hideLoading()
     // reset local state for next run
     progress.value = { state: '', completed: 0, total: 0 }
     statusPhase.value = ''
@@ -228,7 +225,7 @@ const scheduleDone = () => {
 }
 
 watch(
-  () => props.isVisible,
+  () => getLoadingState(),
   (visible) => {
     if (visible) {
       enterPhase('saving')
@@ -260,11 +257,12 @@ watch(
       statusPhase.value = ''
       phaseEnterAt = null
     }
-  }
+  },
+  { immediate: true }
 )
 
 onMounted(() => {
-  if (props.isVisible) {
+  if (getLoadingState()) {
     statusPhase.value = 'saving'
     attachListeners()
   }

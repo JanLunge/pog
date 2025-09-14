@@ -51,7 +51,12 @@
       </ul>
     </div>
     <div id="step-scroller" class="flex-grow-1 h-full overflow-y-auto px-8">
-      <KmkInstaller v-if="currentStep === 0" :initial-setup="true" @next="currentStep++" />
+      <KmkInstaller
+        v-if="currentStep === 0"
+        :initial-setup="true"
+        @next="currentStep++"
+        @done="toConfigurator"
+      />
       <keyboard-name v-if="currentStep === 1" :initial-setup="true" @next="currentStep++" />
       <MatrixSetup v-if="currentStep === 2" :initial-setup="true" @next="currentStep++" />
       <PinSetup v-if="currentStep === 3" :initial-setup="true" @next="currentStep++" />
@@ -79,6 +84,7 @@ const router = useRouter()
 const currentStep = ref(0)
 const toConfigurator = () => {
   router.push('/configurator/keymap')
+  window.api.serialSend('ctrld')
 }
 
 watch(currentStep, () => {
