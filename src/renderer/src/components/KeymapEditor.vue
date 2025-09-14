@@ -90,7 +90,7 @@
       </p>
     </div>
   </div>
-  <KeyPicker @set-key="setKey"></KeyPicker>
+  <KeyPicker :show-secondary="true" @set-key="setKey"></KeyPicker>
 
   <!-- Macro Modal -->
   <MacroModal
