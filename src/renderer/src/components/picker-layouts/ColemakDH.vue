@@ -111,7 +111,7 @@
       <div class="key" @click="emit('key', 'KC.D')">D</div>
       <div class="key" @click="emit('key', 'KC.V')">V</div>
       <div class="key" @click="emit('key', 'KC.K')">K</div>
-      <div class="key" @click="emit('key', 'KC.M')">M</div>
+      <div class="key" @click="emit('key', 'KC.H')">H</div>
       <div class="key" @click="emit('key', 'KC.COMM')"><span>&lt;</span><span>,</span></div>
       <div class="key" @click="emit('key', 'KC.DOT')"><span>&gt;</span><span>,</span></div>
       <div class="key" @click="emit('key', 'KC.SLSH')"><span>?</span><span>/</span></div>
