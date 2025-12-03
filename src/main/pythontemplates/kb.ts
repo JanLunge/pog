@@ -9,6 +9,7 @@ from kmk.scanners.keypad import KeysScanner
 
 class POGKeyboard(KMKKeyboard):
     def __init__(self, features=['basic']):
+        super().__init__()
         if "basic" in features:
             from kmk.modules.layers import Layers;
             combo_layers = {
@@ -18,7 +19,7 @@ class POGKeyboard(KMKKeyboard):
             self.modules.append(Layers(combo_layers))
             from kmk.extensions.media_keys import MediaKeys; self.extensions.append(MediaKeys())
         if "international" in features:
-            from kmk.extensions.international import International 
+            from kmk.extensions.international import International
             self.extensions.append(International())
         if "serial" in features:
             from pog_serial import pogSerial; self.modules.append(pogSerial())
@@ -29,7 +30,7 @@ class POGKeyboard(KMKKeyboard):
             # optional: set a custom release timeout in ms (default: 1000ms)
             # sticky_keys = StickyKeys(release_after=5000)
             self.modules.append(sticky_keys)
-            
+
 
         if "tapdance" in features:
             from kmk.modules.tapdance import TapDance
@@ -151,7 +152,7 @@ class POGKeyboard(KMKKeyboard):
 
     # coord_mapping
     if len(pog.config["coordMap"]) != 0:
-        exec("coord_mapping = [ " + pog.coordMapping + " ]")
+        coord_mapping = [int(val) for val in pog.coordMapping.split(",")[:-1]]
 
 
 `
