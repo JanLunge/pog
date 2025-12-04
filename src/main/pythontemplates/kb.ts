@@ -137,22 +137,22 @@ class POGKeyboard(KMKKeyboard):
         # Must be set during init to override defaulting to matrix wiring
         if pog.directWiring:
             self.matrix = KeysScanner(
-                pins=eval(pog.pins),
+                pins=pog.pins_tuple,
                 value_when_pressed=False,
                 pull=True,
                 interval=0.02,
                 max_events=64
             )
 
-    # matrix wiring
-    if pog.matrixWiring:
-        exec("col_pins = (" + pog.colPins + ")")
-        exec("row_pins = (" + pog.rowPins + ")")
-        exec("diode_orientation = DiodeOrientation." + pog.config["diodeDirection"])
+        # matrix wiring
+        if pog.matrixWiring:
+            self.col_pins = pog.col_pins_tuple
+            self.row_pins = pog.row_pins_tuple
+            self.diode_orientation = DiodeOrientation.ROW2COL if pog.config["diodeDirection"] == "ROW2COL" else DiodeOrientation.COL2ROW
 
-    # coord_mapping
-    if len(pog.config["coordMap"]) != 0:
-        coord_mapping = [int(val) for val in pog.coordMapping.split(",")[:-1]]
+        # coord_mapping
+        if len(pog.config["coordMap"]) != 0:
+            self.coord_mapping = [int(val) for val in pog.coordMapping.split(",")[:-1]]
 
 
 `

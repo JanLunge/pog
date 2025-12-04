@@ -11,7 +11,7 @@ import { bootpy } from './pythontemplates/boot'
 
 // downloads kmk to app storage
 export const updateFirmware = async () => {
-  const versionSha = 'dbc26504ac9111e6f0b5ba99d1dbf35275319e27'
+  const versionSha = '5a6669d1da219444e027fb20f57d4f5b3ecdedfe'
   console.log('updating kmk firmware', appDir, versionSha)
   const file_url = `https://github.com/KMKfw/kmk_firmware/archive/${versionSha}.zip`
   const targetPath = appDir + 'kmk.zip'

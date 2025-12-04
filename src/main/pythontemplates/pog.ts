@@ -55,6 +55,8 @@ colPinsArray = [pin for pin in colPinsArray if pin is not None]
 colPins = ",".join(colPinsArray)
 if len(colPinsArray) == 1:
     colPins = colPins + ","
+# Create actual tuple of pin objects for direct use
+col_pins_tuple = tuple(eval(pin) for pin in colPinsArray)
 
 rowPinsArray = []
 for i, item in enumerate(config["rowPins"]):
@@ -64,6 +66,8 @@ rowPinsArray = [pin for pin in rowPinsArray if pin is not None]
 rowPins = ",".join(rowPinsArray)
 if len(rowPinsArray) == 1:
     rowPins = rowPins + ","
+# Create actual tuple of pin objects for direct use
+row_pins_tuple = tuple(eval(pin) for pin in rowPinsArray)
 
 pinsArray = []
 for i, item in enumerate(config["directPins"]):
@@ -73,6 +77,8 @@ pinsArray = [pin for pin in pinsArray if pin is not None]
 pins = ",".join(pinsArray)
 if len(pinsArray) == 1:
     pins = pins + ","
+# Create actual tuple of pin objects for direct use
+pins_tuple = tuple(eval(pin) for pin in pinsArray)
 
 kbFeatures = config.get('kbFeatures')
 
@@ -89,9 +95,11 @@ directWiring = False
 if config['wiringMethod'] == 'matrix':
     matrixWiring = True
     keyCount = len(rowPinsArray) * len(colPinsArray)
+    print(f"Matrix wiring: rows={rowPins} cols={colPins}")
 else:
     directWiring = True
     keyCount = len(pinsArray)
+    print(f"Direct wiring: pins={pins}")
 
 
 # encoders
