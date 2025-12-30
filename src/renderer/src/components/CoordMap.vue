@@ -34,12 +34,12 @@
         If this did not help check the diode direction or pins.
       </p>
       <p class="py-4">
-        the coordmap should be printed as a list of 3 digit numbers seperated by spaces.<br />
+        The coordmap should be printed as a list of 3 digit numbers seperated by spaces.<br />
         eg 001 005 008 002 ... <br />
-        it will print this via a hotkey on the number row so make sure to switch to something like
-        qwerty if you are using azerty or another layout that maps other keys to the number row. for
+        Tt will print this via a hotkey on the number row so make sure to switch to something like
+        QWERTY if you are using AZERTY or another layout that maps other keys to the number row. For
         split keyboards try the coordmap with the type set to normal as depending on the split side
-        detection the secondary half might not output to usb.
+        detection the secondary half might not output to USB.
       </p>
       <textarea
         id="keycapture"
@@ -48,10 +48,10 @@
       ></textarea>
     </div>
     <div class="flex gap-2 py-4">
-      <button class="btn btn-primary" @click="addRow">new Row</button>
-      <button class="btn btn-primary" @click="addSpc">add Space</button>
-      <button class="btn btn-primary" @click="rmLast">remove last</button>
-      <button class="btn btn-primary" @click="clear">clear</button>
+      <button class="btn btn-primary" @click="addRow">New Row</button>
+      <button class="btn btn-primary" @click="addSpc">Add Space</button>
+      <button class="btn btn-primary" @click="rmLast">Remove last</button>
+      <button class="btn btn-primary" @click="clear">Clear</button>
     </div>
 
     <div>
@@ -67,16 +67,16 @@
     </div>
     <div class="flex gap-2">
       <button class="btn btn-primary mt-2" @click="done">
-        {{ initialSetup ? 'next' : 'save Coord Maping & create keyboard layout' }}
+        {{ initialSetup ? 'Next' : 'Save CoordMap & Create keyboard layout' }}
       </button>
       <button v-if="!initialSetup" class="btn btn-primary mt-2" @click="onlySave">
-        only save Coord Maping
+        Only save Coord Maping
       </button>
     </div>
     <p class="my-4">
-      note if your key indexes changed you need to rebuild your layout or adjust the indexes on the
+      Note if your key indexes changed you need to rebuild your layout or adjust the indexes on the
       on the layout editor, only saving the coord map is only advisable if you wanted to modify
-      spacings but not the order of the keys
+      spacings but not the order of the keys.
     </p>
   </div>
 </template>
