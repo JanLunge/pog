@@ -36,7 +36,7 @@
       <p class="py-4">
         The coordmap should be printed as a list of 3 digit numbers seperated by spaces.<br />
         eg 001 005 008 002 ... <br />
-        Tt will print this via a hotkey on the number row so make sure to switch to something like
+        It will print this via a hotkey on the number row so make sure to switch to something like
         QWERTY if you are using AZERTY or another layout that maps other keys to the number row. For
         split keyboards try the coordmap with the type set to normal as depending on the split side
         detection the secondary half might not output to USB.
