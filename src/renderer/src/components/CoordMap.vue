@@ -3,7 +3,7 @@
     <div class="modal-box">
       <h3 class="text-lg font-bold">Attention</h3>
       <p class="py-4">
-        Flashing the pog utilities on to the keyboard will delete the code.py and similar files from
+        Flashing the POG utilities onto the keyboard will erase <tt>code.py</tt> and other related files from
         the keyboard.
       </p>
       <p class="py-4">Be sure to backup your code if you still need any of it.</p>
@@ -13,33 +13,31 @@
       </div>
     </div>
     <form method="dialog" class="modal-backdrop">
-      <button>close</button>
+      <button>Close</button>
     </form>
   </dialog>
-  <div>
+<div>
     <p class="py-4">1. Install the debug code on the keyboard</p>
     <button class="btn btn-primary btn-sm" @click="promptFlashing">
       Flash CoordMap Finder to keyboard
     </button>
     <div>
       <p class="py-4">2. Click the text area and follow the guide below</p>
-
       <p class="mb-4">
-        3. Now press each key starting in the top left corner in the first row and moving to the
-        right when you reached the end press the last key once again to start with the next row
-      </p>
-
-      <p class="py-4">
-        If nothing is happening first replug the board in case it hasnt started and wait 5 seconds.
-        If this did not help check the diode direction or pins.
+        3. Press each key starting from the top left corner of the first row, moving right across the row. 
+        When you reach the end, press the last key once more to begin the next row.
       </p>
       <p class="py-4">
-        The coordmap should be printed as a list of 3 digit numbers seperated by spaces.<br />
-        eg 001 005 008 002 ... <br />
-        It will print this via a hotkey on the number row so make sure to switch to something like
-        QWERTY if you are using AZERTY or another layout that maps other keys to the number row. For
-        split keyboards try the coordmap with the type set to normal as depending on the split side
-        detection the secondary half might not output to USB.
+        If nothing happens, first replug the board in case it hasn't started, then wait 5 seconds.
+        If this doesn't help, check the diode direction or pins.
+      </p>
+      <p class="py-4">
+        The CoordMap will be printed as a list of 3-digit numbers separated by space.<br />
+        e.g., 001 005 008 002 ... <br />
+        It outputs via a hotkey on the number row, so make sure to switch to QWERTY if you're using 
+        AZERTY or another layout that maps different keys to the number row. For split keyboards, 
+        try setting the CoordMap type to "normal," as the secondary half might not output to USB 
+        depending on the split side detection.
       </p>
       <textarea
         id="keycapture"
@@ -50,10 +48,9 @@
     <div class="flex gap-2 py-4">
       <button class="btn btn-primary" @click="addRow">New Row</button>
       <button class="btn btn-primary" @click="addSpc">Add Space</button>
-      <button class="btn btn-primary" @click="rmLast">Remove last</button>
+      <button class="btn btn-primary" @click="rmLast">Remove Last</button>
       <button class="btn btn-primary" @click="clear">Clear</button>
     </div>
-
     <div>
       <KeyboardLayout
         :key-layout="keyboardlayout"
@@ -67,16 +64,16 @@
     </div>
     <div class="flex gap-2">
       <button class="btn btn-primary mt-2" @click="done">
-        {{ initialSetup ? 'Next' : 'Save CoordMap & Create keyboard layout' }}
+        {{ initialSetup ? 'Next' : 'Save CoordMap & Create Keyboard Layout' }}
       </button>
       <button v-if="!initialSetup" class="btn btn-primary mt-2" @click="onlySave">
-        Only save Coord Maping
+        Only Save CoordMap
       </button>
     </div>
     <p class="my-4">
-      Note if your key indexes changed you need to rebuild your layout or adjust the indexes on the
-      on the layout editor, only saving the coord map is only advisable if you wanted to modify
-      spacings but not the order of the keys.
+      <strong>Note:</strong> If your key indexes have changed, you need to rebuild your layout or 
+      adjust the indexes in the layout editor. Only saving the CoordMap is advisable if you want 
+      to modify spacing without changing the key order.
     </p>
   </div>
 </template>
