@@ -25,6 +25,10 @@ else:
     if pog.hasEncoders:
         keyboard.encoder_handler.map = keymap.encoderKeymap
 
+    # Combos if available
+    if "combos" in pog.kbFeatures and keymap.combos_list:
+        keyboard.combos.combos = keymap.combos_list
+
     # Execute the keyboard loop
     if __name__ == '__main__':
         keyboard.go()

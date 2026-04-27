@@ -48,6 +48,13 @@ class POGKeyboard(KMKKeyboard):
             self.combos = Combos()
             self.modules.append(self.combos)
 
+        if "autoshift" in features:
+            from kmk.modules.autoshift import Autoshift
+            # tap_time: how long to hold before auto-shifting (default 300ms)
+            autoshift_tap_time = pog.config.get('autoshiftTapTime', 300)
+            self.autoshift = Autoshift(tap_time=autoshift_tap_time)
+            self.modules.append(self.autoshift)
+
         # if "macros" in features:
         from kmk.modules.macros import Macros
         self.macros = Macros()
