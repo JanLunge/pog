@@ -67,7 +67,15 @@ jobs:
           compression-level: 0
 
   build-mac:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x64
+            runner: macos-15-intel
+          - arch: arm64
+            runner: macos-latest
+    runs-on: ${{ matrix.runner }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -76,6 +84,9 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '18'
+
+      - name: Verify runner architecture
+        run: uname -m
 
       - name: Import Apple Developer Certificate
         env:
@@ -96,16 +107,15 @@ jobs:
       - name: Resign modules
         run: npm run resign
 
-      - name: Build Electron App for Mac
-        run: npm run build && npx electron-builder --mac --config
+      - name: Build Electron App for Mac (${{ matrix.arch }})
+        run: npm run build && npx electron-builder --mac --${{ matrix.arch }} --config
         env:
           CSC_NAME: "Jan Vincent Lunge (BLH4PG2L7J)"
           CSC_KEYCHAIN: build.keychain
 
-      - name: Upload Mac Artifact
+      - name: Upload Mac Artifact (${{ matrix.arch }})
         uses: actions/upload-artifact@v4
         with:
-          name: mac-app
-          path: dist/*.dmg
+          name: mac-${{ matrix.arch }}-app
+          path: dist/*-${{ matrix.arch }}.dmg
           compression-level: 0
-
